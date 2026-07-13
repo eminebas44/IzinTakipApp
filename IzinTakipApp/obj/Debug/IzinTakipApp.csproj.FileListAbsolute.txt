@@ -116,3 +116,4 @@ C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\System.Web.Http.Cors.d
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\System.Web.Http.Cors.xml
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinKotalariGuncelleme.resources
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.GuncelModelGecisi.resources
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.valuetype_changes.resources

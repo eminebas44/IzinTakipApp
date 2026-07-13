@@ -3,404 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İzin Takip Sistemi</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>İzinTakip Portal - Giriş</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Rounded">
     <style>
         body {
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .navbar {
-            background-color: #2c3e50 !important;
-        }
-
-        .btn-primary {
-            background-color: #3498db;
-            border: none;
-        }
-
-            .btn-primary:hover {
-                background-color: #2980b9;
-            }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .toggle-link {
-            color: #3498db;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-            .toggle-link:hover {
-                text-decoration: underline;
-            }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
 
-    <div id="loginSection" class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card p-4 mt-5">
-                    <h3 class="text-center mb-4 text-secondary">İzin Takip Sistemi Giriş</h3>
-                    <div class="mb-3">
-                        <label class="form-label">E-posta Adresi</label>
-                        <input type="email" id="loginEmail" class="form-control" placeholder="ornek@sirket.com">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Şifre</label>
-                        <input type="password" id="loginPassword" class="form-control" placeholder="••••••">
-                    </div>
-                    <button onclick="login()" class="btn btn-primary w-100 py-2 mb-3">Giriş Yap</button>
-                    <p class="text-center m-0">Hesabınız yok mu? <span onclick="ekranDegistir('registerSection')" class="toggle-link">Kayıt Ol</span></p>
-                    <div id="loginError" class="alert alert-danger mt-3 hidden"></div>
-                </div>
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-100 p-8 transition-all duration-300">
+
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-sky-100 text-sky-600 rounded-2xl mb-4">
+                <span class="material-icons-rounded text-3xl">shield</span>
             </div>
+            <h1 class="text-2xl font-bold text-slate-800">İzinTakip Portal</h1>
+            <p class="text-sm text-slate-500 mt-1" id="page-subtitle">Kurumsal İzin Yönetim Sistemi</p>
         </div>
-    </div>
 
-    <div id="registerSection" class="container mt-5 hidden">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card p-4 mt-3">
-                    <h3 class="text-center mb-4 text-secondary">Yeni Personel Kaydı</h3>
-                    <div class="mb-2">
-                        <label class="form-label">Ad Soyad</label>
-                        <input type="text" id="regName" class="form-control" placeholder="Ahmet Yılmaz">
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">E-posta Adresi</label>
-                        <input type="email" id="regEmail" class="form-control" placeholder="ahmet@sirket.com">
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Şifre</label>
-                        <input type="password" id="regPassword" class="form-control" placeholder="••••••">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Rol / Yetki</label>
-                        <select id="regRole" class="form-select">
-                            <option value="0">Personel</option>
-                            <option value="1">Yönetici</option>
-                        </select>
-                    </div>
-                    <button onclick="kayitOl()" class="btn btn-success w-100 py-2 mb-3">Kaydı Tamamla</button>
-                    <p class="text-center m-0">Zaten hesabınız var mı? <span onclick="ekranDegistir('loginSection')" class="toggle-link">Giriş Yap</span></p>
-                    <div id="regError" class="alert alert-danger mt-3 hidden"></div>
-                </div>
-            </div>
+        <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-sm font-medium flex items-center gap-3">
+            <span class="material-icons-rounded" id="alert-icon">info</span>
+            <span id="alert-message"></span>
         </div>
-    </div>
 
-    <div id="appSection" class="hidden">
-        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-            <div class="container">
-                <a class="navbar-brand" href="#">İzin Modülü</a>
-                <div class="d-flex align-items-center">
-                    <span id="userWelcome" class="text-white me-3"></span>
-                    <button onclick="logout()" class="btn btn-outline-light btn-sm">Çıkış Yap</button>
-                </div>
-            </div>
-        </nav>
-
-        <div class="container">
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="card p-3 bg-white text-center">
-                        <h6 class="text-muted">Kalan Yıllık İzin Hakkınız</h6>
-                        <h2 id="badgeKalanIzin" class="text-primary m-0">0 Gün</h2>
-                    </div>
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">E-posta Adresi</label>
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:border-sky-500 focus-within:bg-white transition-all px-4 py-3">
+                    <span class="material-icons-rounded text-slate-400 text-xl mr-3 select-none">email</span>
+                    <input type="email" id="login-email" required placeholder="name@company.com"
+                           class="w-full bg-transparent border-none outline-none text-slate-700 placeholder-slate-400 p-0 m-0 focus:ring-0">
                 </div>
             </div>
 
-            <div id="personelPanel" class="row hidden">
-                <div class="col-md-4 mb-4">
-                    <div class="card p-4">
-                        <h4 class="mb-3 text-secondary">Yeni İzin Talebi</h4>
-                        <div class="mb-2">
-                            <label class="form-label">İzin Kategorisi</label>
-                            <select id="izinKategori" class="form-select">
-                                <option value="0">Yıllık İzin</option>
-                                <option value="1">Mazeret İzni</option>
-                                <option value="2">Hastalık İzni</option>
-                                <option value="3">İdari İzin</option>
-                                <option value="4">Ücretsiz İzin</option>
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Süre Tipi</label>
-                            <select id="izinSureTipi" class="form-select" onchange="toggleTarihAlanlari()">
-                                <option value="0">Tam Gün / Uzun Vadeli</option>
-                                <option value="1">Kısa Süreli (0.25 Gün)</option>
-                                <option value="2">Yarım Gün (0.5 Gün)</option>
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Başlangıç Tarihi</label>
-                            <input type="date" id="baslangicTarihi" class="form-control">
-                        </div>
-                        <div id="bitisTarihGrup" class="mb-2">
-                            <label class="form-label">Bitiş Tarihi</label>
-                            <input type="date" id="bitisTarihi" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Açıklama</label>
-                            <textarea id="izinAciklama" class="form-control" rows="2" placeholder="İzin gerekçesi..."></textarea>
-                        </div>
-                        <button onclick="talepOluştur()" class="btn btn-primary w-100">Talebi Gönder</button>
-                    </div>
-                </div>
-
-                <div class="col-md-8 mb-4">
-                    <div class="card p-4">
-                        <h4 class="mb-3 text-secondary">Geçmiş İzin Taleplerim</h4>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Kategori</th>
-                                        <th>Süre Tipi</th>
-                                        <th>Başlangıç</th>
-                                        <th>Bitiş</th>
-                                        <th>Toplam Gün</th>
-                                        <th>Durum</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="personelIzinTablo"></tbody>
-                            </table>
-                        </div>
-                    </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Giriş Şifresi</label>
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:border-sky-500 focus-within:bg-white transition-all px-4 py-3">
+                    <span class="material-icons-rounded text-slate-400 text-xl mr-3 select-none">lock</span>
+                    <input type="password" id="login-password" required placeholder="••••••••"
+                           class="w-full bg-transparent border-none outline-none text-slate-700 placeholder-slate-400 p-0 m-0 focus:ring-0">
                 </div>
             </div>
 
-            <div id="yoneticiPanel" class="row hidden">
-                <div class="col-md-12">
-                    <div class="card p-4">
-                        <h4 class="mb-3 text-secondary">Onay Bekleyen Personel İzinleri</h4>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Personel</th>
-                                        <th>Kategori</th>
-                                        <th>Süre Tipi</th>
-                                        <th>Başlangıç</th>
-                                        <th>Bitiş</th>
-                                        <th>Toplam</th>
-                                        <th>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="yoneticiOnayTablo"></tbody>
-                            </table>
-                        </div>
-                    </div>
+            <button type="submit" id="login-btn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-slate-800/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>Sisteme Giriş Yap</span>
+                <span class="material-icons-rounded text-lg">login</span>
+            </button>
+
+            <div class="text-center pt-4 border-t border-slate-100">
+                <button type="button" onclick="toggleForm(true)" class="text-xs font-bold text-sky-600 hover:text-sky-700 transition-all cursor-pointer">
+                    Şirket Kurulumu Yapmak mı İstiyorsunuz? Yeni Hesap Oluştur
+                </button>
+            </div>
+        </form>
+
+        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-5 hidden">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Yönetici Adı Soyadı</label>
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:border-sky-500 focus-within:bg-white transition-all px-4 py-3">
+                    <span class="material-icons-rounded text-slate-400 text-xl mr-3 select-none">person</span>
+                    <input type="text" id="reg-name" required placeholder="Emine Baş"
+                           class="w-full bg-transparent border-none outline-none text-slate-700 placeholder-slate-400 p-0 m-0 focus:ring-0">
                 </div>
             </div>
 
-        </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Yönetici E-posta</label>
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:border-sky-500 focus-within:bg-white transition-all px-4 py-3">
+                    <span class="material-icons-rounded text-slate-400 text-xl mr-3 select-none">email</span>
+                    <input type="email" id="reg-email" required placeholder="admin@company.com"
+                           class="w-full bg-transparent border-none outline-none text-slate-700 placeholder-slate-400 p-0 m-0 focus:ring-0">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Güvenli Şifre</label>
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:border-sky-500 focus-within:bg-white transition-all px-4 py-3">
+                    <span class="material-icons-rounded text-slate-400 text-xl mr-3 select-none">lock</span>
+                    <input type="password" id="reg-password" required placeholder="••••••••"
+                           class="w-full bg-transparent border-none outline-none text-slate-700 placeholder-slate-400 p-0 m-0 focus:ring-0">
+                </div>
+            </div>
+
+            <button type="submit" id="register-btn" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-sky-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>Şirket Hesabını Aktif Et</span>
+                <span class="material-icons-rounded text-lg">app_registration</span>
+            </button>
+
+            <div class="text-center pt-4 border-t border-slate-100">
+                <button type="button" onclick="toggleForm(false)" class="text-xs font-bold text-slate-600 hover:text-slate-700 transition-all cursor-pointer">
+                    Zaten bir şirket hesabınız var mı? Giriş Yap
+                </button>
+            </div>
+        </form>
+
     </div>
 
     <script>
-        const API_URL = "https://localhost:44379/api";
-        let aktifKullanici = null;
+        function toggleForm(showRegister) {
+            const loginForm = document.getElementById("login-form");
+            const regForm = document.getElementById("register-form");
+            const subtitle = document.getElementById("page-subtitle");
+            hideAlert();
 
-        function ekranDegistir(hedefId) {
-            document.getElementById("loginSection").classList.add("hidden");
-            document.getElementById("registerSection").classList.add("hidden");
-            document.getElementById("appSection").classList.add("hidden");
-            document.getElementById(hedefId).classList.remove("hidden");
-        }
-
-        function kayitOl() {
-            const name = document.getElementById("regName").value;
-            const email = document.getElementById("regEmail").value;
-            const password = document.getElementById("regPassword").value;
-            const role = parseInt(document.getElementById("regRole").value);
-            const errorDiv = document.getElementById("regError");
-
-            errorDiv.classList.add("hidden");
-
-            fetch(`${API_URL}/identity/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ Name: name, Email: email, Password: password, Role: role })
-            })
-                .then(res => {
-                    if (!res.ok) return res.text().then(text => { throw new Error(text) });
-                    return res.text();
-                })
-                .then(msg => {
-                    alert(msg);
-                    ekranDegistir("loginSection");
-                })
-                .catch(err => {
-                    errorDiv.innerText = err.message;
-                    errorDiv.classList.remove("hidden");
-                });
-        }
-
-        function login() {
-            const email = document.getElementById("loginEmail").value;
-            const password = document.getElementById("loginPassword").value;
-            const errorDiv = document.getElementById("loginError");
-
-            errorDiv.classList.add("hidden");
-
-            fetch(`${API_URL}/identity/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ Email: email, Password: password })
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error("Giriş bilgileri hatalı veya servis kapalı.");
-                    return res.json();
-                })
-                .then(data => {
-                    aktifKullanici = data;
-                    document.getElementById("loginSection").classList.add("hidden");
-                    document.getElementById("appSection").classList.remove("hidden");
-                    document.getElementById("userWelcome").innerText = `Hoş geldiniz, ${data.Name}`;
-                    document.getElementById("badgeKalanIzin").innerText = `${data.KalanYillikIzin} Gün`;
-
-                    if (data.Role === 0) {
-                        document.getElementById("personelPanel").classList.remove("hidden");
-                        personelIzinleriniYukle();
-                    } else if (data.Role === 1) {
-                        document.getElementById("yoneticiPanel").classList.remove("hidden");
-                        yoneticiOnayListesiniYukle();
-                    }
-                })
-                .catch(err => {
-                    errorDiv.innerText = err.message;
-                    errorDiv.classList.remove("hidden");
-                });
-        }
-
-        function toggleTarihAlanlari() {
-            const sureTipi = document.getElementById("izinSureTipi").value;
-            const bitisGrup = document.getElementById("bitisTarihGrup");
-            if (sureTipi === "1" || sureTipi === "2") {
-                bitisGrup.classList.add("hidden");
+            if (showRegister) {
+                loginForm.classList.add("hidden");
+                regForm.classList.remove("hidden");
+                subtitle.innerText = "Yeni Şirket ve Yönetici Kaydı";
             } else {
-                bitisGrup.classList.remove("hidden");
+                regForm.classList.add("hidden");
+                loginForm.classList.remove("hidden");
+                subtitle.innerText = "Kurumsal İzin Yönetim Sistemi";
             }
         }
 
-        function talepOluştur() {
-            const kategori = parseInt(document.getElementById("izinKategori").value);
-            const sureTipi = parseInt(document.getElementById("izinSureTipi").value);
-            const baslangic = document.getElementById("baslangicTarihi").value;
-            let bitis = document.getElementById("bitisTarihi").value;
-            const aciklama = document.getElementById("izinAciklama").value;
+        function showAlert(message, isSuccess = false) {
+            const box = document.getElementById("alert-box");
+            const msg = document.getElementById("alert-message");
+            const icon = document.getElementById("alert-icon");
 
-            if (sureTipi === 1 || sureTipi === 2) {
-                bitis = baslangic;
+            msg.innerText = message;
+            box.classList.remove("hidden", "bg-red-50", "text-red-700", "bg-emerald-50", "text-emerald-700");
+
+            if (isSuccess) {
+                box.classList.add("bg-emerald-50", "text-emerald-700");
+                icon.innerText = "check_circle";
+            } else {
+                box.classList.add("bg-red-50", "text-red-700");
+                icon.innerText = "error";
             }
+        }
 
-            const talepData = {
-                KullaniciID: aktifKullanici.ID,
-                Kategori: kategori,
-                SureTipi: sureTipi,
-                BaslangicTarihi: baslangic,
-                BitisTarihi: bitis,
-                Aciklama: aciklama
+        function hideAlert() {
+            document.getElementById("alert-box").classList.add("hidden");
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideAlert();
+
+            const btn = document.getElementById("login-btn");
+            btn.disabled = true;
+            btn.innerHTML = `<span>Giriş Yapılıyor...</span>`;
+
+            const payload = {
+                email: document.getElementById("login-email").value.trim(),
+                password: document.getElementById("login-password").value
             };
 
-            fetch(`${API_URL}/izinler/talep`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(talepData)
-            })
-                .then(res => {
-                    if (!res.ok) return res.text().then(text => { throw new Error(text) });
-                    return res.text();
-                })
-                .then(msg => {
-                    alert(msg);
-                    personelIzinleriniYukle();
-                })
-                .catch(err => alert(err.message));
-        }
-
-        function personelIzinleriniYukle() {
-            fetch(`${API_URL}/izinler/personel/${aktifKullanici.ID}`)
-                .then(res => res.json())
-                .then(data => {
-                    const tbody = document.getElementById("personelIzinTablo");
-                    tbody.innerHTML = "";
-                    const kategoriler = ["Yıllık İzin", "Mazeret İzni", "Hastalık İzni", "İdari İzin", "Ücretsiz İzin"];
-                    const sureTipleri = ["Tam Gün", "Kısa Süreli (0.25)", "Yarım Gün (0.5)"];
-                    const durumlar = ["Beklemede", "Onaylandı", "Reddedildi"];
-
-                    data.forEach(i => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${kategoriler[i.Kategori]}</td>
-                                <td>${sureTipleri[i.SureTipi]}</td>
-                                <td>${new Date(i.BaslangicTarihi).toLocaleDateString('tr-TR')}</td>
-                                <td>${new Date(i.BitisTarihi).toLocaleDateString('tr-TR')}</td>
-                                <td>${i.ToplamGun} Gün</td>
-                                <td><span class="badge ${i.Durum === 1 ? 'bg-success' : i.Durum === 2 ? 'bg-danger' : 'bg-warning'}">${durumlar[i.Durum]}</span></td>
-                            </tr>
-                        `;
-                    });
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert("Giriş başarılı! Yönlendiriliyorsunuz...", true);
+                    sessionStorage.setItem("user_data", JSON.stringify(data));
+
+                    setTimeout(() => {
+                        if (data.role === "1") {
+                            window.location.href = "admin.html";
+                        } else {
+                            window.location.href = "personel.html";
+                        }
+                    }, 1000);
+                } else {
+                    showAlert(data.message || "Giriş başarısız. Bilgilerinizi kontrol edin.");
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>Sisteme Giriş Yap</span><span class="material-icons-rounded text-lg">login</span>`;
+                }
+            } catch (error) {
+                showAlert("Sunucu bağlantı hatası oluştu.");
+                btn.disabled = false;
+                btn.innerHTML = `<span>Sisteme Giriş Yap</span><span class="material-icons-rounded text-lg">login</span>`;
+            }
         }
 
-        function yoneticiOnayListesiniYukle() {
-            fetch(`${API_URL}/izinler/yonetici/${aktifKullanici.ID}/onay-listesi`)
-                .then(res => res.json())
-                .then(data => {
-                    const tbody = document.getElementById("yoneticiOnayTablo");
-                    tbody.innerHTML = "";
-                    const kategoriler = ["Yıllık İzin", "Mazeret İzni", "Hastalık Yıllık İzin", "İdari İzin", "Ücretsiz İzin"];
-                    const sureTipleri = ["Tam Gün", "Kısa Süreli", "Yarım Gün"];
+        async function handleRegister(event) {
+            event.preventDefault();
+            hideAlert();
 
-                    data.forEach(i => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${i.PersonelAdi}</td>
-                                <td>${kategoriler[i.Kategori]}</td>
-                                <td>${sureTipleri[i.SureTipi]}</td>
-                                <td>${new Date(i.BaslangicTarihi).toLocaleDateString('tr-TR')}</td>
-                                <td>${new Date(i.BitisTarihi).toLocaleDateString('tr-TR')}</td>
-                                <td>${i.ToplamGun} Gün</td>
-                                <td>
-                                    <button onclick="kararVer(${i.ID}, 1)" class="btn btn-success btn-sm me-1">Onayla</button>
-                                    <button onclick="kararVer(${i.ID}, 2)" class="btn btn-danger btn-sm">Reddet</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
+            const btn = document.getElementById("register-btn");
+            btn.disabled = true;
+            btn.innerHTML = `<span>Şirket Kuruluyor...</span>`;
+
+            const payload = {
+                adminName: document.getElementById("reg-name").value.trim(),
+                email: document.getElementById("reg-email").value.trim(),
+                password: document.getElementById("reg-password").value
+            };
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-        }
 
-        function kararVer(izinId, durum) {
-            fetch(`${API_URL}/izinler/onayla-reddet`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ IzinID: izinId, Durum: durum })
-            })
-                .then(res => res.json())
-                .then(() => {
-                    alert("İzin durumu güncellendi.");
-                    yoneticiOnayListesiniYukle();
-                });
-        }
-
-        function logout() {
-            aktifKullanici = null;
-            ekranDegistir("loginSection");
-            document.getElementById("loginEmail").value = "";
-            document.getElementById("loginPassword").value = "";
+                if (response.ok) {
+                    showAlert("Şirket ve admin hesabı başarıyla oluşturuldu! Giriş yapabilirsiniz.", true);
+                    setTimeout(() => {
+                        toggleForm(false);
+                        document.getElementById("login-email").value = payload.email;
+                    }, 1500);
+                } else {
+                    const errorText = await response.text();
+                    showAlert(errorText || "Kayıt işlemi sırasında bir hata oluştu.");
+                }
+            } catch (error) {
+                showAlert("Sunucu bağlantı hatası oluştu.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Şirket Hesabını Aktif Et</span><span class="material-icons-rounded text-lg">app_registration</span>`;
+            }
         }
     </script>
 </body>

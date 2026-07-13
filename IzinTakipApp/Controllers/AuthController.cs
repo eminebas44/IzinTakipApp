@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Web.Http;
 using System.Web.Helpers;
+using System.Linq;
+using System.Collections.Generic;
 using IzinTakipApp.Data;
 using IzinTakipApp.Models;
 using IzinTakipApp.Enums;
@@ -19,31 +21,31 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var personeller = System.Linq.Queryable.Where(db.Users, u => u.Role == "0");
-                    var liste = new System.Collections.Generic.List<object>();
+                    var personeller = db.Users.Where(u => u.Role == "0").ToList();
+                    var liste = new List<object>();
 
                     foreach (var p in personeller)
                     {
                         liste.Add(new
                         {
+                            id = p.ID,
                             ad = p.Name,
                             rol = "Personel",
                             eposta = p.Email,
-                            kalanIzin = p.KalanYillikIzin + " Gün"
+                            kalanIzin = p.KalanYillikIzin,
+                            mazeretKota = p.MazeretIzinKotasi,
+                            ucretsizKota = p.UcretsizIzinKotasi
                         });
                     }
-
                     return Ok(liste);
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("PERSONEL LISTESI HATASI: " + ex.ToString());
-                return BadRequest("Veritabanından personeller çekilemedi: " + ex.Message);
+                return BadRequest("Personeller çekilemedi: " + ex.Message);
             }
         }
 
-        // FİLTRELİ YENİ SÜRÜM: Sadece bu yöneticiye bağlı bekleyen izinleri getirir
         [HttpGet]
         [Route("get-pending-leaves/{adminId}")]
         public IHttpActionResult GetPendingLeaves(int adminId)
@@ -52,24 +54,35 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var talepler = System.Linq.Queryable.Where(db.IzinTalepleri,
-                        t => t.Durum == IzinDurumu.Beklemede && t.Kullanici.ManagerID == adminId);
+                    var tumTalepler = db.IzinTalepleri.Where(t => t.Durum == IzinDurumu.Beklemede).ToList();
+                    var tumKullanicilar = db.Users.ToList();
 
-                    var liste = new System.Collections.Generic.List<object>();
+                    var benimPersonelIdleri = tumKullanicilar
+                                                 .Where(u => u.ManagerID == adminId && u.Role == "0")
+                                                 .Select(u => u.ID)
+                                                 .ToList();
 
-                    foreach (var t in talepler)
+                    var liste = new List<object>();
+
+                    foreach (var talep in tumTalepler)
                     {
-                        liste.Add(new
+                        if (benimPersonelIdleri.Contains(talep.KullaniciId))
                         {
-                            id = t.ID,
-                            personelId = t.KullaniciID,
-                            ad = t.Kullanici != null ? t.Kullanici.Name : "İsimsiz Personel",
-                            kategori = ((int)t.Kategori).ToString(),
-                            baslangic = t.BaslangicTarihi.ToString("yyyy-MM-dd"),
-                            bitis = t.BitisTarihi.ToString("yyyy-MM-dd"),
-                            gun = t.ToplamGun,
-                            aciklama = t.Aciklama
-                        });
+                            var personel = tumKullanicilar.FirstOrDefault(u => u.ID == talep.KullaniciId);
+                            string personelAdi = personel != null ? personel.Name : "Bilinmeyen Personel";
+
+                            liste.Add(new
+                            {
+                                id = talep.ID,
+                                personelId = talep.KullaniciId,
+                                ad = personelAdi,
+                                kategori = (int)talep.Kategori,
+                                baslangic = talep.BaslangicTarihi.ToString("yyyy-MM-dd"),
+                                bitis = talep.BitisTarihi.ToString("yyyy-MM-dd"),
+                                gun = talep.ToplamGun,
+                                aciklama = talep.Aciklama
+                            });
+                        }
                     }
 
                     return Ok(liste);
@@ -77,8 +90,7 @@ namespace IzinTakip.API.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("IZIN LISTESI HATASI: " + ex.ToString());
-                return BadRequest("Bekleyen izin talepleri çekilemedi: " + ex.Message);
+                return BadRequest("Bekleyen izinler çekilemedi: " + ex.Message);
             }
         }
 
@@ -90,15 +102,14 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var talepler = System.Linq.Queryable.Where(db.IzinTalepleri, t => t.KullaniciID == userId);
-                    var liste = new System.Collections.Generic.List<object>();
+                    var talepler = db.IzinTalepleri.Where(t => t.KullaniciId == userId).ToList();
+                    var liste = new List<object>();
 
                     foreach (var t in talepler)
                     {
                         liste.Add(new
                         {
                             id = t.ID,
-                            personelId = t.KullaniciID,
                             durum = (int)t.Durum,
                             kategori = (int)t.Kategori,
                             baslangic = t.BaslangicTarihi.ToString("yyyy-MM-dd"),
@@ -112,7 +123,7 @@ namespace IzinTakip.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("Kullanıcı izinleri çekilemedi: " + ex.Message);
+                return BadRequest("Personel izin geçmişi çekilemedi: " + ex.Message);
             }
         }
 
@@ -120,17 +131,14 @@ namespace IzinTakip.API.Controllers
         [Route("register")]
         public IHttpActionResult Register([FromBody] RegisterDto dto)
         {
-            if (dto == null)
-                return BadRequest("Backend Hatası: Veri çözülemedi.");
+            if (dto == null) return BadRequest("Geçersiz kayıt verisi.");
 
             try
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var varOlanKullanici = System.Linq.Queryable.FirstOrDefault(db.Users, u => u.Email == dto.Email);
-
-                    if (varOlanKullanici != null)
-                        return BadRequest("Bu e-posta adresi zaten sisteme kayıtlı.");
+                    var varOlan = db.Users.FirstOrDefault(u => u.Email == dto.Email);
+                    if (varOlan != null) return BadRequest("Bu e-posta adresi zaten kayıtlı.");
 
                     Kullanici yeniKullanici = new Kullanici
                     {
@@ -146,38 +154,30 @@ namespace IzinTakip.API.Controllers
 
                     db.Users.Add(yeniKullanici);
                     db.SaveChanges();
+                    return Ok("Şirket yöneticisi kaydı başarılı.");
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest("Veritabanı hatası: " + ex.Message);
+                return BadRequest("Kayıt hatası: " + ex.Message);
             }
-
-            return Ok("Şirket kurulumu başarıyla tamamlandı!");
         }
 
         [HttpPost]
         [Route("register-personel")]
         public IHttpActionResult RegisterPersonel([FromBody] RegisterDto dto)
         {
-            if (dto == null)
-                return BadRequest("Backend Hatası: Veri boş.");
+            if (dto == null) return BadRequest("Personel verisi boş.");
 
             try
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var varOlanKullanici = System.Linq.Queryable.FirstOrDefault(db.Users, u => u.Email == dto.Email);
-
-                    if (varOlanKullanici != null)
-                        return BadRequest("Bu e-posta adresiyle kayıtlı bir personel zaten var.");
+                    var varOlan = db.Users.FirstOrDefault(u => u.Email == dto.Email);
+                    if (varOlan != null) return BadRequest("Bu personel zaten kayıtlı.");
 
                     DateTime iseGiris = dto.IseBaslamaTarihi ?? DateTime.Now;
-                    DateTime bugun = DateTime.Now;
-
-                    int kidemYili = bugun.Year - iseGiris.Year;
-                    if (iseGiris > bugun.AddYears(-kidemYili)) kidemYili--;
-
+                    int kidemYili = DateTime.Now.Year - iseGiris.Year;
                     int tanimlananIzinGunu = kidemYili >= 5 ? 20 : kidemYili >= 1 ? 14 : 5;
 
                     Kullanici yeniPersonel = new Kullanici
@@ -195,64 +195,65 @@ namespace IzinTakip.API.Controllers
 
                     db.Users.Add(yeniPersonel);
                     db.SaveChanges();
+                    return Ok("Personel başarıyla tanımlandı.");
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest("Veritabanı hatası: " + ex.Message);
+                return BadRequest("Personel eklenemedi: " + ex.Message);
             }
-
-            return Ok("Personel başarıyla veritabanına kaydedildi!");
         }
 
         [HttpPost]
         [Route("update-company-quotas")]
         public IHttpActionResult UpdateCompanyQuotas([FromBody] CompanyQuotaDto dto)
         {
-            if (dto == null) return BadRequest("Geçersiz kota verisi.");
+            if (dto == null) return BadRequest("Kota verisi eksik.");
 
             try
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var adminUser = System.Linq.Queryable.FirstOrDefault(db.Users, u => u.ID == dto.AdminId);
+                    var adminUser = db.Users.FirstOrDefault(u => u.ID == dto.AdminId);
                     if (adminUser == null) return BadRequest("Yönetici bulunamadı.");
 
                     adminUser.MazeretIzinKotasi = dto.MazeretKota;
                     adminUser.UcretsizIzinKotasi = dto.UcretsizKota;
 
                     db.SaveChanges();
+                    return Ok("Şirket kotaları başarıyla güncellendi.");
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest("Veritabanı hatası: " + ex.Message);
+                return BadRequest("Kota güncelleme hatası: " + ex.Message);
             }
-
-            return Ok("Şirket izin kotaları başarıyla güncellendi!");
         }
 
         [HttpPost]
         [Route("request-leave")]
         public IHttpActionResult RequestLeave([FromBody] RequestLeaveDto dto)
         {
-            if (dto == null) return BadRequest("Geçersiz talep verisi.");
+            if (dto == null) return BadRequest("Talep verisi eksik.");
 
             try
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var personel = System.Linq.Queryable.FirstOrDefault(db.Users, u => u.ID == dto.KullaniciId);
+                    var personel = db.Users.FirstOrDefault(u => u.ID == dto.KullaniciId);
                     if (personel == null) return BadRequest("Personel bulunamadı.");
+
+                    if (dto.Kategori == IzinKategorisi.YillikIzin && dto.ToplamGun > personel.KalanYillikIzin)
+                        return BadRequest("Yıllık izin limitinizi aşıyorsunuz.");
 
                     IzinTalebi yeniTalep = new IzinTalebi
                     {
-                        KullaniciID = dto.KullaniciId,
+                        KullaniciId = dto.KullaniciId,
                         Kategori = dto.Kategori,
                         SureTipi = dto.SureTipi,
                         BaslangicTarihi = dto.BaslangicTarihi,
                         BitisTarihi = dto.BitisTarihi,
-                        ToplamGun = dto.ToplamGun,
+                        ToplamGun = (int)dto.ToplamGun,
                         Durum = IzinDurumu.Beklemede,
                         Aciklama = dto.Aciklama,
                         OlusturulmaTarihi = DateTime.Now
@@ -260,42 +261,37 @@ namespace IzinTakip.API.Controllers
 
                     db.IzinTalepleri.Add(yeniTalep);
                     db.SaveChanges();
+                    return Ok("İzin talebi başarıyla iletildi.");
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest("İzin talebi oluşturulurken hata: " + ex.Message);
+                return BadRequest("Talep oluşturulamadı: " + ex.Message);
             }
-
-            return Ok("İzin talebiniz başarıyla yöneticiye iletildi!");
         }
 
         [HttpPost]
         [Route("respond-leave")]
         public IHttpActionResult RespondLeave([FromBody] RespondLeaveDto dto)
         {
-            if (dto == null) return BadRequest("Geçersiz işlem verisi.");
+            if (dto == null) return BadRequest("İşlem verisi eksik.");
 
             try
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var talep = System.Linq.Queryable.FirstOrDefault(db.IzinTalepleri, t => t.ID == dto.TalepId);
-                    if (talep == null) return BadRequest("İzin talebi bulunamadı.");
+                    var talep = db.IzinTalepleri.FirstOrDefault(t => t.ID == dto.TalepId);
+                    if (talep == null) return BadRequest("Talep bulunamadı.");
 
-                    var personel = System.Linq.Queryable.FirstOrDefault(db.Users, u => u.ID == talep.KullaniciID);
-                    if (personel == null) return BadRequest("İlgili personel bulunamadı.");
+                    var personel = db.Users.FirstOrDefault(u => u.ID == talep.KullaniciId);
+                    if (personel == null) return BadRequest("Personel bulunamadı.");
 
                     if (dto.OnaylandiMi)
                     {
                         talep.Durum = IzinDurumu.Onaylandi;
-
-                        if (talep.Kategori == IzinKategorisi.YillikIzin)
-                            personel.KalanYillikIzin -= (int)talep.ToplamGun;
-                        else if (talep.Kategori == IzinKategorisi.MazeretIzni)
-                            personel.MazeretIzinKotasi -= (int)talep.ToplamGun;
-                        else if (talep.Kategori == IzinKategorisi.UcretsizIzin)
-                            personel.UcretsizIzinKotasi -= (int)talep.ToplamGun;
+                        if (talep.Kategori == IzinKategorisi.YillikIzin) personel.KalanYillikIzin -= talep.ToplamGun;
+                        if (talep.Kategori == IzinKategorisi.MazeretIzni) personel.MazeretIzinKotasi -= talep.ToplamGun;
+                        if (talep.Kategori == IzinKategorisi.UcretsizIzin) personel.UcretsizIzinKotasi -= talep.ToplamGun;
                     }
                     else
                     {
@@ -303,12 +299,12 @@ namespace IzinTakip.API.Controllers
                     }
 
                     db.SaveChanges();
-                    return Ok("İzin talebi başarıyla sonuçlandırıldı!");
+                    return Ok("İzin talebi sonuçlandırıldı.");
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest("Veritabanı hatası: " + ex.Message);
+                return BadRequest("İşlem başarısız: " + ex.Message);
             }
         }
 
@@ -317,39 +313,46 @@ namespace IzinTakip.API.Controllers
         public IHttpActionResult Login([FromBody] LoginDto dto)
         {
             if (dto == null || string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Password))
-            {
                 return BadRequest("Lütfen tüm alanları doldurun.");
-            }
 
             try
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var kullanici = System.Linq.Queryable.FirstOrDefault(db.Users, u => u.Email == dto.Email);
-                    if (kullanici == null) return BadRequest("E-posta adresi sistemde bulunamadı.");
+                    var kullanici = db.Users.FirstOrDefault(u => u.Email == dto.Email);
+                    if (kullanici == null) return BadRequest("E-posta adresi bulunamadı.");
 
                     bool sifreDogruMu = false;
                     try { sifreDogruMu = Crypto.VerifyHashedPassword(kullanici.PasswordHash, dto.Password); }
                     catch { sifreDogruMu = (kullanici.PasswordHash == dto.Password); }
 
-                    if (!sifreDogruMu) return BadRequest("Girdiğiniz şifre hatalı.");
+                    if (!sifreDogruMu) return BadRequest("Hatalı şifre.");
+
+                    int userId = kullanici.ID;
+                    string userName = kullanici.Name;
+                    string userEmail = kullanici.Email;
+                    string userRole = kullanici.Role;
+                    double kalanIzin = kullanici.KalanYillikIzin;
+                    double mazeretKota = kullanici.MazeretIzinKotasi;
+                    double ucretsizKota = kullanici.UcretsizIzinKotasi;
 
                     return Ok(new
                     {
-                        Message = "Giriş başarılı!",
-                        Id = kullanici.ID,
-                        Name = kullanici.Name,
-                        Email = kullanici.Email,
-                        Role = kullanici.Role,
-                        KalanIzin = kullanici.KalanYillikIzin,
-                        MazeretKota = kullanici.MazeretIzinKotasi,
-                        UcretsizKota = kullanici.UcretsizIzinKotasi
+                        message = "Giriş başarılı!",
+                        UserID = userId,
+                        ID = userId,
+                        name = userName,
+                        email = userEmail,
+                        role = userRole,
+                        kalanIzin = kalanIzin,
+                        mazeretKota = mazeretKota,
+                        ucretsizKota = ucretsizKota
                     });
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest("Sistem Hatası: " + ex.Message);
+                return BadRequest("Sistem hatası: " + ex.Message);
             }
         }
     }

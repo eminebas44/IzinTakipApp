@@ -27,11 +27,11 @@ namespace IzinTakipApp.Models
 
         public DateTime IseGirisTarihi { get; set; }
 
-        public int KalanYillikIzin { get; set; }
+        public double KalanYillikIzin { get; set; }
 
-        public int MazeretIzinKotasi { get; set; }
+        public double MazeretIzinKotasi { get; set; }
 
-        public int UcretsizIzinKotasi { get; set; }
+        public double UcretsizIzinKotasi { get; set; }
 
         public int? ManagerID { get; set; }
 

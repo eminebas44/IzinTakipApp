@@ -1,6 +1,7 @@
-﻿using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Http.Cors;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace IzinTakipApp
 {
@@ -8,8 +9,7 @@ namespace IzinTakipApp
     {
         public static void Register(HttpConfiguration config)
         {
-            config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
-
+            // Web API rotaları
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
@@ -18,11 +18,18 @@ namespace IzinTakipApp
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            var appXmlType = config.Formatters.XmlFormatter.SupportedMediaTypes
-                .FirstOrDefault(t => t.MediaType == "application/xml");
+            // 🚨 500 HATASINI BİTİREN KRİTİK JSON AYARLARI
+            var json = config.Formatters.JsonFormatter;
 
-            if (appXmlType != null)
-                config.Formatters.XmlFormatter.SupportedMediaTypes.Remove(appXmlType);
+            // Nesne ilişkilerindeki döngüsel kilitlenmeleri görmezden gel ve engelle:
+            json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+            // Nesnelerin JavaScript dünyasına camelCase (küçük harfle başlayan) gitmesini sağla:
+            json.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            json.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+
+            // XML çıktısını kapat
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
         }
     }
 }
