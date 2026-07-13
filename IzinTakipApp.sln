@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IzinTakipApp", "IzinTakipApp\IzinTakipApp.csproj", "{6AFE0866-14C0-4255-957D-808B12B7F793}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6AFE0866-14C0-4255-957D-808B12B7F793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AFE0866-14C0-4255-957D-808B12B7F793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AFE0866-14C0-4255-957D-808B12B7F793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AFE0866-14C0-4255-957D-808B12B7F793}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8DCC407D-C198-4D79-9148-CD828021CEBB}
+	EndGlobalSection
+EndGlobal
