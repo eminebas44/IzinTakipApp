@@ -3,40 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İzinTakip Portal - Yönetici Paneli</title>
+    <title>İzinPort - Yönetici Paneli</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+
+        .introjs-tooltip {
+            background-color: #0b1329 !important;
+            color: #f1f5f9 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3) !important;
+            font-family: 'Inter', sans-serif !important;
+            padding: 20px !important;
+            max-width: 320px !important;
+        }
+
+        .introjs-arrow {
+            border-bottom-color: #0b1329 !important;
+            border-top-color: #0b1329 !important;
+            border-left-color: #0b1329 !important;
+            border-right-color: #0b1329 !important;
+        }
+
+        .introjs-badge {
+            background-color: #0091ff !important;
+            color: white !important;
+            font-weight: bold !important;
+        }
+
+        .introjs-button {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            text-shadow: none !important;
+            border-radius: 8px !important;
+            transition: all 0.2s ease !important;
+            border: none !important;
+            padding: 8px 14px !important;
+        }
+
+        .introjs-nextbutton, .introjs-donebutton {
+            background: #0091ff !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(0, 145, 255, 0.2) !important;
+        }
+
+            .introjs-nextbutton:hover, .introjs-donebutton:hover {
+                background: #0077d6 !important;
+            }
+
+        .introjs-prevbutton {
+            background: #241a2f !important;
+            color: #f1f5f9 !important;
+        }
+
+            .introjs-prevbutton:hover {
+                background: #2e223c !important;
+            }
+
+        .introjs-skipbutton {
+            color: #94a3b8 !important;
+            font-weight: 500 !important;
+        }
+
+            .introjs-skipbutton:hover {
+                color: #f1f5f9 !important;
+            }
+
+        .introjs-bullets ul li a {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
+            .introjs-bullets ul li a.active {
+                background: #0091ff !important;
+                width: 20px !important;
+                border-radius: 4px !important;
+            }
+
+        .introjs-helperLayer {
+            background-color: rgba(255, 255, 255, 0.03) !important;
+            border: 2px solid #0091ff !important;
+            box-shadow: 0 0 20px rgba(0, 145, 255, 0.2) !important;
+            border-radius: 16px !important;
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col md:flex-row">
 
-    <aside class="w-full md:w-64 bg-slate-900 text-white p-6 flex flex-col justify-between shrink-0 md:min-h-screen">
+    <aside class="w-full md:w-64 bg-[#0b1329] text-white p-6 flex flex-col justify-between shrink-0 md:min-h-screen shadow-xl">
         <div class="space-y-8">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-sky-500 rounded-xl flex items-center justify-center font-bold text-white select-none">İT</div>
-                <h2 class="text-lg font-bold tracking-wide">İzinTakip Portal</h2>
+            <div class="flex flex-col items-center text-center select-none space-y-4 pb-6 border-b border-slate-800/60">
+                <img src="logo.png" alt="İzinPort Logo" class="h-12 w-auto object-contain mx-auto">
+                <h2 class="font-bold text-white text-lg tracking-tight">İzinPort</h2>
             </div>
 
-            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/30">
+            <div class="bg-slate-800/30 p-4 rounded-xl border border-slate-800/50">
                 <p class="text-xs text-slate-400 font-medium">Aktif Yönetici</p>
                 <h4 class="font-bold text-sm text-slate-200 mt-0.5" id="admin-name">Yükleniyor...</h4>
                 <span class="inline-block text-[10px] font-bold bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded mt-1.5 uppercase tracking-wider">Şirket Yöneticisi</span>
             </div>
 
-            <div class="space-y-4 pt-4 border-t border-slate-800">
+            <div id="step-admin-policy" class="space-y-4 pt-4 border-t border-slate-800/80">
                 <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Şirket İzin Politikası</h5>
                 <form onsubmit="handleQuotaUpdate(event)" class="space-y-3.5">
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1.5">Mazeret İzni (Gün)</label>
-                        <input type="number" id="quota-mazeret-input" required value="5" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                        <input type="number" id="quota-mazeret-input" required value="5" class="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1.5">Ücretsiz İzin (Gün)</label>
-                        <input type="number" id="quota-ucretsiz-input" required value="15" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                        <input type="number" id="quota-ucretsiz-input" required value="15" class="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
                     </div>
                     <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 rounded-lg text-xs transition-all cursor-pointer">Kotaları Tanımla</button>
                 </form>
@@ -51,12 +132,12 @@
                 <h1 class="text-xl font-bold text-slate-800">Yönetici Kontrol ve Onay Paneli</h1>
                 <p class="text-xs text-slate-500 mt-1">Personel tanımlamalarını ve izin taleplerini bu ekrandan yönetebilirsiniz.</p>
             </div>
-            <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-3 rounded-xl text-sm shadow-md transition-all cursor-pointer">Yeni Personel Tanımla</button>
+            <button id="step-admin-register" onclick="openModal()" class="bg-[#0091ff] hover:bg-sky-600 text-white font-semibold px-5 py-3 rounded-xl text-sm shadow-md transition-all cursor-pointer">Yeni Personel Tanımla</button>
         </div>
 
         <div id="alert-box" class="hidden p-4 rounded-xl text-sm font-medium"></div>
 
-        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div id="step-admin-leaves" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-100"><h3 class="font-bold text-slate-800 text-sm">Onay Bekleyen Personel İzin Talepleri</h3></div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -76,7 +157,7 @@
             <div id="no-leaves-message" class="hidden p-8 text-center text-sm text-slate-400 font-medium">Şu an onay bekleyen bir izin talebi yok.</div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div id="step-admin-personels" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-100"><h3 class="font-bold text-slate-800 text-sm">Sistemde Tanımlı Şirket Personelleri</h3></div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -125,6 +206,7 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
     <script>
         let currentUser = null;
         let adminLogID = 0;
@@ -136,12 +218,59 @@
             currentUser = JSON.parse(sessionData);
             if (currentUser.role !== "1") { window.location.href = "personel.html"; return; }
 
-            // 🚨 Hepsini güvenceye aldık
-            adminLogID = currentUser.id || currentUser.ID || currentUser.Id || 0;
+            adminLogID = currentUser.UserID || currentUser.id || currentUser.ID || currentUser.Id || 0;
 
             document.getElementById("admin-name").innerText = currentUser.name;
+
+            document.getElementById("quota-mazeret-input").value = currentUser.mazeretKota || 5;
+            document.getElementById("quota-ucretsiz-input").value = currentUser.ucretsizKota || 15;
+
             loadAllData();
+
+            const isFirst = currentUser.isFirstLogin === true || currentUser.isFirstLogin === "true" || currentUser.IsFirstLogin === true || currentUser.IsFirstLogin === "true";
+            const localOnboardingKey = `onboarding_completed_admin_${adminLogID}`;
+            const isLocalCompleted = localStorage.getItem(localOnboardingKey) === "true";
+
+            if (isFirst && !isLocalCompleted) {
+                localStorage.setItem(localOnboardingKey, "true");
+                setTimeout(() => {
+                    introJs().setOptions({
+                        steps: [
+                            { element: '#step-admin-policy', intro: 'Şirket genelindeki tüm personeller için geçerli mazeret ve ücretsiz izin kotalarını buradan dinamik olarak güncelleyebilirsiniz.' },
+                            { element: '#step-admin-register', intro: 'Şirketinize yeni katılacak olan personelleri, sisteme kayıt etmek için bu butona tıklayarak formu açabilirsiniz.' },
+                            { element: '#step-admin-leaves', intro: 'Personellerinizden gelen onay bekleyen aktif izin talepleri burada listelenir. Tek tıkla onaylayabilir veya reddedebilirsiniz.' },
+                            { element: '#step-admin-personels', intro: 'Sisteminizde tanımlı olan tüm personellerin güncel listesini ve kalan yıllık izin haklarını bu alandan anlık görebilirsiniz.' }
+                        ],
+                        nextLabel: 'İleri ➔',
+                        prevLabel: '➔ Geri',
+                        skipLabel: 'Atla',
+                        doneLabel: 'Tamamla',
+                        overlayOpacity: 0.7,
+                        showStepNumbers: false,
+                        disableInteraction: true
+                    })
+                        .oncomplete(async () => {
+                            await finishOnboarding(adminLogID, localOnboardingKey);
+                        })
+                        .onexit(async () => {
+                            await finishOnboarding(adminLogID, localOnboardingKey);
+                        })
+                        .start();
+                }, 1000);
+            }
         });
+
+        async function finishOnboarding(userId, localKey) {
+            localStorage.setItem(localKey, "true");
+            try {
+                const response = await fetch(`/api/auth/complete-onboarding/${userId}`, { method: 'POST' });
+                if (response.ok) {
+                    currentUser.isFirstLogin = false;
+                    currentUser.IsFirstLogin = false;
+                    sessionStorage.setItem("user_data", JSON.stringify(currentUser));
+                }
+            } catch (e) { console.error("Onboarding tamamlanma kaydı başarısız:", e); }
+        }
 
         function loadAllData() { getPersonelsList(); getPendingLeaves(); }
 
@@ -155,20 +284,26 @@
 
         async function getPersonelsList() {
             try {
-                const response = await fetch('/api/auth/get-personels');
+                const response = await fetch(`/api/auth/get-personels/${adminLogID}`);
                 if (response.ok) {
                     const personeller = await response.json();
                     const tbody = document.getElementById("personels-table");
                     tbody.innerHTML = "";
+
+                    if (personeller.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-slate-400 font-medium">Şirketinize tanımlı herhangi bir personel bulunamadı.</td></tr>`;
+                        return;
+                    }
+
                     personeller.forEach(p => {
                         const tr = document.createElement("tr");
                         tr.className = "hover:bg-slate-50/80 transition-all";
                         tr.innerHTML = `
-                                <td class="px-6 py-4 font-semibold text-slate-800">${p.ad}</td>
-                                <td class="px-6 py-4 text-xs font-medium text-slate-400">${p.rol}</td>
-                                <td class="px-6 py-4 text-slate-500">${p.eposta}</td>
-                                <td class="px-6 py-4 font-bold text-sky-600">${p.kalanIzin} Gün</td>
-                            `;
+                                            <td class="px-6 py-4 font-semibold text-slate-800">${p.ad}</td>
+                                            <td class="px-6 py-4 text-xs font-medium text-slate-400">${p.rol}</td>
+                                            <td class="px-6 py-4 text-slate-500">${p.eposta}</td>
+                                            <td class="px-6 py-4 font-bold text-sky-600">${p.kalanIzin} Gün</td>
+                                        `;
                         tbody.appendChild(tr);
                     });
                 }
@@ -189,22 +324,22 @@
                     msgBox.classList.add("hidden");
                     talepler.forEach(t => {
                         let katMetni = 'Yıllık İzin';
-                        if (t.kategori === 1) katMetni = 'Mazeret İzni';
-                        if (t.kategori === 2) katMetni = 'Ücretsiz İzin';
+                        if (t.kategori === 3) katMetni = 'Mazeret İzni';
+                        if (t.kategori === 5) katMetni = 'Ücretsiz İzin';
 
                         const tr = document.createElement("tr");
                         tr.className = "hover:bg-slate-50/80 transition-all";
                         tr.innerHTML = `
-                                <td class="px-6 py-4 font-semibold text-slate-800">${t.ad}</td>
-                                <td class="px-6 py-4 text-xs font-medium text-slate-500">${katMetni}</td>
-                                <td class="px-6 py-4 text-slate-500 text-xs">${t.baslangic} / ${t.bitis}</td>
-                                <td class="px-6 py-4 font-bold text-slate-700">${t.gun} Gün</td>
-                                <td class="px-6 py-4 text-slate-500 text-xs max-w-[150px] truncate">${t.aciklama}</td>
-                                <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                    <button onclick="respondLeave(${t.id}, true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Onayla</button>
-                                    <button onclick="respondLeave(${t.id}, false)" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Reddet</button>
-                                </td>
-                            `;
+                                            <td class="px-6 py-4 font-semibold text-slate-800">${t.ad}</td>
+                                            <td class="px-6 py-4 text-xs font-medium text-slate-500">${katMetni}</td>
+                                            <td class="px-6 py-4 text-slate-500 text-xs">${t.baslangic} / ${t.bitis}</td>
+                                            <td class="px-6 py-4 font-bold text-slate-700">${t.gun} Gün</td>
+                                            <td class="px-6 py-4 text-slate-500 text-xs max-w-[150px] truncate">${t.aciklama}</td>
+                                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                                                <button onclick="respondLeave(${t.id}, true)" class="bg-[#0091ff] hover:bg-sky-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Onayla</button>
+                                                <button onclick="respondLeave(${t.id}, false)" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Reddet</button>
+                                            </td>
+                                        `;
                         tbody.appendChild(tr);
                     });
                 }
@@ -234,7 +369,7 @@
                 Password: document.getElementById("p-password").value,
                 IseBaslamaTarihi: document.getElementById("p-date").value,
                 Role: "0",
-                ManagerID: adminLogID // 🚨 %100 BÜYÜK HARFLİ C# DTO FORMATI
+                ManagerID: adminLogID
             };
 
             try {

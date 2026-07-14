@@ -33,6 +33,8 @@ namespace IzinTakipApp.Models
 
         public double UcretsizIzinKotasi { get; set; }
 
+        public bool IsFirstLogin { get; set; } = true;
+
         public int? ManagerID { get; set; }
 
         [ForeignKey("ManagerID")]

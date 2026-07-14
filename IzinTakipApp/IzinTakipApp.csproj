@@ -201,6 +201,10 @@
     <Compile Include="Migrations\202607131245246_valuetype_changes.designer.cs">
       <DependentUpon>202607131245246_valuetype_changes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202607141040115_AddIsFirstLoginToUsers.cs" />
+    <Compile Include="Migrations\202607141040115_AddIsFirstLoginToUsers.designer.cs">
+      <DependentUpon>202607141040115_AddIsFirstLoginToUsers.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\IzinTalebi.cs" />
     <Compile Include="Models\Kullanici.cs" />
@@ -309,6 +313,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202607131245246_valuetype_changes.resx">
       <DependentUpon>202607131245246_valuetype_changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202607141040115_AddIsFirstLoginToUsers.resx">
+      <DependentUpon>202607141040115_AddIsFirstLoginToUsers.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

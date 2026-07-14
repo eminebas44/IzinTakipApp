@@ -14,14 +14,14 @@ namespace IzinTakip.API.Controllers
     public class AuthController : ApiController
     {
         [HttpGet]
-        [Route("get-personels")]
-        public IHttpActionResult GetPersonels()
+        [Route("get-personels/{adminId}")]
+        public IHttpActionResult GetPersonels(int adminId)
         {
             try
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var personeller = db.Users.Where(u => u.Role == "0").ToList();
+                    var personeller = db.Users.Where(u => u.Role == "0" && u.ManagerID == adminId).ToList();
                     var liste = new List<object>();
 
                     foreach (var p in personeller)
@@ -107,16 +107,18 @@ namespace IzinTakip.API.Controllers
 
                     foreach (var t in talepler)
                     {
-                        liste.Add(new
                         {
-                            id = t.ID,
-                            durum = (int)t.Durum,
-                            kategori = (int)t.Kategori,
-                            baslangic = t.BaslangicTarihi.ToString("yyyy-MM-dd"),
-                            bitis = t.BitisTarihi.ToString("yyyy-MM-dd"),
-                            gun = t.ToplamGun,
-                            aciklama = t.Aciklama
-                        });
+                            liste.Add(new
+                            {
+                                id = t.ID,
+                                durum = (int)t.Durum,
+                                kategori = (int)t.Kategori,
+                                baslangic = t.BaslangicTarihi.ToString("yyyy-MM-dd"),
+                                bitis = t.BitisTarihi.ToString("yyyy-MM-dd"),
+                                gun = t.ToplamGun,
+                                aciklama = t.Aciklama
+                            });
+                        }
                     }
                     return Ok(liste);
                 }
@@ -180,6 +182,8 @@ namespace IzinTakip.API.Controllers
                     int kidemYili = DateTime.Now.Year - iseGiris.Year;
                     int tanimlananIzinGunu = kidemYili >= 5 ? 20 : kidemYili >= 1 ? 14 : 5;
 
+                    var adminUser = db.Users.FirstOrDefault(u => u.ID == dto.ManagerID);
+
                     Kullanici yeniPersonel = new Kullanici
                     {
                         Name = dto.AdminName,
@@ -188,8 +192,8 @@ namespace IzinTakip.API.Controllers
                         Role = "0",
                         IseGirisTarihi = iseGiris,
                         KalanYillikIzin = tanimlananIzinGunu,
-                        MazeretIzinKotasi = 5,
-                        UcretsizIzinKotasi = 15,
+                        MazeretIzinKotasi = adminUser != null ? adminUser.MazeretIzinKotasi : 5,
+                        UcretsizIzinKotasi = adminUser != null ? adminUser.UcretsizIzinKotasi : 15,
                         ManagerID = dto.ManagerID
                     };
 
@@ -220,6 +224,13 @@ namespace IzinTakip.API.Controllers
                     adminUser.MazeretIzinKotasi = dto.MazeretKota;
                     adminUser.UcretsizIzinKotasi = dto.UcretsizKota;
 
+                    var bagliPersoneller = db.Users.Where(u => u.ManagerID == dto.AdminId && u.Role == "0").ToList();
+                    foreach (var personel in bagliPersoneller)
+                    {
+                        personel.MazeretIzinKotasi = dto.MazeretKota;
+                        personel.UcretsizIzinKotasi = dto.UcretsizKota;
+                    }
+
                     db.SaveChanges();
                     return Ok("Şirket kotaları başarıyla güncellendi.");
                 }
@@ -243,17 +254,25 @@ namespace IzinTakip.API.Controllers
                     var personel = db.Users.FirstOrDefault(u => u.ID == dto.KullaniciId);
                     if (personel == null) return BadRequest("Personel bulunamadı.");
 
-                    if (dto.Kategori == IzinKategorisi.YillikIzin && dto.ToplamGun > personel.KalanYillikIzin)
+                    double hesaplananGun = (dto.BitisTarihi.Date - dto.BaslangicTarihi.Date).TotalDays + 1;
+
+                    if (dto.Kategori == IzinKategorisi.YillikIzin && hesaplananGun > personel.KalanYillikIzin)
                         return BadRequest("Yıllık izin limitinizi aşıyorsunuz.");
+
+                    if (dto.Kategori == IzinKategorisi.MazeretIzni && hesaplananGun > personel.MazeretIzinKotasi)
+                        return BadRequest("Mazeret izni limitinizi aşıyorsunuz.");
+
+                    if (dto.Kategori == IzinKategorisi.UcretsizIzin && hesaplananGun > personel.UcretsizIzinKotasi)
+                        return BadRequest("Ücretsiz izin limitinizi aşıyorsunuz.");
 
                     IzinTalebi yeniTalep = new IzinTalebi
                     {
                         KullaniciId = dto.KullaniciId,
                         Kategori = dto.Kategori,
                         SureTipi = dto.SureTipi,
-                        BaslangicTarihi = dto.BaslangicTarihi,
-                        BitisTarihi = dto.BitisTarihi,
-                        ToplamGun = (int)dto.ToplamGun,
+                        BaslangicTarihi = dto.BaslangicTarihi.Date,
+                        BitisTarihi = dto.BitisTarihi.Date,
+                        ToplamGun = hesaplananGun,
                         Durum = IzinDurumu.Beklemede,
                         Aciklama = dto.Aciklama,
                         OlusturulmaTarihi = DateTime.Now
@@ -335,6 +354,8 @@ namespace IzinTakip.API.Controllers
                     double kalanIzin = kullanici.KalanYillikIzin;
                     double mazeretKota = kullanici.MazeretIzinKotasi;
                     double ucretsizKota = kullanici.UcretsizIzinKotasi;
+                    DateTime? iseGirisTarihi = kullanici.IseGirisTarihi;
+                    bool isFirstLogin = kullanici.IsFirstLogin;
 
                     return Ok(new
                     {
@@ -346,13 +367,37 @@ namespace IzinTakip.API.Controllers
                         role = userRole,
                         kalanIzin = kalanIzin,
                         mazeretKota = mazeretKota,
-                        ucretsizKota = ucretsizKota
+                        ucretsizKota = ucretsizKota,
+                        iseGirisTarihi = iseGirisTarihi,
+                        isFirstLogin = isFirstLogin
                     });
                 }
             }
             catch (Exception ex)
             {
                 return BadRequest("Sistem hatası: " + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("complete-onboarding/{userId}")]
+        public IHttpActionResult CompleteOnboarding(int userId)
+        {
+            try
+            {
+                using (AppDbContext db = new AppDbContext())
+                {
+                    var kullanici = db.Users.FirstOrDefault(u => u.ID == userId);
+                    if (kullanici == null) return NotFound();
+
+                    kullanici.IsFirstLogin = false;
+                    db.SaveChanges();
+                    return Ok("Onboarding tamamlandı.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Durum güncellenirken hata oluştu: " + ex.Message);
             }
         }
     }
