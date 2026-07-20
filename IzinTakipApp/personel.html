@@ -101,14 +101,25 @@
 </head>
 <body class="bg-slate-50/50 h-screen overflow-hidden text-slate-800 antialiased flex flex-col md:flex-row">
 
-    <aside id="step-profile" class="w-full md:w-80 bg-[#0b1329] text-slate-200 md:h-screen p-8 flex flex-col justify-between shadow-xl md:overflow-y-auto z-40 shrink-0">
-        <div class="space-y-8">
+    <!-- LACİVERT YAN PANEL (AÇILIR / KAPANIR) -->
+    <aside id="sidebar" class="w-full md:w-80 bg-[#0b1329] text-slate-200 md:h-screen p-8 flex flex-col justify-between shadow-xl md:overflow-y-auto z-40 shrink-0 transition-all duration-300 relative">
+
+        <!-- YAN PANELİ AÇMA / KAPATMA BUTONU -->
+        <button onclick="toggleSidebar()" title="Yan Paneli Daralt/Genişlet" class="absolute top-4 right-3 p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-all cursor-pointer z-10">
+            <svg id="sidebar-toggle-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            </svg>
+        </button>
+
+        <div class="space-y-8" id="step-profile">
+            <!-- LOGO ALANI -->
             <div class="flex flex-col items-center text-center select-none space-y-4 pb-6 border-b border-slate-800/60">
                 <img src="logo.png" alt="İzinPort Logo" class="h-16 w-auto object-contain mx-auto">
-                <h2 class="font-bold text-white text-xl tracking-tight">İzinPort</h2>
+                <h2 class="font-bold text-white text-xl tracking-tight sidebar-text">İzinPort</h2>
             </div>
 
-            <div class="space-y-6 px-2">
+            <!-- AKTİF PERSONEL PROFİL BİLGİLERİ -->
+            <div class="space-y-6 px-2 sidebar-text">
                 <div class="space-y-1">
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Aktif Personel</span>
                     <span class="text-lg font-bold text-white tracking-tight block" id="user-profile-name">Yükleniyor...</span>
@@ -126,14 +137,18 @@
             </div>
         </div>
 
+        <!-- ÇIKIŞ BUTONU -->
         <div class="pt-6 border-t border-slate-800/80 mt-6 md:mt-0">
-            <button onclick="handleLogout()" class="w-full bg-[#241a2f] hover:bg-red-900/40 text-red-400 hover:text-red-300 font-semibold py-3.5 rounded-xl border border-red-500/10 transition-all duration-200 cursor-pointer text-center text-sm">
-                <span>Güvenli Çıkış</span>
+            <button onclick="handleLogout()" class="w-full bg-[#241a2f] hover:bg-red-900/40 text-red-400 hover:text-red-300 font-semibold py-3.5 rounded-xl border border-red-500/10 transition-all duration-200 cursor-pointer text-center text-sm flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span class="sidebar-text">Güvenli Çıkış</span>
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 p-6 md:p-10 space-y-8 h-screen overflow-y-auto w-full">
+    <main class="flex-1 p-6 md:p-10 space-y-8 h-screen overflow-y-auto w-full transition-all duration-300">
 
         <div id="alert-box" class="hidden p-4 rounded-xl text-sm font-medium flex items-center gap-3 border transition-all duration-300">
             <span id="alert-message"></span>
@@ -314,6 +329,7 @@
         let userLeaves = [];
         let activeDurationType = 0;
         let activeIntervalsGlobal = {};
+        let isSidebarCollapsed = false;
 
         document.addEventListener("DOMContentLoaded", () => {
             const sessionData = localStorage.getItem("user_data");
@@ -371,6 +387,27 @@
                 }, 1000);
             }
         });
+
+        // YAN PANELİ AÇMA / KAPATMA FONKSİYONU
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const toggleIcon = document.getElementById("sidebar-toggle-icon");
+            const texts = document.querySelectorAll(".sidebar-text");
+
+            isSidebarCollapsed = !isSidebarCollapsed;
+
+            if (isSidebarCollapsed) {
+                sidebar.classList.remove("md:w-80", "p-8");
+                sidebar.classList.add("md:w-20", "p-4");
+                toggleIcon.classList.add("rotate-180");
+                texts.forEach(el => el.classList.add("hidden"));
+            } else {
+                sidebar.classList.remove("md:w-20", "p-4");
+                sidebar.classList.add("md:w-80", "p-8");
+                toggleIcon.classList.remove("rotate-180");
+                texts.forEach(el => el.classList.remove("hidden"));
+            }
+        }
 
         async function finishOnboarding(userId, localKey) {
             localStorage.setItem(localKey, "true");
@@ -644,23 +681,23 @@
                         let operasyonIcerigi = `<span class="text-xs text-slate-400 font-medium">-</span>`;
                         if (i.durum === 1) {
                             operasyonIcerigi = `
-                                            <div class="flex items-center justify-end gap-2" id="action-container-${i.id}">
-                                                <span id="timer-${i.id}" class="text-xs font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg border border-red-100">05:00</span>
-                                                <button id="btn-boz-${i.id}" onclick="handleCancelLeave(${i.id})" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg shadow-sm shadow-red-600/10 transition-all cursor-pointer">İzin Boz</button>
-                                            </div>
-                                        `;
+                                                <div class="flex items-center justify-end gap-2" id="action-container-${i.id}">
+                                                    <span id="timer-${i.id}" class="text-xs font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg border border-red-100">05:00</span>
+                                                    <button id="btn-boz-${i.id}" onclick="handleCancelLeave(${i.id})" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg shadow-sm shadow-red-600/10 transition-all cursor-pointer">İzin Boz</button>
+                                                </div>
+                                            `;
                         }
 
                         tbody.innerHTML += `
-                                                <tr class="hover:bg-slate-50/50 transition-all duration-200">
-                                                    <td class="py-4 px-6 font-semibold text-slate-700">${katText}</td>
-                                                    <td class="py-4 px-6 font-medium text-slate-500">${i.baslangic}</td>
-                                                    <td class="py-4 px-6 font-medium text-slate-500">${i.bitis}</td>
-                                                    <td class="py-4 px-6 text-center font-bold text-slate-700">${i.gun} Gün</td>
-                                                    <td class="py-4 px-6 text-center"><span class="inline-block px-3 py-1 text-xs font-bold rounded-full border shadow-sm ${durumClass}">${durumText}</span></td>
-                                                    <td class="py-4 px-6 text-slate-400 max-w-xs truncate font-medium" title="${i.aciklama}">${i.aciklama}</td>
-                                                    <td class="py-4 px-6 text-right select-none">${operasyonIcerigi}</td>
-                                                </tr>`;
+                                                    <tr class="hover:bg-slate-50/50 transition-all duration-200">
+                                                        <td class="py-4 px-6 font-semibold text-slate-700">${katText}</td>
+                                                        <td class="py-4 px-6 font-medium text-slate-500">${i.baslangic}</td>
+                                                        <td class="py-4 px-6 font-medium text-slate-500">${i.bitis}</td>
+                                                        <td class="py-4 px-6 text-center font-bold text-slate-700">${i.gun} Gün</td>
+                                                        <td class="py-4 px-6 text-center"><span class="inline-block px-3 py-1 text-xs font-bold rounded-full border shadow-sm ${durumClass}">${durumText}</span></td>
+                                                        <td class="py-4 px-6 text-slate-400 max-w-xs truncate font-medium" title="${i.aciklama}">${i.aciklama}</td>
+                                                        <td class="py-4 px-6 text-right select-none">${operasyonIcerigi}</td>
+                                                    </tr>`;
 
                         if (i.durum === 1 && i.olusturulmaTarihi) {
                             BerkleyCountdownTimer(i.id, i.olusturulmaTarihi);

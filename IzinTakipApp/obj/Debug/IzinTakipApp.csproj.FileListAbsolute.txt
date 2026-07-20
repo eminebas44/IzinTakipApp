@@ -123,3 +123,4 @@ C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.dll
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.Web.dll
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.xml
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.Web.xml
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.AddMaxIzinliKotaToUser.resources

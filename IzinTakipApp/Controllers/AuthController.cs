@@ -218,7 +218,8 @@ namespace IzinTakip.API.Controllers
                         IseGirisTarihi = DateTime.Now,
                         KalanYillikIzin = 30,
                         MazeretIzinKotasi = 5,
-                        UcretsizIzinKotasi = 15
+                        UcretsizIzinKotasi = 15,
+                        MaxIzinliKota = 3
                     };
 
                     db.Users.Add(yeniKullanici);
@@ -335,8 +336,10 @@ namespace IzinTakip.API.Controllers
                     var adminUser = db.Users.FirstOrDefault(u => u.ID == adminId);
                     if (adminUser == null) return BadRequest("Yönetici bulunamadı.");
 
+                    // GÜNCELLEME: Yönetici hesabındaki limitleri güncelliyoruz
                     adminUser.MazeretIzinKotasi = mazeretKota;
                     adminUser.UcretsizIzinKotasi = ucretsizKota;
+                    adminUser.MaxIzinliKota = maxIzinliKota;
 
                     var bagliPersoneller = db.Users.Where(u => u.ManagerID == adminId && u.Role == "0").ToList();
                     foreach (var personel in bagliPersoneller)
@@ -372,7 +375,13 @@ namespace IzinTakip.API.Controllers
 
                     double hesaplananGun = (dto.BitisTarihi.Date - dto.BaslangicTarihi.Date).TotalDays + 1;
 
+                    // GÜNCELLEME: Sabit "3" değeri yerine yöneticinin belirlediği dinamik kotayı veritabanından çekiyoruz
                     int maxIzinliLimiti = 3;
+                    var adminUser = db.Users.FirstOrDefault(u => u.ID == personel.ManagerID);
+                    if (adminUser != null && adminUser.MaxIzinliKota > 0)
+                    {
+                        maxIzinliLimiti = adminUser.MaxIzinliKota;
+                    }
 
                     for (DateTime date = dto.BaslangicTarihi.Date; date <= dto.BitisTarihi.Date; date = date.AddDays(1))
                     {
@@ -478,7 +487,6 @@ namespace IzinTakip.API.Controllers
                     {
                         talep.Durum = IzinDurumu.Onaylandi;
 
-                        // KRİTİK GÜNCELLEME: Sadece yönetici "İzne Yansıt" seçeneğini seçtiyse kotadan düşüyoruz.
                         if (dto.IzneYansitilsinMi)
                         {
                             if (talep.Kategori == IzinKategorisi.YillikIzin) personel.KalanYillikIzin -= talep.ToplamGun;
@@ -539,6 +547,7 @@ namespace IzinTakip.API.Controllers
                     double kalanIzin = kullanici.KalanYillikIzin;
                     double mazeretKota = kullanici.MazeretIzinKotasi;
                     double ucretsizKota = kullanici.UcretsizIzinKotasi;
+                    int maxIzinliKota = kullanici.MaxIzinliKota;
                     DateTime? iseGirisTarihi = kullanici.IseGirisTarihi;
                     bool isFirstLogin = kullanici.IsFirstLogin;
 
@@ -555,6 +564,7 @@ namespace IzinTakip.API.Controllers
                         kalanIzin = kalanIzin,
                         mazeretKota = mazeretKota,
                         ucretsizKota = ucretsizKota,
+                        maxIzinliKota = maxIzinliKota,
                         iseGirisTarihi = iseGirisTarihi,
                         isFirstLogin = isFirstLogin
                     });

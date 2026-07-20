@@ -5,5 +5,6 @@
         public int AdminId { get; set; }
         public int MazeretKota { get; set; }
         public int UcretsizKota { get; set; }
+        public int MaxIzinliKota { get; set; }
     }
 }

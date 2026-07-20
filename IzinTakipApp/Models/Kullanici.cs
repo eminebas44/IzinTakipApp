@@ -33,6 +33,9 @@ namespace IzinTakipApp.Models
 
         public double UcretsizIzinKotasi { get; set; }
 
+        // YENİ EKLENEN ALAN: Aynı gün izinli olabilecek maksimum personel kotası
+        public int MaxIzinliKota { get; set; } = 3;
+
         public bool IsFirstLogin { get; set; } = true;
 
         public int? ManagerID { get; set; }
