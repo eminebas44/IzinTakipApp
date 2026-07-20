@@ -99,9 +99,9 @@
         }
     </style>
 </head>
-<body class="bg-slate-50/50 min-h-screen text-slate-800 antialiased flex flex-col md:flex-row">
+<body class="bg-slate-50/50 h-screen overflow-hidden text-slate-800 antialiased flex flex-col md:flex-row">
 
-    <aside id="step-profile" class="w-full md:w-80 bg-[#0b1329] text-slate-200 md:min-h-screen p-8 flex flex-col justify-between shadow-xl md:sticky md:top-0 md:h-screen z-40 shrink-0">
+    <aside id="step-profile" class="w-full md:w-80 bg-[#0b1329] text-slate-200 md:h-screen p-8 flex flex-col justify-between shadow-xl md:overflow-y-auto z-40 shrink-0">
         <div class="space-y-8">
             <div class="flex flex-col items-center text-center select-none space-y-4 pb-6 border-b border-slate-800/60">
                 <img src="logo.png" alt="İzinPort Logo" class="h-16 w-auto object-contain mx-auto">
@@ -133,7 +133,7 @@
         </div>
     </aside>
 
-    <main class="flex-1 p-6 md:p-10 space-y-8 max-w-6xl mx-auto w-full">
+    <main class="flex-1 p-6 md:p-10 space-y-8 h-screen overflow-y-auto w-full">
 
         <div id="alert-box" class="hidden p-4 rounded-xl text-sm font-medium flex items-center gap-3 border transition-all duration-300">
             <span id="alert-message"></span>
@@ -211,8 +211,8 @@
     </main>
 
     <div id="leave-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="modal-container">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300" id="modal-container">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 sticky top-0 bg-white z-20">
                 <div>
                     <h3 class="font-bold text-slate-800 text-lg tracking-tight">Yeni İzin Talebi</h3>
                     <p class="text-xs text-slate-400 mt-0.5">Formu doldurarak onaya gönderebilirsiniz</p>
@@ -224,10 +224,10 @@
 
             <div id="modal-error-box" class="hidden mx-6 mt-4 p-3.5 bg-red-50 text-red-700 border border-red-100 font-semibold text-xs rounded-xl animate-pulse"></div>
 
-            <form onsubmit="handleLeaveRequest(event)" class="p-6 space-y-5">
+            <form onsubmit="handleLeaveRequest(event)" class="p-6 space-y-4">
                 <div id="step-modal-cat">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">İzin Kategorisi</label>
-                    <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 focus-within:border-sky-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-sky-500/10 transition-all relative">
+                    <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus-within:border-sky-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-sky-500/10 transition-all relative">
                         <select id="leave-kategori" onchange="onCategoryChange()" class="w-full bg-transparent border-none outline-none text-sm text-slate-700 font-medium p-0 m-0 focus:ring-0 cursor-pointer z-10">
                             <option value="1">Yıllık İzin</option>
                             <option value="3">Mazeret İzni</option>
@@ -240,33 +240,33 @@
                     </div>
                 </div>
 
-                <div id="rapor-upload-block" class="hidden space-y-2">
+                <div id="rapor-upload-block" class="hidden space-y-1.5">
                     <label class="block text-xs font-bold text-red-600 uppercase tracking-wider">Sağlık Raporu Belgesi / Görseli</label>
                     <div class="flex items-center justify-center w-full">
-                        <label class="flex flex-col w-full h-32 border-2 border-red-300 border-dashed rounded-xl hover:bg-red-50/30 hover:border-red-400 transition-all duration-200 justify-center items-center cursor-pointer relative bg-red-50/10">
-                            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                                <svg class="w-8 h-8 text-red-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <label class="flex flex-col w-full h-24 border-2 border-red-300 border-dashed rounded-xl hover:bg-red-50/30 hover:border-red-400 transition-all duration-200 justify-center items-center cursor-pointer relative bg-red-50/10">
+                            <div class="flex flex-col items-center justify-center pt-3 pb-3 text-center px-4">
+                                <svg class="w-6 h-6 text-red-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 <p class="text-xs font-bold text-red-700" id="upload-status-text">Rapor Dosyasını veya Görselini Seçin</p>
-                                <p class="text-[10px] text-red-400 mt-0.5">PNG, JPG or PDF (Maks. 5MB)</p>
+                                <p class="text-[10px] text-red-400 mt-0.5">Sadece PNG, JPG veya PDF (Maks. 5MB)</p>
                             </div>
-                            <input type="file" id="leave-rapor-file" onchange="handleFileSelection()" class="hidden" accept=".png,.jpg,.jpeg,.pdf" />
+                            <input type="file" id="leave-rapor-file" onchange="handleFileSelection()" class="hidden" accept="image/png, image/jpeg, image/jpg, application/pdf" />
                         </label>
                     </div>
                 </div>
 
                 <div id="step-modal-dur">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">İzin Süresi</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">İzin Süresi</label>
                     <div class="grid grid-cols-3 gap-3">
-                        <button type="button" onclick="selectDurationType(0)" id="duration-btn-0" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-sky-500 bg-sky-50/40 text-sky-700 font-bold text-xs transition-all duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <button type="button" onclick="selectDurationType(0)" id="duration-btn-0" class="flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border-2 border-sky-500 bg-sky-50/40 text-sky-700 font-bold text-xs transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                             Tam Gün
                         </button>
-                        <button type="button" onclick="selectDurationType(1)" id="duration-btn-1" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-xs transition-all duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <button type="button" onclick="selectDurationType(1)" id="duration-btn-1" class="flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-xs transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                             Yarım Gün
                         </button>
-                        <button type="button" onclick="selectDurationType(2)" id="duration-btn-2" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-xs transition-all duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <button type="button" onclick="selectDurationType(2)" id="duration-btn-2" class="flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-xs transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             Kısa Süreli
                         </button>
                     </div>
@@ -274,33 +274,33 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Başlangıç Tarihi</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Başlangıç Tarihi</label>
                         <input type="date" id="leave-baslangic" required onchange="calculateDays()"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-700 font-medium focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 focus:bg-white transition-all block cursor-pointer">
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 text-sm text-slate-700 font-medium focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 focus:bg-white transition-all block cursor-pointer">
                     </div>
                     <div id="end-date-container">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Bitiş Tarihi</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Bitiş Tarihi</label>
                         <input type="date" id="leave-bitis" required onchange="calculateDays()"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-700 font-medium focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 focus:bg-white transition-all block cursor-pointer">
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 text-sm text-slate-700 font-medium focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 focus:bg-white transition-all block cursor-pointer">
                     </div>
                 </div>
 
-                <div id="duration-block" class="hidden p-4 rounded-xl text-sm font-semibold flex items-center gap-2 border select-none">
+                <div id="duration-block" class="hidden p-3 rounded-xl text-sm font-semibold flex items-center gap-2 border select-none">
                     <svg id="duration-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <span id="duration-text">Talep Edilen Süre: <span id="total-days" class="font-bold text-base mx-0.5">0</span> Gün</span>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Açıklama / Gerekçe</label>
-                    <textarea id="leave-aciklama" required rows="3" placeholder="Lütfen izin gerekçesini detaylıca yazınız..."
-                              class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 focus:bg-white transition-all block resize-none"></textarea>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Açıklama / Gerekçe</label>
+                    <textarea id="leave-aciklama" required rows="2.5" placeholder="Lütfen izin gerekçesini detaylıca yazınız..."
+                              class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 focus:bg-white transition-all block resize-none"></textarea>
                 </div>
 
-                <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeLeaveModal()" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200 font-semibold py-3 rounded-xl transition-all duration-200 cursor-pointer text-center text-sm">
+                <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeLeaveModal()" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200 font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer text-center text-sm">
                         İptal Et
                     </button>
-                    <button type="submit" id="submit-btn" class="flex-1 bg-[#1e3a8a] hover:bg-slate-900 text-white font-bold py-3 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer text-sm">
+                    <button type="submit" id="submit-btn" class="flex-1 bg-[#1e3a8a] hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer text-sm">
                         <span>Onaya Gönder</span>
                     </button>
                 </div>
@@ -392,10 +392,8 @@
 
             if (kategori === "7") {
                 raporBlock.classList.remove("hidden");
-                fileInput.required = true;
             } else {
                 raporBlock.classList.add("hidden");
-                fileInput.required = false;
                 fileInput.value = "";
                 statusText.innerText = "Rapor Dosyasını veya Görselini Seçin";
                 statusText.className = "text-xs font-bold text-red-700";
@@ -403,11 +401,46 @@
             calculateDays();
         }
 
-        function handleFileSelection() {
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleFileSelection() {
             const fileInput = document.getElementById("leave-rapor-file");
             const statusText = document.getElementById("upload-status-text");
+            const errBox = document.getElementById("modal-error-box");
+            errBox.classList.add("hidden");
+
             if (fileInput.files.length > 0) {
-                statusText.innerText = `Seçilen Dosya: ${fileInput.files[0].name}`;
+                const file = fileInput.files[0];
+                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                const validExtensions = ["jpg", "jpeg", "png", "pdf"];
+
+                if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+                    fileInput.value = "";
+                    statusText.innerText = "Rapor Dosyasını veya Görselini Seçin";
+                    statusText.className = "text-xs font-bold text-red-700";
+
+                    errBox.innerText = "Geçersiz dosya türü! Lütfen sadece görsel (PNG, JPG) veya PDF belgesi seçiniz.";
+                    errBox.classList.remove("hidden");
+                    errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    return;
+                }
+
+                try {
+                    const base64 = await readFileAsBase64(file);
+                    let sampleStore = JSON.parse(localStorage.getItem("rapor_files_store") || "{}");
+                    sampleStore[`latest_rapor`] = base64;
+                    localStorage.setItem("rapor_files_store", JSON.stringify(sampleStore));
+                } catch (e) { console.error("Ön izleme kaydı hatası:", e); }
+
+                statusText.innerText = `Seçilen Dosya: ${file.name}`;
                 statusText.className = "text-xs font-bold text-emerald-700";
             } else {
                 statusText.innerText = "Rapor Dosyasını veya Görselini Seçin";
@@ -423,10 +456,10 @@
             const endDateContainer = document.getElementById("end-date-container");
 
             [btn0, btn1, btn2].forEach(btn => {
-                btn.className = "flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-xs transition-all duration-200 cursor-pointer";
+                btn.className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-xs transition-all duration-200 cursor-pointer";
             });
 
-            document.getElementById(`duration-btn-${type}`).className = "flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-sky-500 bg-sky-50/40 text-sky-700 font-bold text-xs transition-all duration-200 cursor-pointer";
+            document.getElementById(`duration-btn-${type}`).className = "flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border-2 border-sky-500 bg-sky-50/40 text-sky-700 font-bold text-xs transition-all duration-200 cursor-pointer";
 
             if (type === 1 || type === 2) {
                 endDateContainer.classList.add("opacity-50", "pointer-events-none");
@@ -471,7 +504,6 @@
             }, 150);
         }
 
-        // KÜRESEL SAYAÇ YÖNETİMİ: 'function' anahtar kelimesi eklenerek yazım hatası düzeltildi
         function BerkleyCountdownTimer(leaveId, createdDateStr) {
             if (activeIntervalsGlobal[leaveId]) clearInterval(activeIntervalsGlobal[leaveId]);
 
@@ -503,14 +535,13 @@
             activeIntervalsGlobal[leaveId] = setInterval(updateClock, 1000);
         }
 
-        // KÜRESEL İPTAL SİLME METODU
         async function handleCancelLeave(leaveId) {
-            if (!confirm("Bu izin talebini iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz ve kayıt tamamen silinir.")) return;
+            if (!confirm("Bu izin talebini iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
 
             try {
                 const response = await fetch(`/api/auth/cancel-leave/${leaveId}`, { method: 'POST' });
                 if (response.ok) {
-                    showNotification("İzin talebiniz başarıyla iptal edildi ve silindi.", true);
+                    showNotification("İzin talebiniz başarıyla iptal edildi.", true);
                     if (activeIntervalsGlobal[leaveId]) clearInterval(activeIntervalsGlobal[leaveId]);
                     loadPersonelLeaves();
                 } else {
@@ -565,7 +596,7 @@
                     }
 
                     if (hasOverlap) {
-                        durationBlock.className = "p-4 rounded-xl text-sm font-semibold flex items-center gap-2 border bg-red-50 text-red-800 border-red-100 select-none animate-bounce";
+                        durationBlock.className = "p-3 rounded-xl text-sm font-semibold flex items-center gap-2 border bg-red-50 text-red-800 border-red-100 select-none animate-bounce";
                         durationText.innerHTML = `Seçtiğiniz tarihlerde zaten aktif izin talebiniz bulunuyor!`;
                         submitBtn.disabled = true;
                         submitBtn.classList.add("opacity-50", "cursor-not-allowed");
@@ -578,12 +609,12 @@
                     else if (kategori === 5) limit = currentUser.ucretsizKota;
 
                     if (farkGun > limit) {
-                        durationBlock.className = "p-4 rounded-xl text-sm font-semibold flex items-center gap-2 border bg-red-50 text-red-800 border-red-100 select-none animate-bounce";
+                        durationBlock.className = "p-3 rounded-xl text-sm font-semibold flex items-center gap-2 border bg-red-50 text-red-800 border-red-100 select-none animate-bounce";
                         durationText.innerHTML = `Yetersiz İzin Kotası! Maksimum <span class="font-bold text-base mx-0.5 text-red-600">${limit}</span> gün seçebilirsiniz.`;
                         submitBtn.disabled = true;
                         submitBtn.classList.add("opacity-50", "cursor-not-allowed");
                     } else {
-                        durationBlock.className = "p-4 rounded-xl text-sm font-semibold flex items-center gap-2 border bg-emerald-50/70 text-emerald-800 border-emerald-100 select-none";
+                        durationBlock.className = "p-3 rounded-xl text-sm font-semibold flex items-center gap-2 border bg-emerald-50/70 text-emerald-800 border-emerald-100 select-none";
                         durationText.innerHTML = `Talep Edilen Süre: <span id="total-days" class="font-bold text-base mx-0.5 text-emerald-600">${farkGun}</span> Gün`;
                         submitBtn.disabled = false;
                         submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
@@ -597,7 +628,6 @@
             return 0;
         }
 
-        // EKSİK OLAN FONKSİYON: calculateDays metodu ile handleLeaveRequest arasına orijinal yerleştirme noktasına konumlandırıldı
         function showNotification(message, isSuccess = false) {
             const box = document.getElementById("alert-box");
             const msg = document.getElementById("alert-message");
@@ -617,9 +647,13 @@
                 const tbody = document.getElementById("leaves-table-body");
                 if (response.ok) {
                     const izinler = await response.json();
-                    userLeaves = izinler;
-                    tbody.innerHTML = izinler.length === 0 ? `<tr><td colspan="7" class="py-12 text-center text-slate-400 font-medium">Henüz oluşturulmuş bir izin talebiniz bulunmuyor.</td></tr>` : "";
-                    izinler.forEach(i => {
+
+                    const aktifVeSonuclananIzinler = izinler.filter(i => i.durum !== 4);
+                    userLeaves = aktifVeSonuclananIzinler;
+
+                    tbody.innerHTML = aktifVeSonuclananIzinler.length === 0 ? `<tr><td colspan="7" class="py-12 text-center text-slate-400 font-medium">Henüz oluşturulmuş aktif bir izin talebiniz bulunmuyor.</td></tr>` : "";
+
+                    aktifVeSonuclananIzinler.forEach(i => {
                         let katText = i.kategori === 1 ? "Yıllık İzin" : i.kategori === 3 ? "Mazeret İzni" : i.kategori === 5 ? "Ücretsiz İzin" : "Hastalık / Rapor İzni";
                         let durumText = i.durum === 2 ? "Onaylandı" : i.durum === 3 ? "Reddedildi" : "Beklemede";
                         let durumClass = i.durum === 2 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : i.durum === 3 ? "bg-red-50 text-red-700 border-red-200" : "bg-amber-50 text-amber-700 border-amber-200";
@@ -627,23 +661,23 @@
                         let operasyonIcerigi = `<span class="text-xs text-slate-400 font-medium">-</span>`;
                         if (i.durum === 1) {
                             operasyonIcerigi = `
-                                        <div class="flex items-center justify-end gap-2" id="action-container-${i.id}">
-                                            <span id="timer-${i.id}" class="text-xs font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg border border-red-100">05:00</span>
-                                            <button id="btn-boz-${i.id}" onclick="handleCancelLeave(${i.id})" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg shadow-sm shadow-red-600/10 transition-all cursor-pointer">İzin Boz</button>
-                                        </div>
-                                    `;
+                                            <div class="flex items-center justify-end gap-2" id="action-container-${i.id}">
+                                                <span id="timer-${i.id}" class="text-xs font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg border border-red-100">05:00</span>
+                                                <button id="btn-boz-${i.id}" onclick="handleCancelLeave(${i.id})" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg shadow-sm shadow-red-600/10 transition-all cursor-pointer">İzin Boz</button>
+                                            </div>
+                                        `;
                         }
 
                         tbody.innerHTML += `
-                                            <tr class="hover:bg-slate-50/50 transition-all duration-200">
-                                                <td class="py-4 px-6 font-semibold text-slate-700">${katText}</td>
-                                                <td class="py-4 px-6 font-medium text-slate-500">${i.baslangic}</td>
-                                                <td class="py-4 px-6 font-medium text-slate-500">${i.bitis}</td>
-                                                <td class="py-4 px-6 text-center font-bold text-slate-700">${i.gun} Gün</td>
-                                                <td class="py-4 px-6 text-center"><span class="inline-block px-3 py-1 text-xs font-bold rounded-full border shadow-sm ${durumClass}">${durumText}</span></td>
-                                                <td class="py-4 px-6 text-slate-400 max-w-xs truncate font-medium" title="${i.aciklama}">${i.aciklama}</td>
-                                                <td class="py-4 px-6 text-right select-none">${operasyonIcerigi}</td>
-                                            </tr>`;
+                                                <tr class="hover:bg-slate-50/50 transition-all duration-200">
+                                                    <td class="py-4 px-6 font-semibold text-slate-700">${katText}</td>
+                                                    <td class="py-4 px-6 font-medium text-slate-500">${i.baslangic}</td>
+                                                    <td class="py-4 px-6 font-medium text-slate-500">${i.bitis}</td>
+                                                    <td class="py-4 px-6 text-center font-bold text-slate-700">${i.gun} Gün</td>
+                                                    <td class="py-4 px-6 text-center"><span class="inline-block px-3 py-1 text-xs font-bold rounded-full border shadow-sm ${durumClass}">${durumText}</span></td>
+                                                    <td class="py-4 px-6 text-slate-400 max-w-xs truncate font-medium" title="${i.aciklama}">${i.aciklama}</td>
+                                                    <td class="py-4 px-6 text-right select-none">${operasyonIcerigi}</td>
+                                                </tr>`;
 
                         if (i.durum === 1 && i.olusturulmaTarihi) {
                             BerkleyCountdownTimer(i.id, i.olusturulmaTarihi);
@@ -655,27 +689,68 @@
 
         async function handleLeaveRequest(event) {
             event.preventDefault();
+
+            const errBox = document.getElementById("modal-error-box");
+            const kategori = parseInt(document.getElementById("leave-kategori").value);
+            const fileInput = document.getElementById("leave-rapor-file");
+
+            let raporDataUrl = null;
+
+            if (kategori === 7) {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    errBox.innerText = "Lütfen sağlık raporu belgenizi veya görselini yükleyiniz.";
+                    errBox.classList.remove("hidden");
+                    errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                const validExtensions = ["jpg", "jpeg", "png", "pdf"];
+
+                if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+                    errBox.innerText = "Geçersiz dosya formatı! Yalnızca PNG, JPG veya PDF yükleyebilirsiniz.";
+                    errBox.classList.remove("hidden");
+                    errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    return;
+                }
+
+                try {
+                    raporDataUrl = await readFileAsBase64(file);
+                } catch (e) {
+                    console.error("Dosya okuma hatası:", e);
+                }
+            }
+
             const totalDays = calculateDays();
             if (totalDays <= 0) { showNotification("Lütfen geçerli bir tarih aralığı seçiniz."); return; }
 
             const btn = document.getElementById("submit-btn");
-            const errBox = document.getElementById("modal-error-box");
             btn.disabled = true; btn.innerHTML = `<span>Gönderiliyor...</span>`;
 
             const payload = {
                 kullaniciId: currentUser.id || currentUser.UserID,
-                kategori: parseInt(document.getElementById("leave-kategori").value),
+                kategori: kategori,
                 sureTipi: activeDurationType,
                 baslangicTarihi: document.getElementById("leave-baslangic").value,
                 bitisTarihi: document.getElementById("leave-bitis").value,
                 toplamGun: totalDays,
                 aciklama: document.getElementById("leave-aciklama").value.trim()
             };
+
             try {
                 const response = await fetch('/api/auth/request-leave', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
                 if (response.ok) {
+                    if (raporDataUrl) {
+                        let sampleStore = JSON.parse(localStorage.getItem("rapor_files_store") || "{}");
+                        sampleStore[`latest_rapor`] = raporDataUrl;
+                        sampleStore[`rapor_${currentUser.id || currentUser.UserID}_${document.getElementById("leave-baslangic").value}`] = raporDataUrl;
+                        localStorage.setItem("rapor_files_store", JSON.stringify(sampleStore));
+                    }
+
                     showNotification("İzin talebiniz iletildi!", true);
                     closeLeaveModal();
                     loadPersonelLeaves();
@@ -696,7 +771,7 @@
                 }
             } catch (error) {
                 showNotification("Sunucu hatası.");
-            } finally { // HATA DÜZELTMESİ: 'disable' kelimesi 'finally' olarak güncellendi
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span>Onaya Gönder</span>`;
             }

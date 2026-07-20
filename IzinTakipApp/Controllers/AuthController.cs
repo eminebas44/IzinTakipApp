@@ -23,7 +23,6 @@ namespace IzinTakip.API.Controllers
     [RoutePrefix("api/auth")]
     public class AuthController : ApiController
     {
-        // GÜNCELLEME: Sınıf içerisindeki tüm operasyonları izleyecek statik NLog motoru tanımı
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         private static readonly Dictionary<string, string> VerificationCodes = new Dictionary<string, string>();
@@ -58,7 +57,6 @@ namespace IzinTakip.API.Controllers
             }
             catch (Exception ex)
             {
-                // GÜNCELLEME: Teknik hata detayı XML günlüğüne yazılır
                 Logger.Error(ex, $"Personel listesi çekilirken hata oluştu. Yönetici ID: {adminId}");
                 return BadRequest("Personeller çekilemedi: " + ex.Message);
             }
@@ -226,7 +224,6 @@ namespace IzinTakip.API.Controllers
                     db.Users.Add(yeniKullanici);
                     db.SaveChanges();
 
-                    // GÜNCELLEME: Başarılı yönetici kaydı XML dosyasına loglanır
                     Logger.Info($"Yeni şirket yöneticisi kaydı başarılı. E-posta: {dto.Email}, Adı: {yeniKullanici.Name}");
                     return Ok("Şirket yöneticisi kaydı başarılı.");
                 }
@@ -273,7 +270,6 @@ namespace IzinTakip.API.Controllers
                     db.Users.Add(yeniPersonel);
                     db.SaveChanges();
 
-                    // GÜNCELLEME: Başarılı personel ekleme kaydı loglanır
                     Logger.Info($"Şirkete yeni personel tanımlandı. Adı: {dto.AdminName}, E-posta: {dto.Email}, Yönetici ID: {dto.ManagerID}");
                     return Ok("Personel başarıyla tanımlandı.");
                 }
@@ -448,11 +444,11 @@ namespace IzinTakip.API.Controllers
                     if (gecenSure.TotalMinutes > 5)
                         return BadRequest("5 dakikalık yasal iptal süreniz dolduğu için bu işlem gerçekleştirilemez.");
 
-                    db.IzinTalepleri.Remove(talep);
+                    talep.Durum = IzinDurumu.IptalEdildi;
                     db.SaveChanges();
 
-                    Logger.Info($"Personel 5 dakikalık geri alma süresi içinde iznini bozdu ve sildi. Talep ID: {leaveId}, İzin Sahibi Personel ID: {talep.KullaniciId}");
-                    return Ok("İzin talebi başarıyla geri çekildi ve silindi.");
+                    Logger.Info($"Personel 5 dakikalık geri alma süresi içinde iznini bozdu. Talep ID: {leaveId}, Personel ID: {talep.KullaniciId}");
+                    return Ok("İzin talebi başarıyla iptal edildi.");
                 }
             }
             catch (Exception ex)
@@ -481,9 +477,14 @@ namespace IzinTakip.API.Controllers
                     if (dto.OnaylandiMi)
                     {
                         talep.Durum = IzinDurumu.Onaylandi;
-                        if (talep.Kategori == IzinKategorisi.YillikIzin) personel.KalanYillikIzin -= talep.ToplamGun;
-                        if (talep.Kategori == IzinKategorisi.MazeretIzni) personel.MazeretIzinKotasi -= talep.ToplamGun;
-                        if (talep.Kategori == IzinKategorisi.UcretsizIzin) personel.UcretsizIzinKotasi -= talep.ToplamGun;
+
+                        // KRİTİK GÜNCELLEME: Sadece yönetici "İzne Yansıt" seçeneğini seçtiyse kotadan düşüyoruz.
+                        if (dto.IzneYansitilsinMi)
+                        {
+                            if (talep.Kategori == IzinKategorisi.YillikIzin) personel.KalanYillikIzin -= talep.ToplamGun;
+                            if (talep.Kategori == IzinKategorisi.MazeretIzni) personel.MazeretIzinKotasi -= talep.ToplamGun;
+                            if (talep.Kategori == IzinKategorisi.UcretsizIzin) personel.UcretsizIzinKotasi -= talep.ToplamGun;
+                        }
                     }
                     else
                     {
@@ -492,7 +493,7 @@ namespace IzinTakip.API.Controllers
 
                     db.SaveChanges();
 
-                    Logger.Info($"Yönetici izin talebini sonuçlandırdı. Talep ID: {dto.TalepId}, Karar: {(dto.OnaylandiMi ? "Onaylandı" : "Reddedildi")}, İzin Sahibi Personel: {personel.Name}");
+                    Logger.Info($"Yönetici izin talebini sonuçlandırdı. Talep ID: {dto.TalepId}, Karar: {(dto.OnaylandiMi ? "Onaylandı" : "Reddedildi")}, İzne Yansıtıldı Mı: {dto.IzneYansitilsinMi}, Personel: {personel.Name}");
                     return Ok("İzin talebi sonuçlandırıldı.");
                 }
             }

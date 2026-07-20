@@ -4,5 +4,6 @@
     {
         public int TalepId { get; set; }
         public bool OnaylandiMi { get; set; }
+        public bool IzneYansitilsinMi { get; set; } = true;  
     }
 }
