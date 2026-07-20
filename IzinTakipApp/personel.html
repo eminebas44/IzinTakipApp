@@ -401,47 +401,30 @@
             calculateDays();
         }
 
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function handleFileSelection() {
+        function handleFileSelection() {
             const fileInput = document.getElementById("leave-rapor-file");
             const statusText = document.getElementById("upload-status-text");
             const errBox = document.getElementById("modal-error-box");
             errBox.classList.add("hidden");
 
-            if (fileInput.files.length > 0) {
+            if (fileInput.files && fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-                const fileExtension = file.name.split('.').pop().toLowerCase();
-                const validExtensions = ["jpg", "jpeg", "png", "pdf"];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64String = e.target.result;
 
-                if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
-                    fileInput.value = "";
-                    statusText.innerText = "Rapor Dosyasını veya Görselini Seçin";
-                    statusText.className = "text-xs font-bold text-red-700";
+                    localStorage.setItem("LAST_RAPOR_IMAGE", base64String);
 
-                    errBox.innerText = "Geçersiz dosya türü! Lütfen sadece görsel (PNG, JPG) veya PDF belgesi seçiniz.";
-                    errBox.classList.remove("hidden");
-                    errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    return;
-                }
+                    try {
+                        let sampleStore = JSON.parse(localStorage.getItem("rapor_files_store") || "{}");
+                        sampleStore["latest_rapor"] = base64String;
+                        localStorage.setItem("rapor_files_store", JSON.stringify(sampleStore));
+                    } catch (err) { }
 
-                try {
-                    const base64 = await readFileAsBase64(file);
-                    let sampleStore = JSON.parse(localStorage.getItem("rapor_files_store") || "{}");
-                    sampleStore[`latest_rapor`] = base64;
-                    localStorage.setItem("rapor_files_store", JSON.stringify(sampleStore));
-                } catch (e) { console.error("Ön izleme kaydı hatası:", e); }
-
-                statusText.innerText = `Seçilen Dosya: ${file.name}`;
-                statusText.className = "text-xs font-bold text-emerald-700";
+                    statusText.innerText = `Seçilen Dosya: ${file.name}`;
+                    statusText.className = "text-xs font-bold text-emerald-700";
+                };
+                reader.readAsDataURL(file);
             } else {
                 statusText.innerText = "Rapor Dosyasını veya Görselini Seçin";
                 statusText.className = "text-xs font-bold text-red-700";
@@ -694,32 +677,12 @@
             const kategori = parseInt(document.getElementById("leave-kategori").value);
             const fileInput = document.getElementById("leave-rapor-file");
 
-            let raporDataUrl = null;
-
             if (kategori === 7) {
                 if (!fileInput.files || fileInput.files.length === 0) {
                     errBox.innerText = "Lütfen sağlık raporu belgenizi veya görselini yükleyiniz.";
                     errBox.classList.remove("hidden");
                     errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     return;
-                }
-
-                const file = fileInput.files[0];
-                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-                const fileExtension = file.name.split('.').pop().toLowerCase();
-                const validExtensions = ["jpg", "jpeg", "png", "pdf"];
-
-                if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
-                    errBox.innerText = "Geçersiz dosya formatı! Yalnızca PNG, JPG veya PDF yükleyebilirsiniz.";
-                    errBox.classList.remove("hidden");
-                    errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    return;
-                }
-
-                try {
-                    raporDataUrl = await readFileAsBase64(file);
-                } catch (e) {
-                    console.error("Dosya okuma hatası:", e);
                 }
             }
 
@@ -744,13 +707,6 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
                 if (response.ok) {
-                    if (raporDataUrl) {
-                        let sampleStore = JSON.parse(localStorage.getItem("rapor_files_store") || "{}");
-                        sampleStore[`latest_rapor`] = raporDataUrl;
-                        sampleStore[`rapor_${currentUser.id || currentUser.UserID}_${document.getElementById("leave-baslangic").value}`] = raporDataUrl;
-                        localStorage.setItem("rapor_files_store", JSON.stringify(sampleStore));
-                    }
-
                     showNotification("İzin talebiniz iletildi!", true);
                     closeLeaveModal();
                     loadPersonelLeaves();
