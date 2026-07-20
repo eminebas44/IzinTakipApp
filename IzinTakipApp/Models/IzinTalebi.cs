@@ -8,11 +8,17 @@ namespace IzinTakipApp.Models
     [Table("IzinTalepleri")]
     public class IzinTalebi
     {
+        // Geri alma (Undo) mekanizmasında nesne ilk üretildiğinde oluşturulma anını otomatik atayan yapıcı metot
+        public IzinTalebi()
+        {
+            OlusturulmaTarihi = DateTime.Now;
+        }
+
         [Key]
         public int ID { get; set; }
 
         [Required]
-        public int KullaniciId { get; set; } // AuthController ile tam uyum için 'Id' yapıldı
+        public int KullaniciId { get; set; }
 
         [Required]
         public IzinKategorisi Kategori { get; set; }
@@ -27,7 +33,7 @@ namespace IzinTakipApp.Models
         public DateTime BitisTarihi { get; set; }
 
         [Required]
-        public double ToplamGun { get; set; } // İzin düşme işlemlerinde cast hatası olmaması için int yapıldı
+        public double ToplamGun { get; set; }
 
         [Required]
         public IzinDurumu Durum { get; set; }
@@ -35,9 +41,10 @@ namespace IzinTakipApp.Models
         [StringLength(500)]
         public string Aciklama { get; set; }
 
+        [Required]
         public DateTime OlusturulmaTarihi { get; set; }
 
-        [ForeignKey("KullaniciId")] // Burası da üstteki alanla eşitlendi
+        [ForeignKey("KullaniciId")]
         public virtual Kullanici Kullanici { get; set; }
     }
 }

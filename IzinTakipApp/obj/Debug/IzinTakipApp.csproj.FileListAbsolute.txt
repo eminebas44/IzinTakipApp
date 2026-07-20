@@ -118,3 +118,8 @@ C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinKotalariGunc
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.GuncelModelGecisi.resources
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.valuetype_changes.resources
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.AddIsFirstLoginToUsers.resources
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.config
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.dll
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.Web.dll
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.xml
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.Web.xml

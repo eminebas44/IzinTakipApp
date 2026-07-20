@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İzinPort - Personel Paneli</title>
+    <title>İzinPort - Kurumsal İzin Yönetim Sistemi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
@@ -192,11 +192,12 @@
                             <th class="py-4 px-6 text-center">Süre</th>
                             <th class="py-4 px-6 text-center">Durum</th>
                             <th class="py-4 px-6">Açıklama</th>
+                            <th class="py-4 px-6 text-right">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody id="leaves-table-body" class="text-sm divide-y divide-slate-100 text-slate-600">
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-400">
+                            <td colspan="7" class="py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <div class="w-6 h-6 border-2 border-[#0091ff] border-t-transparent rounded-full animate-spin"></div>
                                     <span class="text-xs font-medium text-slate-400 mt-1">Veriler yükleniyor...</span>
@@ -216,10 +217,12 @@
                     <h3 class="font-bold text-slate-800 text-lg tracking-tight">Yeni İzin Talebi</h3>
                     <p class="text-xs text-slate-400 mt-0.5">Formu doldurarak onaya gönderebilirsiniz</p>
                 </div>
-                <button onclick="closeLeaveModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer">
+                <button type="button" onclick="closeLeaveModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
+
+            <div id="modal-error-box" class="hidden mx-6 mt-4 p-3.5 bg-red-50 text-red-700 border border-red-100 font-semibold text-xs rounded-xl animate-pulse"></div>
 
             <form onsubmit="handleLeaveRequest(event)" class="p-6 space-y-5">
                 <div id="step-modal-cat">
@@ -242,9 +245,9 @@
                     <div class="flex items-center justify-center w-full">
                         <label class="flex flex-col w-full h-32 border-2 border-red-300 border-dashed rounded-xl hover:bg-red-50/30 hover:border-red-400 transition-all duration-200 justify-center items-center cursor-pointer relative bg-red-50/10">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <svg class="w-8 h-8 text-red-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 <p class="text-xs font-bold text-red-700" id="upload-status-text">Rapor Dosyasını veya Görselini Seçin</p>
-                                <p class="text-[10px] text-red-400 mt-0.5">PNG, JPG veya PDF (Maks. 5MB)</p>
+                                <p class="text-[10px] text-red-400 mt-0.5">PNG, JPG or PDF (Maks. 5MB)</p>
                             </div>
                             <input type="file" id="leave-rapor-file" onchange="handleFileSelection()" class="hidden" accept=".png,.jpg,.jpeg,.pdf" />
                         </label>
@@ -310,9 +313,10 @@
         let currentUser = null;
         let userLeaves = [];
         let activeDurationType = 0;
+        let activeIntervalsGlobal = {};
 
         document.addEventListener("DOMContentLoaded", () => {
-            const sessionData = sessionStorage.getItem("user_data");
+            const sessionData = localStorage.getItem("user_data");
             if (!sessionData) { window.location.href = "index.html"; return; }
 
             currentUser = JSON.parse(sessionData);
@@ -355,9 +359,6 @@
                         showStepNumbers: false,
                         disableInteraction: true
                     })
-                        .onbeforechange(function (targetElement) {
-                            if (targetElement.id === 'step-modal-cat') openLeaveModal();
-                        })
                         .oncomplete(async () => {
                             closeLeaveModal();
                             await finishOnboarding(userId, localOnboardingKey);
@@ -378,7 +379,7 @@
                 if (response.ok) {
                     currentUser.isFirstLogin = false;
                     currentUser.IsFirstLogin = false;
-                    sessionStorage.setItem("user_data", JSON.stringify(currentUser));
+                    localStorage.setItem("user_data", JSON.stringify(currentUser));
                 }
             } catch (e) { console.error("Onboarding tamamlanma kaydı başarısız:", e); }
         }
@@ -464,8 +465,60 @@
                 document.getElementById("leave-aciklama").value = "";
                 document.getElementById("leave-rapor-file").value = "";
                 document.getElementById("duration-block").classList.add("hidden");
+                document.getElementById("modal-error-box").classList.add("hidden");
                 document.getElementById("submit-btn").disabled = false;
+                document.getElementById("submit-btn").classList.remove("opacity-50", "cursor-not-allowed");
             }, 150);
+        }
+
+        // KÜRESEL SAYAÇ YÖNETİMİ: 'function' anahtar kelimesi eklenerek yazım hatası düzeltildi
+        function BerkleyCountdownTimer(leaveId, createdDateStr) {
+            if (activeIntervalsGlobal[leaveId]) clearInterval(activeIntervalsGlobal[leaveId]);
+
+            const createdTime = new Date(createdDateStr).getTime();
+            const timerSpan = document.getElementById(`timer-${leaveId}`);
+
+            function updateClock() {
+                const now = new Date().getTime();
+                const elapsed = now - createdTime;
+                const limitMs = 5 * 60 * 1000;
+                const remaining = limitMs - elapsed;
+
+                if (remaining <= 0) {
+                    clearInterval(activeIntervalsGlobal[leaveId]);
+                    if (timerSpan) timerSpan.innerHTML = `<span class="text-[11px] text-slate-400 font-medium">Süre Doldu</span>`;
+                    const btn = document.getElementById(`btn-boz-${leaveId}`);
+                    if (btn) btn.remove();
+                } else {
+                    const totalSecs = Math.floor(remaining / 1000);
+                    const mins = Math.floor(totalSecs / 60);
+                    const secs = totalSecs % 60;
+                    if (timerSpan) {
+                        timerSpan.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    }
+                }
+            }
+
+            updateClock();
+            activeIntervalsGlobal[leaveId] = setInterval(updateClock, 1000);
+        }
+
+        // KÜRESEL İPTAL SİLME METODU
+        async function handleCancelLeave(leaveId) {
+            if (!confirm("Bu izin talebini iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz ve kayıt tamamen silinir.")) return;
+
+            try {
+                const response = await fetch(`/api/auth/cancel-leave/${leaveId}`, { method: 'POST' });
+                if (response.ok) {
+                    showNotification("İzin talebiniz başarıyla iptal edildi ve silindi.", true);
+                    if (activeIntervalsGlobal[leaveId]) clearInterval(activeIntervalsGlobal[leaveId]);
+                    loadPersonelLeaves();
+                } else {
+                    showNotification(await response.text() || "İptal işlemi başarısız.");
+                }
+            } catch (err) {
+                showNotification("Bağlantı hatası.");
+            }
         }
 
         function calculateDays() {
@@ -476,6 +529,9 @@
             const durationBlock = document.getElementById("duration-block");
             const durationText = document.getElementById("duration-text");
             const submitBtn = document.getElementById("submit-btn");
+            const errBox = document.getElementById("modal-error-box");
+
+            errBox.classList.add("hidden");
 
             if (activeDurationType === 1 || activeDurationType === 2) {
                 if (baslangicInput) {
@@ -541,36 +597,57 @@
             return 0;
         }
 
+        // EKSİK OLAN FONKSİYON: calculateDays metodu ile handleLeaveRequest arasına orijinal yerleştirme noktasına konumlandırıldı
         function showNotification(message, isSuccess = false) {
             const box = document.getElementById("alert-box");
             const msg = document.getElementById("alert-message");
             msg.innerText = message;
             box.classList.remove("hidden", "bg-red-50", "text-red-700", "border-red-100", "bg-emerald-50", "text-emerald-700", "border-emerald-100");
             box.classList.add(isSuccess ? "bg-emerald-50" : "bg-red-50", isSuccess ? "text-emerald-700" : "text-red-700", isSuccess ? "border-emerald-100" : "border-red-100");
+            box.classList.remove("hidden");
             box.scrollIntoView({ behavior: 'smooth' });
         }
 
         async function loadPersonelLeaves() {
             try {
+                Object.keys(activeIntervalsGlobal).forEach(k => clearInterval(activeIntervalsGlobal[k]));
+                activeIntervalsGlobal = {};
+
                 const response = await fetch(`/api/auth/get-personel-leaves/${currentUser.id || currentUser.UserID}`);
                 const tbody = document.getElementById("leaves-table-body");
                 if (response.ok) {
                     const izinler = await response.json();
                     userLeaves = izinler;
-                    tbody.innerHTML = izinler.length === 0 ? `<tr><td colspan="6" class="py-12 text-center text-slate-400 font-medium">Henüz oluşturulmuş bir izin talebiniz bulunmuyor.</td></tr>` : "";
+                    tbody.innerHTML = izinler.length === 0 ? `<tr><td colspan="7" class="py-12 text-center text-slate-400 font-medium">Henüz oluşturulmuş bir izin talebiniz bulunmuyor.</td></tr>` : "";
                     izinler.forEach(i => {
                         let katText = i.kategori === 1 ? "Yıllık İzin" : i.kategori === 3 ? "Mazeret İzni" : i.kategori === 5 ? "Ücretsiz İzin" : "Hastalık / Rapor İzni";
                         let durumText = i.durum === 2 ? "Onaylandı" : i.durum === 3 ? "Reddedildi" : "Beklemede";
                         let durumClass = i.durum === 2 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : i.durum === 3 ? "bg-red-50 text-red-700 border-red-200" : "bg-amber-50 text-amber-700 border-amber-200";
+
+                        let operasyonIcerigi = `<span class="text-xs text-slate-400 font-medium">-</span>`;
+                        if (i.durum === 1) {
+                            operasyonIcerigi = `
+                                        <div class="flex items-center justify-end gap-2" id="action-container-${i.id}">
+                                            <span id="timer-${i.id}" class="text-xs font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg border border-red-100">05:00</span>
+                                            <button id="btn-boz-${i.id}" onclick="handleCancelLeave(${i.id})" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg shadow-sm shadow-red-600/10 transition-all cursor-pointer">İzin Boz</button>
+                                        </div>
+                                    `;
+                        }
+
                         tbody.innerHTML += `
-                                    <tr class="hover:bg-slate-50/50 transition-all duration-200">
-                                        <td class="py-4 px-6 font-semibold text-slate-700">${katText}</td>
-                                        <td class="py-4 px-6 font-medium text-slate-500">${i.baslangic}</td>
-                                        <td class="py-4 px-6 font-medium text-slate-500">${i.bitis}</td>
-                                        <td class="py-4 px-6 text-center font-bold text-slate-700">${i.gun} Gün</td>
-                                        <td class="py-4 px-6 text-center"><span class="inline-block px-3 py-1 text-xs font-bold rounded-full border shadow-sm ${durumClass}">${durumText}</span></td>
-                                        <td class="py-4 px-6 text-slate-400 max-w-xs truncate font-medium" title="${i.aciklama}">${i.aciklama}</td>
-                                    </tr>`;
+                                            <tr class="hover:bg-slate-50/50 transition-all duration-200">
+                                                <td class="py-4 px-6 font-semibold text-slate-700">${katText}</td>
+                                                <td class="py-4 px-6 font-medium text-slate-500">${i.baslangic}</td>
+                                                <td class="py-4 px-6 font-medium text-slate-500">${i.bitis}</td>
+                                                <td class="py-4 px-6 text-center font-bold text-slate-700">${i.gun} Gün</td>
+                                                <td class="py-4 px-6 text-center"><span class="inline-block px-3 py-1 text-xs font-bold rounded-full border shadow-sm ${durumClass}">${durumText}</span></td>
+                                                <td class="py-4 px-6 text-slate-400 max-w-xs truncate font-medium" title="${i.aciklama}">${i.aciklama}</td>
+                                                <td class="py-4 px-6 text-right select-none">${operasyonIcerigi}</td>
+                                            </tr>`;
+
+                        if (i.durum === 1 && i.olusturulmaTarihi) {
+                            BerkleyCountdownTimer(i.id, i.olusturulmaTarihi);
+                        }
                     });
                 }
             } catch (error) { console.error("Veri hatası:", error); }
@@ -580,8 +657,11 @@
             event.preventDefault();
             const totalDays = calculateDays();
             if (totalDays <= 0) { showNotification("Lütfen geçerli bir tarih aralığı seçiniz."); return; }
+
             const btn = document.getElementById("submit-btn");
+            const errBox = document.getElementById("modal-error-box");
             btn.disabled = true; btn.innerHTML = `<span>Gönderiliyor...</span>`;
+
             const payload = {
                 kullaniciId: currentUser.id || currentUser.UserID,
                 kategori: parseInt(document.getElementById("leave-kategori").value),
@@ -595,13 +675,35 @@
                 const response = await fetch('/api/auth/request-leave', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
-                if (response.ok) { showNotification("İzin talebiniz iletildi!", true); closeLeaveModal(); loadPersonelLeaves(); }
-                else showNotification(await response.text() || "Talep oluşturulamadı.");
-            } catch (error) { showNotification("Sunucu hatası."); } finally { btn.disabled = false; btn.innerHTML = `<span>Onaya Gönder</span>`; }
+                if (response.ok) {
+                    showNotification("İzin talebiniz iletildi!", true);
+                    closeLeaveModal();
+                    loadPersonelLeaves();
+                }
+                else {
+                    const errorText = await response.text();
+                    let parsedError = "Talep oluşturulamadı.";
+                    try {
+                        const jsonErr = JSON.parse(errorText);
+                        parsedError = jsonErr.message || jsonErr;
+                    } catch (e) {
+                        parsedError = errorText;
+                    }
+
+                    errBox.innerText = parsedError;
+                    errBox.classList.remove("hidden");
+                    errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            } catch (error) {
+                showNotification("Sunucu hatası.");
+            } finally { // HATA DÜZELTMESİ: 'disable' kelimesi 'finally' olarak güncellendi
+                btn.disabled = false;
+                btn.innerHTML = `<span>Onaya Gönder</span>`;
+            }
         }
 
         function handleLogout() {
-            sessionStorage.clear();
+            localStorage.clear();
             window.location.href = "index.html";
         }
     </script>

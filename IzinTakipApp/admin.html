@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -91,6 +92,63 @@
             box-shadow: 0 0 20px rgba(0, 145, 255, 0.2) !important;
             border-radius: 16px !important;
         }
+
+        .fc {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .fc-theme-standard td, .fc-theme-standard th {
+            border: 1px solid #f1f5f9 !important;
+        }
+
+        .fc-col-header-cell {
+            background: #f8fafc;
+            padding: 12px 0 !important;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .fc-daygrid-day:hover {
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        .fc-button-primary {
+            background-color: #0091ff !important;
+            border-color: #0091ff !important;
+            font-weight: 600 !important;
+            text-transform: capitalize !important;
+            border-radius: 8px !important;
+        }
+
+            .fc-button-primary:hover {
+                background-color: #0077d6 !important;
+                border-color: #0077d6 !important;
+            }
+
+        .fc-button-active {
+            background-color: #0b1329 !important;
+            border-color: #0b1329 !important;
+        }
+
+        .fc-toolbar-title {
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            color: #1e293b;
+        }
+
+        .fc-event {
+            border-radius: 6px !important;
+            padding: 2px 6px !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            border: none !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col md:flex-row">
@@ -119,6 +177,10 @@
                         <label class="block text-[11px] font-medium text-slate-400 mb-1.5">Ücretsiz İzin (Gün)</label>
                         <input type="number" id="quota-ucretsiz-input" required value="15" class="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
                     </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1.5">Aynı Gün Maks. İzinli (Kişi)</label>
+                        <input type="number" id="quota-maxpersonel-input" required value="3" class="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
                     <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 rounded-lg text-xs transition-all cursor-pointer">Kotaları Tanımla</button>
                 </form>
             </div>
@@ -127,18 +189,56 @@
     </aside>
 
     <main class="flex-1 p-6 md:p-8 space-y-8 overflow-x-hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-            <div>
-                <h1 class="text-xl font-bold text-slate-800">Yönetici Kontrol ve Onay Paneli</h1>
-                <p class="text-xs text-slate-500 mt-1">Personel tanımlamalarını ve izin taleplerini bu ekrandan yönetebilirsiniz.</p>
+
+        <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 bg-white py-6 px-6 rounded-2xl border border-slate-100 shadow-sm">
+            <div class="min-w-0">
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">Yönetici Kontrol ve Onay Paneli</h1>
+                <p class="text-xs text-slate-500 mt-1">Şirket izin takvimini, bekleyen talepleri ve personel listesini buradan yönetebilirsiniz.</p>
             </div>
-            <button id="step-admin-register" onclick="openModal()" class="bg-[#0091ff] hover:bg-sky-600 text-white font-semibold px-5 py-3 rounded-xl text-sm shadow-md transition-all cursor-pointer">Yeni Personel Tanımla</button>
+
+            <div class="flex flex-row items-center gap-3 justify-end flex-nowrap shrink-0 max-w-full">
+                <div class="flex flex-row items-center gap-1.5 bg-slate-50 p-1.5 rounded-2xl border border-slate-100 flex-nowrap shrink-0 overflow-x-auto">
+                    <button onclick="switchView('calendar')" id="tab-calendar-btn" class="bg-[#0b1329] text-white text-xs font-bold px-3.5 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap">Takvim Görünümü</button>
+                    <button onclick="switchView('leaves')" id="tab-leaves-btn" class="relative bg-transparent text-slate-600 hover:text-slate-800 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap">
+                        <span>Onay Bekleyenler</span>
+                        <span id="pending-count-badge" class="hidden absolute -top-1.5 -right-1 bg-red-500 text-white text-[10px] font-bold h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center shadow-sm animate-pulse border border-white">0</span>
+                    </button>
+                    <button onclick="switchView('past-leaves')" id="tab-past-leaves-btn" class="bg-transparent text-slate-600 hover:text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap">Geçmiş İzinler</button>
+                    <button onclick="switchView('personels')" id="tab-personels-btn" class="bg-transparent text-slate-600 hover:text-slate-800 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap">Personel Listesi</button>
+                </div>
+                <button id="step-admin-register" onclick="openModal()" class="bg-[#0091ff] hover:bg-sky-600 text-white font-semibold px-4 py-3 rounded-xl text-xs shadow-md shadow-sky-600/10 transition-all cursor-pointer shrink-0 whitespace-nowrap">Yeni Personel Tanımla</button>
+            </div>
         </div>
 
         <div id="alert-box" class="hidden p-4 rounded-xl text-sm font-medium"></div>
 
-        <div id="step-admin-leaves" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div class="p-5 border-b border-slate-100"><h3 class="font-bold text-slate-800 text-sm">Onay Bekleyen Personel İzin Talepleri</h3></div>
+        <div id="view-calendar-section" class="flex flex-col xl:flex-row gap-6">
+            <div class="flex-1 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                <div id="calendar"></div>
+            </div>
+
+            <div class="w-full xl:w-80 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col h-fit space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-sm" id="selected-date-title">Seçili Tarih</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Bu tarihte izinli olan personel listesi</p>
+                </div>
+
+                <div id="daily-top3-container" class="space-y-3">
+                    <p class="text-xs text-slate-400 text-center py-6">Takvimden bir güne tıklayarak izinli personelleri görebilirsiniz.</p>
+                </div>
+
+                <div id="daily-all-toggle-block" class="hidden pt-2 border-t border-slate-100/60">
+                    <button onclick="toggleAllDailyPersonels()" id="all-personels-view-btn" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-lg transition-all cursor-pointer text-center">Tüm İzinlileri Gör</button>
+                    <div id="daily-full-list" class="hidden space-y-2 mt-3 pt-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-leaves-section" class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-fadeIn">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800 text-sm">Onay Bekleyen Personel İzin Talepleri</h3>
+                <button onclick="switchView('calendar')" class="text-xs text-sky-600 font-bold hover:underline">← Takvime Dön</button>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -157,8 +257,44 @@
             <div id="no-leaves-message" class="hidden p-8 text-center text-sm text-slate-400 font-medium">Şu an onay bekleyen bir izin talebi yok.</div>
         </div>
 
-        <div id="step-admin-personels" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div class="p-5 border-b border-slate-100"><h3 class="font-bold text-slate-800 text-sm">Sistemde Tanımlı Şirket Personelleri</h3></div>
+        <div id="view-past-leaves-section" class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-fadeIn">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800 text-sm">Sonuçlandırılmış Geçmiş İzin Talepleri Arşivi</h3>
+                <button onclick="switchView('calendar')" class="text-xs text-sky-600 font-bold hover:underline">← Takvime Dön</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-slate-100">
+                            <th class="px-6 py-4">Personel</th>
+                            <th class="px-6 py-4">İzin Türü</th>
+                            <th class="px-6 py-4">Tarih Aralığı</th>
+                            <th class="px-6 py-4">Süre</th>
+                            <th class="px-6 py-4">Açıklama</th>
+                            <th class="px-6 py-4 text-right">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="past-leaves-table" class="divide-y divide-slate-100 text-sm text-slate-600"></tbody>
+                </table>
+            </div>
+            <div id="no-past-leaves-message" class="hidden p-8 text-center text-sm text-slate-400 font-medium">Sistemde sonuçlandırılmış geçmiş izin talebi bulunmuyor.</div>
+        </div>
+
+        <div id="view-personels-section" class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-fadeIn">
+            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h3 class="font-bold text-slate-800 text-sm">Sistemde Tanımlı Şirket Personelleri</h3>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="personel-search-input" oninput="filterPersonelsTable()" placeholder="Personel ismi ara..."
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-2 text-xs font-medium focus:outline-none focus:border-sky-500 transition-all">
+                        <span class="absolute right-3 top-2.5 text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/xl" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </span>
+                    </div>
+                    <button onclick="switchView('calendar')" class="text-xs text-sky-600 font-bold hover:underline shrink-0">← Takvime Dön</button>
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -167,6 +303,7 @@
                             <th class="px-6 py-4">Rol</th>
                             <th class="px-6 py-4">E-posta</th>
                             <th class="px-6 py-4">Yıllık İzin Hakkı</th>
+                            <th class="px-6 py-4 text-right">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody id="personels-table" class="divide-y divide-slate-100 text-sm text-slate-600"></tbody>
@@ -178,10 +315,12 @@
     <div id="personel-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 md:p-8 space-y-5 border border-slate-100">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold text-slate-800">Şirkete Yeni Personel Tanımla</h3>
+                <h3 class="text-lg font-bold text-slate-800" id="modal-title">Şirkete Yeni Personel Tanımla</h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer">&times;</button>
             </div>
-            <form onsubmit="handlePersonelRegister(event)" class="space-y-4">
+            <form onsubmit="handlePersonelSubmit(event)" class="space-y-4">
+                <input type="hidden" id="p-id-hidden" value="">
+
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Personel Adı Soyadı</label>
                     <input type="text" id="p-name" required placeholder="Ahmet Yılmaz" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
@@ -190,9 +329,9 @@
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">E-posta Adresi</label>
                     <input type="email" id="p-email" required placeholder="ahmet@company.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
                 </div>
-                <div>
+                <div id="p-password-block">
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Giriş Şifresi</label>
-                    <input type="password" id="p-password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                    <input type="password" id="p-password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">İşe Başlama Tarihi</label>
@@ -206,25 +345,52 @@
         </div>
     </div>
 
+    <div id="detail-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="text-base font-bold text-slate-800">Personel Detay Kartı</h3>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div><span class="text-xs font-semibold text-slate-400 block">Ad Soyad:</span><span id="d-name" class="font-bold text-slate-800"></span></div>
+                <div><span class="text-xs font-semibold text-slate-400 block">E-posta:</span><span id="d-email" class="font-medium text-slate-600"></span></div>
+                <div><span class="text-xs font-semibold text-slate-400 block">Kalan Yıllık İzin:</span><span id="d-yillik" class="font-bold text-sky-600"></span></div>
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100/60">
+                    <div><span class="text-[11px] font-semibold text-slate-400 block">Mazeret Kotası:</span><span id="d-mazeret" class="font-semibold text-slate-700"></span></div>
+                    <div><span class="text-[11px] font-semibold text-slate-400 block">Ücretsiz İzin Kotası:</span><span id="d-ucretsiz" class="font-semibold text-slate-700"></span></div>
+                </div>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeDetailModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-xl transition-all">Kapat</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
     <script>
         let currentUser = null;
         let adminLogID = 0;
+        let calendar = null;
+        let allApprovedLeavesGlobal = [];
+        let globalPersonelsList = [];
 
         document.addEventListener("DOMContentLoaded", () => {
-            const sessionData = sessionStorage.getItem("user_data");
+            const sessionData = localStorage.getItem("user_data");
             if (!sessionData) { window.location.href = "index.html"; return; }
 
             currentUser = JSON.parse(sessionData);
-            if (currentUser.role !== "1") { window.location.href = "personel.html"; return; }
+            const userRole = currentUser.role || currentUser.Role;
+            if (!userRole || userRole !== "1") { window.location.href = "personel.html"; return; }
 
             adminLogID = currentUser.UserID || currentUser.id || currentUser.ID || currentUser.Id || 0;
 
-            document.getElementById("admin-name").innerText = currentUser.name;
+            document.getElementById("admin-name").innerText = currentUser.name || currentUser.Name || "Yönetici";
 
-            document.getElementById("quota-mazeret-input").value = currentUser.mazeretKota || 5;
-            document.getElementById("quota-ucretsiz-input").value = currentUser.ucretsizKota || 15;
+            document.getElementById("quota-mazeret-input").value = currentUser.mazeretKota || currentUser.MazeretKota || 5;
+            document.getElementById("quota-ucretsiz-input").value = currentUser.ucretsizKota || currentUser.UcretsizKota || 15;
+            document.getElementById("quota-maxpersonel-input").value = currentUser.maxIzinliKota || currentUser.MaxIzinliKota || 3;
 
+            initFullCalendar();
             loadAllData();
 
             const isFirst = currentUser.isFirstLogin === true || currentUser.isFirstLogin === "true" || currentUser.IsFirstLogin === true || currentUser.IsFirstLogin === "true";
@@ -234,12 +400,10 @@
             if (isFirst && !isLocalCompleted) {
                 localStorage.setItem(localOnboardingKey, "true");
                 setTimeout(() => {
-                    introJs().setOptions({
+                    introJs.tour().setOptions({
                         steps: [
                             { element: '#step-admin-policy', intro: 'Şirket genelindeki tüm personeller için geçerli mazeret ve ücretsiz izin kotalarını buradan dinamik olarak güncelleyebilirsiniz.' },
-                            { element: '#step-admin-register', intro: 'Şirketinize yeni katılacak olan personelleri, sisteme kayıt etmek için bu butona tıklayarak formu açabilirsiniz.' },
-                            { element: '#step-admin-leaves', intro: 'Personellerinizden gelen onay bekleyen aktif izin talepleri burada listelenir. Tek tıkla onaylayabilir veya reddedebilirsiniz.' },
-                            { element: '#step-admin-personels', intro: 'Sisteminizde tanımlı olan tüm personellerin güncel listesini ve kalan yıllık izin haklarını bu alandan anlık görebilirsiniz.' }
+                            { element: '#step-admin-register', intro: 'Şirketinize yeni katılacak olan personelleri, sisteme kayıt etmek için bu butona tıklayarak formu açabilirsiniz.' }
                         ],
                         nextLabel: 'İleri ➔',
                         prevLabel: '➔ Geri',
@@ -249,16 +413,139 @@
                         showStepNumbers: false,
                         disableInteraction: true
                     })
-                        .oncomplete(async () => {
-                            await finishOnboarding(adminLogID, localOnboardingKey);
-                        })
-                        .onexit(async () => {
-                            await finishOnboarding(adminLogID, localOnboardingKey);
-                        })
+                        .oncomplete(async () => { await finishOnboarding(adminLogID, localOnboardingKey); })
+                        .onexit(async () => { await finishOnboarding(adminLogID, localOnboardingKey); })
                         .start();
                 }, 1000);
             }
         });
+
+        function switchView(viewName) {
+            const calendarSec = document.getElementById("view-calendar-section");
+            const leavesSec = document.getElementById("view-leaves-section");
+            const personelsSec = document.getElementById("view-personels-section");
+            const pastLeavesSec = document.getElementById("view-past-leaves-section");
+
+            const calBtn = document.getElementById("tab-calendar-btn");
+            const leaveBtn = document.getElementById("tab-leaves-btn");
+            const persBtn = document.getElementById("tab-personels-btn");
+            const pastLeaveBtn = document.getElementById("tab-past-leaves-btn");
+
+            calendarSec.classList.add("hidden");
+            leavesSec.classList.add("hidden");
+            personelsSec.classList.add("hidden");
+            pastLeavesSec.classList.add("hidden");
+
+            [calBtn, leaveBtn, persBtn, pastLeaveBtn].forEach(b => {
+                b.className = "bg-transparent text-slate-500 hover:text-slate-800 text-xs font-bold px-4 py-2.5 rounded-lg transition-all cursor-pointer whitespace-nowrap";
+            });
+
+            if (viewName === 'calendar') {
+                calendarSec.classList.remove("hidden");
+                calBtn.className = "bg-[#0b1329] text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all cursor-pointer whitespace-nowrap";
+                if (calendar) { calendar.render(); }
+            } else if (viewName === 'leaves') {
+                leavesSec.classList.remove("hidden");
+                leaveBtn.className = "bg-[#0b1329] text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all cursor-pointer whitespace-nowrap";
+            } else if (viewName === 'personels') {
+                personelsSec.classList.remove("hidden");
+                persBtn.className = "bg-[#0b1329] text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all cursor-pointer whitespace-nowrap";
+            } else if (viewName === 'past-leaves') {
+                pastLeavesSec.classList.remove("hidden");
+                pastLeaveBtn.className = "bg-[#0b1329] text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all cursor-pointer whitespace-nowrap";
+            }
+        }
+
+        function initFullCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'tr',
+                firstDay: 1,
+                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+                buttonText: { today: 'Bugün', month: 'Ay', week: 'Hafta' },
+                dayMaxEvents: 2,
+                eventDisplay: 'block',
+                moreLinkText: function (num) {
+                    return '+' + num + ' personel';
+                },
+
+                events: function (info, successCallback, failureCallback) {
+                    successCallback(allApprovedLeavesGlobal);
+                },
+                dateClick: function (info) {
+                    handleDateSelection(info.dateStr);
+                }
+            });
+            calendar.render();
+        }
+
+        function handleDateSelection(dateStr) {
+            const dateTitle = document.getElementById("selected-date-title");
+            const top3Container = document.getElementById("daily-top3-container");
+            const toggleBlock = document.getElementById("daily-all-toggle-block");
+            const fullList = document.getElementById("daily-full-list");
+
+            const clickedDate = new Date(dateStr);
+            clickedDate.setHours(0, 0, 0, 0);
+
+            dateTitle.innerText = new Date(dateStr).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+            top3Container.innerHTML = "";
+            fullList.innerHTML = "";
+            fullList.classList.add("hidden");
+            document.getElementById("all-personels-view-btn").innerText = "Tüm İzinlileri Gör";
+
+            const filteredPersonels = allApprovedLeavesGlobal.filter(ev => {
+                const start = new Date(ev.start); start.setHours(0, 0, 0, 0);
+                const end = new Date(ev.end); end.setHours(0, 0, 0, 0);
+                return clickedDate >= start && clickedDate <= end;
+            });
+
+            if (filteredPersonels.length === 0) {
+                top3Container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Bu tarihte izinli personel bulunmuyor.</p>`;
+                toggleBlock.classList.add("hidden");
+                return;
+            }
+
+            const top3 = filteredPersonels.slice(0, 3);
+            top3.forEach(p => {
+                top3Container.innerHTML += `
+                            <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center justify-between shadow-inner">
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-800">${p.title.split(' (')[0]}</h4>
+                                    <p class="text-[10px] font-semibold text-sky-600 mt-0.5">${p.categoryName}</p>
+                                </div>
+                                <span class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">${p.duration} Gün</span>
+                            </div>
+                        `;
+            });
+
+            if (filteredPersonels.length > 3) {
+                toggleBlock.classList.remove("hidden");
+                filteredPersonels.forEach(p => {
+                    fullList.innerHTML += `
+                                <div class="bg-white border border-slate-100 p-2.5 rounded-lg flex items-center justify-between text-xs">
+                                    <span class="font-semibold text-slate-700">${p.title.split(' (')[0]}</span>
+                                    <span class="text-[10px] font-medium text-slate-400">${p.categoryName}</span>
+                                </div>
+                            `;
+                });
+            } else {
+                toggleBlock.classList.add("hidden");
+            }
+        }
+
+        function toggleAllDailyPersonels() {
+            const fullList = document.getElementById("daily-full-list");
+            const btn = document.getElementById("all-personels-view-btn");
+            if (fullList.classList.contains("hidden")) {
+                fullList.classList.remove("hidden");
+                btn.innerText = "Listeyi Kapat";
+            } else {
+                fullList.classList.add("hidden");
+                btn.innerText = "Tüm İzinlileri Gör";
+            }
+        }
 
         async function finishOnboarding(userId, localKey) {
             localStorage.setItem(localKey, "true");
@@ -267,12 +554,53 @@
                 if (response.ok) {
                     currentUser.isFirstLogin = false;
                     currentUser.IsFirstLogin = false;
-                    sessionStorage.setItem("user_data", JSON.stringify(currentUser));
+                    localStorage.setItem("user_data", JSON.stringify(currentUser));
                 }
             } catch (e) { console.error("Onboarding tamamlanma kaydı başarısız:", e); }
         }
 
-        function loadAllData() { getPersonelsList(); getPendingLeaves(); }
+        async function loadAllData() {
+            await getPersonelsList();
+            await getPendingLeaves();
+            await getPastLeavesList();
+            await fetchAndBuildCalendarEvents();
+        }
+
+        async function fetchAndBuildCalendarEvents() {
+            try {
+                const response = await fetch(`/api/auth/get-personels/${adminLogID}`);
+                if (response.ok) {
+                    const personeller = await response.json();
+                    allApprovedLeavesGlobal = [];
+
+                    for (const p of personeller) {
+                        const leaveResp = await fetch(`/api/auth/get-personel-leaves/${p.id}`);
+                        if (leaveResp.ok) {
+                            const izinler = await leaveResp.json();
+                            izinler.forEach(iz => {
+                                if (iz.durum === 2) {
+                                    let renk = "#0091ff";
+                                    let katAd = "Yıllık İzin";
+                                    if (iz.kategori === 3) { renk = "#f59e0b"; katAd = "Mazeret İzni"; }
+                                    if (iz.kategori === 5) { renk = "#ef4444"; katAd = "Ücretsiz İzin"; }
+
+                                    allApprovedLeavesGlobal.push({
+                                        id: iz.id,
+                                        title: `${p.ad} (${katAd})`,
+                                        start: iz.baslangic,
+                                        end: iz.bitis,
+                                        backgroundColor: renk,
+                                        categoryName: katAd,
+                                        duration: iz.gun
+                                    });
+                                }
+                            });
+                        }
+                    }
+                    if (calendar) { calendar.refetchEvents(); }
+                }
+            } catch (err) { console.error("Takvim verileri yüklenirken hata:", err); }
+        }
 
         function showNotification(message, isSuccess = false) {
             const box = document.getElementById("alert-box");
@@ -287,27 +615,146 @@
                 const response = await fetch(`/api/auth/get-personels/${adminLogID}`);
                 if (response.ok) {
                     const personeller = await response.json();
-                    const tbody = document.getElementById("personels-table");
-                    tbody.innerHTML = "";
 
-                    if (personeller.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-slate-400 font-medium">Şirketinize tanımlı herhangi bir personel bulunamadı.</td></tr>`;
-                        return;
-                    }
-
-                    personeller.forEach(p => {
-                        const tr = document.createElement("tr");
-                        tr.className = "hover:bg-slate-50/80 transition-all";
-                        tr.innerHTML = `
-                                            <td class="px-6 py-4 font-semibold text-slate-800">${p.ad}</td>
-                                            <td class="px-6 py-4 text-xs font-medium text-slate-400">${p.rol}</td>
-                                            <td class="px-6 py-4 text-slate-500">${p.eposta}</td>
-                                            <td class="px-6 py-4 font-bold text-sky-600">${p.kalanIzin} Gün</td>
-                                        `;
-                        tbody.appendChild(tr);
+                    personeller.sort((a, b) => {
+                        const adA = a.ad || "";
+                        const adB = b.ad || "";
+                        return adA.localeCompare(adB, 'tr', { sensitivity: 'base' });
                     });
+
+                    globalPersonelsList = personeller;
+                    renderPersonelsTable(globalPersonelsList);
                 }
             } catch (error) { console.error(error); }
+        }
+
+        function renderPersonelsTable(list) {
+            const tbody = document.getElementById("personels-table");
+            tbody.innerHTML = "";
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 font-medium">Eşleşen herhangi bir personel bulunamadı.</td></tr>`;
+                return;
+            }
+
+            list.forEach(p => {
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50/80 transition-all";
+
+                let formattedDate = p.iseBaslamaTarihi || p.IseBaslamaTarihi || "";
+                if (formattedDate && formattedDate.includes("T")) {
+                    formattedDate = formattedDate.split("T")[0];
+                }
+
+                tr.innerHTML = `
+                            <td class="px-6 py-4 font-semibold text-slate-800">${p.ad}</td>
+                            <td class="px-6 py-4 text-xs font-medium text-slate-400">${p.rol}</td>
+                            <td class="px-6 py-4 text-slate-500">${p.eposta}</td>
+                            <td class="px-6 py-4 font-bold text-sky-600">${p.kalanIzin} Gün</td>
+                            <td class="px-6 py-4 text-right space-x-1.5 whitespace-nowrap">
+                                <button onclick="openDetailModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Detay</button>
+                                <button onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')}, '${formattedDate}')" class="bg-sky-50 hover:bg-sky-100 text-sky-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Düzenle</button>
+                            </td>
+                        `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterPersonelsTable() {
+            const searchKeyword = document.getElementById("personel-search-input").value.trim().toLowerCase('tr');
+
+            if (!searchKeyword) {
+                renderPersonelsTable(globalPersonelsList);
+                return;
+            }
+
+            const filtered = globalPersonelsList.filter(p => {
+                const nameLower = (p.ad || "").toLowerCase('tr');
+                const emailLower = (p.eposta || "").toLowerCase('tr');
+                return nameLower.includes(searchKeyword) || emailLower.includes(searchKeyword);
+            });
+
+            renderPersonelsTable(filtered);
+        }
+
+        function openEditModal(personelObj, dateString) {
+            document.getElementById("modal-title").innerText = "Personel Bilgilerini Düzenle";
+            document.getElementById("p-id-hidden").value = personelObj.id;
+            document.getElementById("p-name").value = personelObj.ad;
+            document.getElementById("p-email").value = personelObj.eposta;
+            document.getElementById("p-date").value = dateString;
+
+            document.getElementById("p-password-block").classList.add("hidden");
+            document.getElementById("p-password").required = false;
+
+            document.getElementById("personel-modal").classList.remove("hidden");
+        }
+
+        function openDetailModal(p) {
+            document.getElementById("d-name").innerText = p.ad;
+            document.getElementById("d-email").innerText = p.eposta;
+            document.getElementById("d-yillik").innerText = `${p.kalanIzin} Gün`;
+            document.getElementById("d-mazeret").innerText = `${p.mazeretKota || 5} Gün`;
+            document.getElementById("d-ucretsiz").innerText = `${p.ucretsizKota || 15} Gün`;
+            document.getElementById("detail-modal").classList.remove("hidden");
+        }
+
+        function closeModal() { document.getElementById("personel-modal").classList.add("hidden"); }
+        function closeDetailModal() { document.getElementById("detail-modal").classList.add("hidden"); }
+
+        async function handlePersonelSubmit(event) {
+            event.preventDefault();
+            const hiddenId = document.getElementById("p-id-hidden").value;
+            const btn = document.getElementById("save-btn");
+            btn.disabled = true; btn.innerText = "Kaydediliyor...";
+
+            const payload = {
+                AdminName: document.getElementById("p-name").value.trim(),
+                Email: document.getElementById("p-email").value.trim(),
+                IseBaslamaTarihi: document.getElementById("p-date").value,
+                Role: "0",
+                ManagerID: adminLogID
+            };
+
+            let url = '/api/auth/register-personel';
+            if (hiddenId) {
+                payload.id = parseInt(hiddenId);
+                url = '/api/auth/update-personel';
+            } else {
+                payload.Password = document.getElementById("p-password").value;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    showNotification(hiddenId ? "Personel bilgileri başarıyla güncellendi!" : "Yeni personel başarıyla tanımlandı!", true);
+                    closeModal();
+                    loadAllData();
+                } else {
+                    showNotification("İşlem başarısız oldu.");
+                }
+            } catch (error) {
+                showNotification("Bağlantı hatası.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "Personeli Kaydet";
+            }
+        }
+
+        function openModal() {
+            document.getElementById("modal-title").innerText = "Şirkete Yeni Personel Tanımla";
+            document.getElementById("p-id-hidden").value = "";
+            document.getElementById("p-name").value = "";
+            document.getElementById("p-email").value = "";
+            document.getElementById("p-date").value = "";
+            document.getElementById("p-password").value = "";
+            document.getElementById("p-password-block").classList.remove("hidden");
+            document.getElementById("p-password").required = true;
+            document.getElementById("personel-modal").classList.remove("hidden");
         }
 
         async function getPendingLeaves() {
@@ -315,10 +762,19 @@
                 const response = await fetch(`/api/auth/get-pending-leaves/${adminLogID}`);
                 const msgBox = document.getElementById("no-leaves-message");
                 const tbody = document.getElementById("pending-leaves-table");
+                const badge = document.getElementById("pending-count-badge");
                 tbody.innerHTML = "";
 
                 if (response.ok) {
                     const talepler = await response.json();
+
+                    if (talepler && talepler.length > 0) {
+                        badge.innerText = talepler.length;
+                        badge.classList.remove("hidden");
+                    } else {
+                        badge.classList.add("hidden");
+                    }
+
                     if (!talepler || talepler.length === 0) { msgBox.classList.remove("hidden"); return; }
 
                     msgBox.classList.add("hidden");
@@ -330,16 +786,54 @@
                         const tr = document.createElement("tr");
                         tr.className = "hover:bg-slate-50/80 transition-all";
                         tr.innerHTML = `
-                                            <td class="px-6 py-4 font-semibold text-slate-800">${t.ad}</td>
-                                            <td class="px-6 py-4 text-xs font-medium text-slate-500">${katMetni}</td>
-                                            <td class="px-6 py-4 text-slate-500 text-xs">${t.baslangic} / ${t.bitis}</td>
-                                            <td class="px-6 py-4 font-bold text-slate-700">${t.gun} Gün</td>
-                                            <td class="px-6 py-4 text-slate-500 text-xs max-w-[150px] truncate">${t.aciklama}</td>
-                                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                                <button onclick="respondLeave(${t.id}, true)" class="bg-[#0091ff] hover:bg-sky-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Onayla</button>
-                                                <button onclick="respondLeave(${t.id}, false)" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Reddet</button>
-                                            </td>
-                                        `;
+                                                            <td class="px-6 py-4 font-semibold text-slate-800">${t.ad}</td>
+                                                            <td class="px-6 py-4 text-xs font-medium text-slate-400">${katMetni}</td>
+                                                            <td class="px-6 py-4 text-slate-500">${t.baslangic} / ${t.bitis}</td>
+                                                            <td class="px-6 py-4 font-bold text-slate-700">${t.gun} Gün</td>
+                                                            <td class="px-6 py-4 text-slate-500 text-xs max-w-[150px] truncate">${t.aciklama}</td>
+                                                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                                                                <button onclick="respondLeave(${t.id}, true)" class="bg-[#0091ff] hover:bg-sky-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Onayla</button>
+                                                                <button onclick="respondLeave(${t.id}, false)" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">Reddet</button>
+                                                            </td>
+                                                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    badge.classList.add("hidden");
+                }
+            } catch (error) { console.error(error); badge.classList.add("hidden"); }
+        }
+
+        async function getPastLeavesList() {
+            try {
+                const response = await fetch(`/api/auth/get-past-leaves/${adminLogID}`);
+                const msgBox = document.getElementById("no-past-leaves-message");
+                const tbody = document.getElementById("past-leaves-table");
+                tbody.innerHTML = "";
+
+                if (response.ok) {
+                    const gecmisTalepler = await response.json();
+                    if (!gecmisTalepler || gecmisTalepler.length === 0) { msgBox.classList.remove("hidden"); return; }
+
+                    msgBox.classList.add("hidden");
+                    gecmisTalepler.forEach(t => {
+                        let katMetni = 'Yıllık İzin';
+                        if (t.kategori === 3) katMetni = 'Mazeret İzni';
+                        if (t.kategori === 5) katMetni = 'Ücretsiz İzin';
+
+                        let durumText = t.durum === 2 ? "Onaylandı" : "Reddedildi";
+                        let durumClass = t.durum === 2 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-700 border-red-100";
+
+                        const tr = document.createElement("tr");
+                        tr.className = "hover:bg-slate-50/80 transition-all";
+                        tr.innerHTML = `
+                                    <td class="px-6 py-4 font-semibold text-slate-800">${t.ad}</td>
+                                    <td class="px-6 py-4 text-xs font-medium text-slate-500">${katMetni}</td>
+                                    <td class="px-6 py-4 text-slate-500 text-xs">${t.baslangic} / ${t.bitis}</td>
+                                    <td class="px-6 py-4 font-bold text-slate-700">${t.gun} Gün</td>
+                                    <td class="px-6 py-4 text-slate-500 text-xs max-w-[150px] truncate" title="${t.aciklama}">${t.aciklama}</td>
+                                    <td class="px-6 py-4 text-right"><span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full border ${durumClass}">${durumText}</span></td>
+                                `;
                         tbody.appendChild(tr);
                     });
                 }
@@ -354,40 +848,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (response.ok) { showNotification(onaylandiMi ? "İzin onaylandı." : "İzin reddedildi.", true); loadAllData(); }
-            } catch (error) { showNotification("İşlem hatası."); }
-        }
-
-        async function handlePersonelRegister(event) {
-            event.preventDefault();
-            const btn = document.getElementById("save-btn");
-            btn.disabled = true; btn.innerText = "Kaydediliyor...";
-
-            const payload = {
-                AdminName: document.getElementById("p-name").value.trim(),
-                Email: document.getElementById("p-email").value.trim(),
-                Password: document.getElementById("p-password").value,
-                IseBaslamaTarihi: document.getElementById("p-date").value,
-                Role: "0",
-                ManagerID: adminLogID
-            };
-
-            try {
-                const response = await fetch('/api/auth/register-personel', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
                 if (response.ok) {
-                    showNotification("Yeni personel başarıyla tanımlandı!", true);
-                    closeModal(); loadAllData();
-                    document.getElementById("p-name").value = "";
-                    document.getElementById("p-email").value = "";
-                    document.getElementById("p-password").value = "";
-                    document.getElementById("p-date").value = "";
-                } else { showNotification("Personel eklenemedi."); }
-            } catch (error) { showNotification("Bağlantı hatası."); }
-            finally { btn.disabled = false; btn.innerText = "Personeli Kaydet"; }
+                    showNotification(onaylandiMi ? "İzin onaylandı." : "İzin reddedildi.", true);
+                    loadAllData();
+                }
+            } catch (error) { showNotification("İşlem hatası."); }
         }
 
         async function handleQuotaUpdate(event) {
@@ -395,7 +860,8 @@
             const payload = {
                 adminId: adminLogID,
                 mazeretKota: parseInt(document.getElementById("quota-mazeret-input").value),
-                ucretsizKota: parseInt(document.getElementById("quota-ucretsiz-input").value)
+                ucretsizKota: parseInt(document.getElementById("quota-ucretsiz-input").value),
+                maxIzinliKota: parseInt(document.getElementById("quota-maxpersonel-input").value)
             };
             try {
                 const response = await fetch('/api/auth/update-company-quotas', {
@@ -403,13 +869,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (response.ok) { showNotification("Kotalar güncellendi!", true); }
+                if (response.ok) {
+                    showNotification("Kotalar güncellendi!", true);
+                    currentUser.maxIzinliKota = payload.maxIzinliKota;
+                    localStorage.setItem("user_data", JSON.stringify(currentUser));
+                }
             } catch (error) { showNotification("Kota güncellenirken hata oluştu."); }
         }
 
-        function openModal() { document.getElementById("personel-modal").classList.remove("hidden"); }
-        function closeModal() { document.getElementById("personel-modal").classList.add("hidden"); }
-        function handleLogout() { sessionStorage.clear(); window.location.href = "index.html"; }
+        function handleLogout() { localStorage.clear(); window.location.href = "index.html"; }
     </script>
 </body>
 </html>
