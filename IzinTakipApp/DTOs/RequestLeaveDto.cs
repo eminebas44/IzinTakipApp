@@ -12,5 +12,8 @@ namespace IzinTakip.API.Models.DTOs
         public DateTime BitisTarihi { get; set; }
         public double ToplamGun { get; set; }
         public string Aciklama { get; set; }
+
+        // Personel tarafından gönderilen rapor verisi (Base64 string veya URL)
+        public string RaporUrl { get; set; }
     }
 }

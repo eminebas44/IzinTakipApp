@@ -19,6 +19,7 @@ namespace IzinTakipApp.Models
         public string Email { get; set; }
 
         [Required]
+        [StringLength(255)]
         public string PasswordHash { get; set; }
 
         [Required]
@@ -35,6 +36,9 @@ namespace IzinTakipApp.Models
 
         // YENİ EKLENEN ALAN: Aynı gün izinli olabilecek maksimum personel kotası
         public int MaxIzinliKota { get; set; } = 3;
+
+        // YENİ EKLENEN ALAN: Şirket İzin Politikası & Duyurular Metni
+        public string SirketPolitikasi { get; set; } = string.Empty;
 
         public bool IsFirstLogin { get; set; } = true;
 

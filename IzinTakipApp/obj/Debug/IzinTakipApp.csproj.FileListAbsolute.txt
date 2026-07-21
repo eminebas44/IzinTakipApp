@@ -124,3 +124,5 @@ C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.Web.dll
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.xml
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\bin\NLog.Web.xml
 C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.AddMaxIzinliKotaToUser.resources
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.AddRaporUrlToIzinTalebi.resources
+C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\obj\Debug\IzinTakipApp.Migrations.AddSirketPolitikasi.resources

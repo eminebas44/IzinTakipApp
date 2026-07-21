@@ -41,6 +41,9 @@ namespace IzinTakipApp.Models
         [StringLength(500)]
         public string Aciklama { get; set; }
 
+        // Yüklenen sağlık raporu / belge (Base64 string veya dosya yolu olarak tutulur)
+        public string RaporUrl { get; set; }
+
         [Required]
         public DateTime OlusturulmaTarihi { get; set; }
 

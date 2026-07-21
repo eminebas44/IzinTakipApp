@@ -40,6 +40,19 @@ namespace IzinTakip.API.Controllers
 
                     foreach (var p in personeller)
                     {
+                        // ------------------ YENİ EKLENEN HESAPLAMA BAŞLANGICI ------------------
+                        // Personelin işe giriş yılından bugüne kadarki toplam hak ettiği izin hesabı
+                        int iseGirisYili = p.IseGirisTarihi.Year;
+                        int buYil = DateTime.Now.Year;
+                        int toplamHakEdilen = 0;
+
+                        for (int y = iseGirisYili; y <= buYil; y++)
+                        {
+                            int kidem = y - iseGirisYili;
+                            toplamHakEdilen += kidem >= 5 ? 20 : kidem >= 1 ? 14 : 5;
+                        }
+                        // ------------------ YENİ EKLENEN HESAPLAMA BİTİŞİ ------------------
+
                         liste.Add(new
                         {
                             id = p.ID,
@@ -47,6 +60,7 @@ namespace IzinTakip.API.Controllers
                             rol = "Personel",
                             eposta = p.Email,
                             kalanIzin = p.KalanYillikIzin,
+                            toplamHakEdilen = toplamHakEdilen, // <-- YENİ EKLENEN ALAN: Toplam Hak Edilen İzin
                             mazeretKota = p.MazeretIzinKotasi,
                             ucretsizKota = p.UcretsizIzinKotasi,
                             iseBaslamaTarihi = p.IseGirisTarihi.ToString("yyyy-MM-dd")
@@ -74,9 +88,9 @@ namespace IzinTakip.API.Controllers
                     var tumKullanicilar = db.Users.ToList();
 
                     var benimPersonelIdleri = tumKullanicilar
-                                                 .Where(u => u.ManagerID == adminId && u.Role == "0")
-                                                 .Select(u => u.ID)
-                                                 .ToList();
+                                                   .Where(u => u.ManagerID == adminId && u.Role == "0")
+                                                   .Select(u => u.ID)
+                                                   .ToList();
 
                     var liste = new List<object>();
 
@@ -96,7 +110,9 @@ namespace IzinTakip.API.Controllers
                                 baslangic = talep.BaslangicTarihi.ToString("yyyy-MM-dd"),
                                 bitis = talep.BitisTarihi.ToString("yyyy-MM-dd"),
                                 gun = talep.ToplamGun,
-                                aciklama = talep.Aciklama
+                                aciklama = talep.Aciklama,
+                                raporUrl = talep.RaporUrl,
+                                raporDosyasi = talep.RaporUrl
                             });
                         }
                     }
@@ -123,9 +139,9 @@ namespace IzinTakip.API.Controllers
                     var tumKullanicilar = db.Users.ToList();
 
                     var benimPersonelIdleri = tumKullanicilar
-                                                 .Where(u => u.ManagerID == adminId && u.Role == "0")
-                                                 .Select(u => u.ID)
-                                                 .ToList();
+                                                   .Where(u => u.ManagerID == adminId && u.Role == "0")
+                                                   .Select(u => u.ID)
+                                                   .ToList();
 
                     var liste = new List<object>();
 
@@ -146,7 +162,9 @@ namespace IzinTakip.API.Controllers
                                 bitis = talep.BitisTarihi.ToString("yyyy-MM-dd"),
                                 gun = talep.ToplamGun,
                                 durum = (int)talep.Durum,
-                                aciklama = talep.Aciklama
+                                aciklama = talep.Aciklama,
+                                raporUrl = talep.RaporUrl,
+                                raporDosyasi = talep.RaporUrl
                             });
                         }
                     }
@@ -183,7 +201,8 @@ namespace IzinTakip.API.Controllers
                             bitis = t.BitisTarihi.ToString("yyyy-MM-dd"),
                             gun = t.ToplamGun,
                             aciklama = t.Aciklama,
-                            olusturulmaTarihi = t.OlusturulmaTarihi.ToString("yyyy-MM-ddTHH:mm:ss")
+                            olusturulmaTarihi = t.OlusturulmaTarihi.ToString("yyyy-MM-ddTHH:mm:ss"),
+                            raporUrl = t.RaporUrl
                         });
                     }
                     return Ok(liste);
@@ -322,41 +341,62 @@ namespace IzinTakip.API.Controllers
 
         [HttpPost]
         [Route("update-company-quotas")]
-        public IHttpActionResult UpdateCompanyQuotas([FromBody] Newtonsoft.Json.Linq.JObject data)
+        public IHttpActionResult UpdateCompanyQuotas([FromBody] CompanyQuotaDto dto)
         {
+            if (dto == null) return BadRequest("Kota güncelleme verisi eksik.");
+
             try
             {
-                int adminId = data["adminId"] != null ? data["adminId"].ToObject<int>() : 0;
-                int mazeretKota = data["mazeretKota"] != null ? data["mazeretKota"].ToObject<int>() : 5;
-                int ucretsizKota = data["ucretsizKota"] != null ? data["ucretsizKota"].ToObject<int>() : 15;
-                int maxIzinliKota = data["maxIzinliKota"] != null ? data["maxIzinliKota"].ToObject<int>() : 3;
-
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var adminUser = db.Users.FirstOrDefault(u => u.ID == adminId);
+                    var adminUser = db.Users.FirstOrDefault(u => u.ID == dto.AdminId);
                     if (adminUser == null) return BadRequest("Yönetici bulunamadı.");
 
-                    // GÜNCELLEME: Yönetici hesabındaki limitleri güncelliyoruz
-                    adminUser.MazeretIzinKotasi = mazeretKota;
-                    adminUser.UcretsizIzinKotasi = ucretsizKota;
-                    adminUser.MaxIzinliKota = maxIzinliKota;
+                    adminUser.MazeretIzinKotasi = dto.MazeretKota;
+                    adminUser.UcretsizIzinKotasi = dto.UcretsizKota;
+                    adminUser.MaxIzinliKota = dto.MaxIzinliKota;
+                    adminUser.SirketPolitikasi = dto.SirketPolitikasi ?? string.Empty;
 
-                    var bagliPersoneller = db.Users.Where(u => u.ManagerID == adminId && u.Role == "0").ToList();
+                    var bagliPersoneller = db.Users.Where(u => u.ManagerID == dto.AdminId && u.Role == "0").ToList();
                     foreach (var personel in bagliPersoneller)
                     {
-                        personel.MazeretIzinKotasi = mazeretKota;
-                        personel.UcretsizIzinKotasi = ucretsizKota;
+                        personel.MazeretIzinKotasi = dto.MazeretKota;
+                        personel.UcretsizIzinKotasi = dto.UcretsizKota;
                     }
 
                     db.SaveChanges();
-                    Logger.Info($"Yönetici şirket genel kotalarını güncelledi. Yönetici ID: {adminId}, Mazeret: {mazeretKota}, Ücretsiz: {ucretsizKota}, Maks Aynı Gün: {maxIzinliKota}");
-                    return Ok("Şirket kotaları başarıyla güncellendi.");
+                    Logger.Info($"Yönetici şirket genel kotalarını ve politikasını güncelledi. Yönetici ID: {dto.AdminId}, Mazeret: {dto.MazeretKota}, Ücretsiz: {dto.UcretsizKota}, Maks Aynı Gün: {dto.MaxIzinliKota}");
+                    return Ok("Şirket kotaları ve politikası başarıyla güncellendi.");
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, $"Şirket kotaları güncellenirken genel hata oluştu.");
                 return BadRequest("Kota güncelleme hatası: " + ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("get-company-policy/{managerId}")]
+        public IHttpActionResult GetCompanyPolicy(int managerId)
+        {
+            try
+            {
+                using (AppDbContext db = new AppDbContext())
+                {
+                    var adminUser = db.Users.FirstOrDefault(u => u.ID == managerId);
+                    if (adminUser == null)
+                    {
+                        return Ok(new { sirketPolitikasi = string.Empty });
+                    }
+
+                    return Ok(new { sirketPolitikasi = adminUser.SirketPolitikasi ?? string.Empty });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Şirket politikası çekilirken hata oluştu. Yönetici ID: {managerId}");
+                return BadRequest("Şirket politikası çekilemedi: " + ex.Message);
             }
         }
 
@@ -375,7 +415,6 @@ namespace IzinTakip.API.Controllers
 
                     double hesaplananGun = (dto.BitisTarihi.Date - dto.BaslangicTarihi.Date).TotalDays + 1;
 
-                    // GÜNCELLEME: Sabit "3" değeri yerine yöneticinin belirlediği dinamik kotayı veritabanından çekiyoruz
                     int maxIzinliLimiti = 3;
                     var adminUser = db.Users.FirstOrDefault(u => u.ID == personel.ManagerID);
                     if (adminUser != null && adminUser.MaxIzinliKota > 0)
@@ -418,6 +457,7 @@ namespace IzinTakip.API.Controllers
                         ToplamGun = hesaplananGun,
                         Durum = IzinDurumu.Beklemede,
                         Aciklama = dto.Aciklama,
+                        RaporUrl = dto.RaporUrl,
                         OlusturulmaTarihi = DateTime.Now
                     };
 

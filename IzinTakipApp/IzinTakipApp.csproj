@@ -215,6 +215,14 @@
     <Compile Include="Migrations\202607201329149_AddMaxIzinliKotaToUser.designer.cs">
       <DependentUpon>202607201329149_AddMaxIzinliKotaToUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202607210644532_AddRaporUrlToIzinTalebi.cs" />
+    <Compile Include="Migrations\202607210644532_AddRaporUrlToIzinTalebi.designer.cs">
+      <DependentUpon>202607210644532_AddRaporUrlToIzinTalebi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202607210744531_AddSirketPolitikasi.cs" />
+    <Compile Include="Migrations\202607210744531_AddSirketPolitikasi.designer.cs">
+      <DependentUpon>202607210744531_AddSirketPolitikasi.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\IzinTalebi.cs" />
     <Compile Include="Models\Kullanici.cs" />
@@ -331,6 +339,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202607201329149_AddMaxIzinliKotaToUser.resx">
       <DependentUpon>202607201329149_AddMaxIzinliKotaToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202607210644532_AddRaporUrlToIzinTalebi.resx">
+      <DependentUpon>202607210644532_AddRaporUrlToIzinTalebi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202607210744531_AddSirketPolitikasi.resx">
+      <DependentUpon>202607210744531_AddSirketPolitikasi.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
