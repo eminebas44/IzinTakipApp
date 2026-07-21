@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Net;
 using System.Net.Mail;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 using IzinTakipApp.Data;
 using IzinTakipApp.Models;
 using IzinTakipApp.Enums;
@@ -18,6 +21,13 @@ namespace IzinTakip.API.Controllers
         public string Email { get; set; }
         public string Code { get; set; }
         public string NewPassword { get; set; }
+    }
+
+    public class BulkRespondLeaveDto
+    {
+        public List<int> TalepIdleri { get; set; }
+        public bool OnaylandiMi { get; set; }
+        public bool IzneYansitilsinMi { get; set; } = true;
     }
 
     [RoutePrefix("api/auth")]
@@ -40,8 +50,6 @@ namespace IzinTakip.API.Controllers
 
                     foreach (var p in personeller)
                     {
-                        // ------------------ YENİ EKLENEN HESAPLAMA BAŞLANGICI ------------------
-                        // Personelin işe giriş yılından bugüne kadarki toplam hak ettiği izin hesabı
                         int iseGirisYili = p.IseGirisTarihi.Year;
                         int buYil = DateTime.Now.Year;
                         int toplamHakEdilen = 0;
@@ -51,7 +59,6 @@ namespace IzinTakip.API.Controllers
                             int kidem = y - iseGirisYili;
                             toplamHakEdilen += kidem >= 5 ? 20 : kidem >= 1 ? 14 : 5;
                         }
-                        // ------------------ YENİ EKLENEN HESAPLAMA BİTİŞİ ------------------
 
                         liste.Add(new
                         {
@@ -60,7 +67,7 @@ namespace IzinTakip.API.Controllers
                             rol = "Personel",
                             eposta = p.Email,
                             kalanIzin = p.KalanYillikIzin,
-                            toplamHakEdilen = toplamHakEdilen, // <-- YENİ EKLENEN ALAN: Toplam Hak Edilen İzin
+                            toplamHakEdilen = toplamHakEdilen,
                             mazeretKota = p.MazeretIzinKotasi,
                             ucretsizKota = p.UcretsizIzinKotasi,
                             iseBaslamaTarihi = p.IseGirisTarihi.ToString("yyyy-MM-dd")
@@ -439,13 +446,13 @@ namespace IzinTakip.API.Controllers
                     }
 
                     if (dto.Kategori == IzinKategorisi.YillikIzin && hesaplananGun > personel.KalanYillikIzin)
-                        return BadRequest("Yıllık izin limitinizi aşıyorsunuz.");
+                        return BadRequest("İzin kotanızın üstünde izin talep ettiniz, izin alınamaz.");
 
                     if (dto.Kategori == IzinKategorisi.MazeretIzni && hesaplananGun > personel.MazeretIzinKotasi)
-                        return BadRequest("Mazeret izni limitinizi aşıyorsunuz.");
+                        return BadRequest("İzin kotanızın üstünde izin talep ettiniz, izin alınamaz.");
 
                     if (dto.Kategori == IzinKategorisi.UcretsizIzin && hesaplananGun > personel.UcretsizIzinKotasi)
-                        return BadRequest("Ücretsiz izin limitinizi aşıyorsunuz.");
+                        return BadRequest("İzin kotanızın üstünde izin talep ettiniz, izin alınamaz.");
 
                     IzinTalebi yeniTalep = new IzinTalebi
                     {
@@ -525,14 +532,29 @@ namespace IzinTakip.API.Controllers
 
                     if (dto.OnaylandiMi)
                     {
-                        talep.Durum = IzinDurumu.Onaylandi;
-
                         if (dto.IzneYansitilsinMi)
                         {
-                            if (talep.Kategori == IzinKategorisi.YillikIzin) personel.KalanYillikIzin -= talep.ToplamGun;
-                            if (talep.Kategori == IzinKategorisi.MazeretIzni) personel.MazeretIzinKotasi -= talep.ToplamGun;
-                            if (talep.Kategori == IzinKategorisi.UcretsizIzin) personel.UcretsizIzinKotasi -= talep.ToplamGun;
+                            if (talep.Kategori == IzinKategorisi.YillikIzin)
+                            {
+                                if (personel.KalanYillikIzin < talep.ToplamGun)
+                                    return BadRequest($"Personelin kalan yıllık izni yetersiz. (Kalan: {personel.KalanYillikIzin} gün)");
+                                personel.KalanYillikIzin -= talep.ToplamGun;
+                            }
+                            else if (talep.Kategori == IzinKategorisi.MazeretIzni)
+                            {
+                                if (personel.MazeretIzinKotasi < talep.ToplamGun)
+                                    return BadRequest($"Personelin mazeret izin kotası yetersiz. (Kalan: {personel.MazeretIzinKotasi} gün)");
+                                personel.MazeretIzinKotasi -= talep.ToplamGun;
+                            }
+                            else if (talep.Kategori == IzinKategorisi.UcretsizIzin)
+                            {
+                                if (personel.UcretsizIzinKotasi < talep.ToplamGun)
+                                    return BadRequest($"Personelin ücretsiz izin kotası yetersiz. (Kalan: {personel.UcretsizIzinKotasi} gün)");
+                                personel.UcretsizIzinKotasi -= talep.ToplamGun;
+                            }
                         }
+
+                        talep.Durum = IzinDurumu.Onaylandi;
                     }
                     else
                     {
@@ -540,6 +562,13 @@ namespace IzinTakip.API.Controllers
                     }
 
                     db.SaveChanges();
+
+                    if (!string.IsNullOrEmpty(personel.Email))
+                    {
+                        string durumMetni = dto.OnaylandiMi ? "ONAYLANDI" : "REDDEDİLDİ";
+                        string tarihAraligi = $"{talep.BaslangicTarihi:dd.MM.yyyy} - {talep.BitisTarihi:dd.MM.yyyy}";
+                        SendLeaveStatusEmail(personel.Email, personel.Name, durumMetni, tarihAraligi, talep.Kategori.ToString());
+                    }
 
                     Logger.Info($"Yönetici izin talebini sonuçlandırdı. Talep ID: {dto.TalepId}, Karar: {(dto.OnaylandiMi ? "Onaylandı" : "Reddedildi")}, İzne Yansıtıldı Mı: {dto.IzneYansitilsinMi}, Personel: {personel.Name}");
                     return Ok("İzin talebi sonuçlandırıldı.");
@@ -549,6 +578,86 @@ namespace IzinTakip.API.Controllers
             {
                 Logger.Error(ex, $"Yönetici izin talebine yanıt verirken (RespondLeave) hata oluştu. Talep ID: {dto?.TalepId}");
                 return BadRequest("İşlem başarısız: " + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("bulk-respond-leave")]
+        public IHttpActionResult BulkRespondLeave([FromBody] BulkRespondLeaveDto dto)
+        {
+            if (dto == null || dto.TalepIdleri == null || !dto.TalepIdleri.Any())
+                return BadRequest("Lütfen işlem yapılacak en az bir talep seçiniz.");
+
+            try
+            {
+                using (AppDbContext db = new AppDbContext())
+                {
+                    var talepler = db.IzinTalepleri.Where(t => dto.TalepIdleri.Contains(t.ID)).ToList();
+                    if (!talepler.Any()) return BadRequest("Seçilen talepler bulunamadı.");
+
+                    int islenenSayi = 0;
+                    var bildirilecekPersoneller = new List<(string Email, string Name, string TarihAraligi, string Kategori)>();
+
+                    foreach (var talep in talepler)
+                    {
+                        if (talep.Durum != IzinDurumu.Beklemede) continue;
+
+                        var personel = db.Users.FirstOrDefault(u => u.ID == talep.KullaniciId);
+                        if (personel == null) continue;
+
+                        if (dto.OnaylandiMi)
+                        {
+                            if (dto.IzneYansitilsinMi)
+                            {
+                                if (talep.Kategori == IzinKategorisi.YillikIzin)
+                                {
+                                    if (personel.KalanYillikIzin < talep.ToplamGun) continue;
+                                    personel.KalanYillikIzin -= talep.ToplamGun;
+                                }
+                                else if (talep.Kategori == IzinKategorisi.MazeretIzni)
+                                {
+                                    if (personel.MazeretIzinKotasi < talep.ToplamGun) continue;
+                                    personel.MazeretIzinKotasi -= talep.ToplamGun;
+                                }
+                                else if (talep.Kategori == IzinKategorisi.UcretsizIzin)
+                                {
+                                    if (personel.UcretsizIzinKotasi < talep.ToplamGun) continue;
+                                    personel.UcretsizIzinKotasi -= talep.ToplamGun;
+                                }
+                            }
+
+                            talep.Durum = IzinDurumu.Onaylandi;
+                        }
+                        else
+                        {
+                            talep.Durum = IzinDurumu.Reddedildi;
+                        }
+
+                        if (!string.IsNullOrEmpty(personel.Email))
+                        {
+                            string tarihAraligi = $"{talep.BaslangicTarihi:dd.MM.yyyy} - {talep.BitisTarihi:dd.MM.yyyy}";
+                            bildirilecekPersoneller.Add((personel.Email, personel.Name, tarihAraligi, talep.Kategori.ToString()));
+                        }
+
+                        islenenSayi++;
+                    }
+
+                    db.SaveChanges();
+
+                    string durumMetni = dto.OnaylandiMi ? "ONAYLANDI" : "REDDEDİLDİ";
+                    foreach (var item in bildirilecekPersoneller)
+                    {
+                        SendLeaveStatusEmail(item.Email, item.Name, durumMetni, item.TarihAraligi, item.Kategori);
+                    }
+
+                    Logger.Info($"Toplu izin işlemi yapıldı. İşlenen Talep Sayısı: {islenenSayi}, Karar: {(dto.OnaylandiMi ? "Onaylandı" : "Reddedildi")}, İzne Yansıtıldı Mı: {dto.IzneYansitilsinMi}");
+                    return Ok($"{islenenSayi} adet izin talebi başarıyla sonuçlandırıldı.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Toplu izin yanıtlanırken teknik hata oluştu.");
+                return BadRequest("Toplu işlem hatası: " + ex.Message);
             }
         }
 
@@ -745,6 +854,116 @@ namespace IzinTakip.API.Controllers
             {
                 Logger.Error(ex, $"Veritabanında şifre hashlenip güncellenirken kritik hata oluştu. Hesap: {email}");
                 return BadRequest("Veritabanı güncelleme hatası: " + ex.Message);
+            }
+        }
+
+        private static void SendLeaveStatusEmail(string personelEmail, string personelName, string statusText, string dateRange, string categoryText)
+        {
+            try
+            {
+                string smtpServer = ConfigurationManager.AppSettings["SmtpServer"];
+                int smtpPort = int.Parse(ConfigurationManager.AppSettings["SmtpPort"]);
+                string senderEmail = ConfigurationManager.AppSettings["SenderEmail"];
+                string senderPassword = ConfigurationManager.AppSettings["SenderPassword"];
+
+                using (var smtpClient = new SmtpClient(smtpServer, smtpPort))
+                {
+                    smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
+                    smtpClient.EnableSsl = true;
+
+                    using (var mailMessage = new MailMessage())
+                    {
+                        mailMessage.From = new MailAddress(senderEmail, "İzinPort Sistem");
+                        mailMessage.Subject = $"İzinPort - İzin Talebiniz {statusText}";
+                        mailMessage.Body = $@"
+                            <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+                                <h3 style='color: #0b1329;'>Merhaba {personelName},</h3>
+                                <p><b>{dateRange}</b> tarihleri arasındaki <b>{categoryText}</b> talebiniz yönetici tarafından <b>{statusText}</b>.</p>
+                                <p>Detayları görüntülemek için sisteme giriş yapabilirsiniz.</p>
+                                <br/>
+                                <p style='font-size: 12px; color: #777;'>Bu e-posta otomatik olarak gönderilmiştir, lütfen yanıtlamayınız.</p>
+                            </div>";
+                        mailMessage.IsBodyHtml = true;
+                        mailMessage.To.Add(personelEmail);
+
+                        smtpClient.Send(mailMessage);
+                    }
+                }
+                Logger.Info($"İzin durum maili başarıyla gönderildi. Alıcı: {personelEmail}, Durum: {statusText}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"İzin durum maili gönderilirken hata oluştu. Hedef: {personelEmail}");
+            }
+        }
+
+        // ------------------ DİREKT METİN AYRIŞTIRICI (REGEX) İLE KESİN LOG OKUMA ------------------
+        [HttpGet]
+        [Route("get-logs")]
+        public IHttpActionResult GetLogs()
+        {
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+                List<string> candidatePaths = new List<string>
+                {
+                    Path.Combine(baseDir, "App_Data", "Logs", "izintakip_log.xml"),
+                    System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/Logs/izintakip_log.xml"),
+                    Path.Combine(baseDir, "App_Data", "izintakip_log.xml"),
+                    System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/izintakip_log.xml")
+                };
+
+                string targetFilePath = candidatePaths.FirstOrDefault(p => !string.IsNullOrEmpty(p) && File.Exists(p));
+
+                if (string.IsNullOrEmpty(targetFilePath))
+                {
+                    return Ok(new List<object>());
+                }
+
+                var logList = new List<object>();
+
+                // FileShare.ReadWrite kullanarak kilitli dosyayı metin satırları halinde oku
+                using (var stream = new FileStream(targetFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+
+                        // <logTime="..." level="..." message="..." exception="..." /> biçimini ayıran Regex
+                        var matchTime = Regex.Match(line, @"logTime=""([^""]+)""");
+                        var matchLevel = Regex.Match(line, @"level=""([^""]+)""");
+                        var matchMessage = Regex.Match(line, @"message=""([^""]+)""");
+                        var matchException = Regex.Match(line, @"exception=""([^""]+)""");
+
+                        if (matchMessage.Success || matchTime.Success)
+                        {
+                            string dateStr = matchTime.Success ? matchTime.Groups[1].Value : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            string levelStr = matchLevel.Success ? matchLevel.Groups[1].Value.ToUpper() : "INFO";
+                            string messageStr = matchMessage.Success ? matchMessage.Groups[1].Value : line.Trim();
+                            string exceptionStr = matchException.Success ? matchException.Groups[1].Value : "";
+
+                            logList.Add(new
+                            {
+                                date = dateStr,
+                                level = levelStr,
+                                message = messageStr,
+                                exception = exceptionStr
+                            });
+                        }
+                    }
+                }
+
+                // En güncel loglar en üstte olsun
+                logList.Reverse();
+                return Ok(logList);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Log verileri okunurken hata oluştu.");
+                return BadRequest("Loglar okunamadı: " + ex.Message);
             }
         }
     }
