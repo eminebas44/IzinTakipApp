@@ -367,3 +367,4 @@
 <logTime="2026-07-21 15:50:47.2986" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
 <logTime="2026-07-21 15:54:31.4774" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ayse celik, Rol: Personel" exception="" />
 <logTime="2026-07-21 15:54:37.4348" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-22 10:46:55.7414" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yönetici şirket genel kotalarını ve politikasını güncelledi. Yönetici ID: 1008, Mazeret: 6, Ücretsiz: 60, Maks Aynı Gün: 7" exception="" />
