@@ -1,0 +1,787 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İzinPort - İnsan Kaynakları Paneli</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+    <!-- ÜST NAVİGASYON BARI -->
+    <header class="bg-[#0b1329] text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="İzinPort Logo" class="h-9 w-auto object-contain">
+                <div>
+                    <h1 class="font-bold text-base tracking-tight text-white">İzinPort</h1>
+                    <span class="text-[10px] font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded uppercase tracking-wider">İnsan Kaynakları Paneli</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- MOD DEĞİŞTİR BUTONU (Mod seçildiğinde görünür) -->
+                <button id="switch-mode-btn" onclick="showSelectionScreen()" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700 transition-all flex items-center gap-2 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                    <span>Mod Değiştir</span>
+                </button>
+
+                <!-- KULLANICI BİLGİSİ -->
+                <div class="hidden sm:flex flex-col text-right">
+                    <span id="hr-user-name" class="font-bold text-xs text-slate-200">Yükleniyor...</span>
+                    <span id="hr-user-email" class="text-[10px] text-slate-400">ik@company.com</span>
+                </div>
+
+                <!-- ÇIKIŞ BUTONU -->
+                <button onclick="handleLogout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-xl border border-red-500/20 transition-all cursor-pointer" title="Güvenli Çıkış">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- GENEL BİLDİRİM KUTUSU (Gerekirse sayfa üzeri için) -->
+        <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-sm font-medium"></div>
+
+        <!-- ========================================================================= -->
+        <!-- EKRAN 0: 2 BUTONLU İK KARŞILAMA / SEÇİM EKRANI -->
+        <!-- ========================================================================= -->
+        <section id="selection-screen" class="space-y-8 py-6">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Hoş Geldiniz, <span id="welcome-name" class="text-purple-600">İK Yetkilisi</span></h2>
+                <p class="text-xs sm:text-sm text-slate-500">Lütfen devam etmek istediğiniz işlem modunu seçiniz.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto pt-4">
+                <!-- 1. KART: KENDİ İZİN İŞLEMLERİM (PERSONEL MODU) -->
+                <div onclick="openMode('personal')" class="bg-white rounded-2xl p-8 border border-slate-100 shadow-md hover:shadow-xl hover:border-purple-200 transition-all duration-300 cursor-pointer group flex flex-col justify-between space-y-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+
+                    <div class="space-y-4 relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center shadow-inner group-hover:bg-sky-600 group-hover:text-white transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 group-hover:text-sky-600 transition-colors">Kendi İzin İşlemlerim</h3>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Kendi yıllık, mazeret ve rapor izinlerinizi talep edin, kalan kotalarınızı ve geçmiş taleplerinizin onay durumunu görüntüleyin.</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-sky-600 group-hover:translate-x-1 transition-transform relative z-10">
+                        <span>Bireysel İzin Paneline Git</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </div>
+                </div>
+
+                <!-- 2. KART: ŞİRKET & PERSONEL YÖNETİMİ (YÖNETİCİ MODU) -->
+                <div onclick="openMode('company')" class="bg-white rounded-2xl p-8 border border-slate-100 shadow-md hover:shadow-xl hover:border-purple-200 transition-all duration-300 cursor-pointer group flex flex-col justify-between space-y-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+
+                    <div class="space-y-4 relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center shadow-inner group-hover:bg-purple-600 group-hover:text-white transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0V11m0 0h12" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 group-hover:text-purple-600 transition-colors">Şirket & Personel Yönetimi</h3>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Şirkete yeni personel/İK kaydı açın, mevcut çalışan listesini inceleyin ve şirket genelindeki izin geçmişi arşivini takip edin.</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-purple-600 group-hover:translate-x-1 transition-transform relative z-10">
+                        <span>Yönetim Paneline Git</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- MOD 1: BİREYSEL İZİN PANELİ (PERSONEL MODU) -->
+        <!-- ========================================================================= -->
+        <section id="personal-mode-section" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Kişisel İzin Paneli</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Kalan kotalarınızı görün ve yeni izin talebi oluşturun.</p>
+                </div>
+                <button onclick="openLeaveRequestModal()" class="bg-[#0091ff] hover:bg-sky-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-sky-600/10 transition-all cursor-pointer">
+                    + Yeni İzin Talebi
+                </button>
+            </div>
+
+            <!-- KOTA KARTLARI -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kalan Yıllık İzin</span>
+                    <h3 id="my-yillik-quota" class="text-2xl font-bold text-sky-600">0 Gün</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Mazeret İzin Kotası</span>
+                    <h3 id="my-mazeret-quota" class="text-2xl font-bold text-amber-600">0 Gün</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ücretsiz İzin Kotası</span>
+                    <h3 id="my-ucretsiz-quota" class="text-2xl font-bold text-slate-700">0 Gün</h3>
+                </div>
+            </div>
+
+            <!-- KENDİ İZİN TALEPLERİM TABLOSU -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-sm">Açtığım İzin Talepleri Geçmişi</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/70 text-slate-600 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
+                                <th class="px-6 py-3">İzin Türü</th>
+                                <th class="px-6 py-3">Tarih Aralığı</th>
+                                <th class="px-6 py-3">Süre</th>
+                                <th class="px-6 py-3">Açıklama</th>
+                                <th class="px-6 py-3">Durum</th>
+                                <th class="px-6 py-3 text-right">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-leaves-tbody" class="divide-y divide-slate-100 text-slate-600"></tbody>
+                    </table>
+                </div>
+                <div id="no-my-leaves-msg" class="hidden p-8 text-center text-slate-400 text-xs font-medium">Henüz açılmış bir izin talebiniz bulunmuyor.</div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- MOD 2: ŞİRKET & PERSONEL YÖNETİMİ PANELİ (YÖNETİCİ MODU) -->
+        <!-- ========================================================================= -->
+        <section id="company-mode-section" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Şirket & Personel Yönetimi</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Şirket çalışanlarını listeyin, yeni personel ekleyin veya izin arşivini takip edin.</p>
+                    </div>
+                    <button onclick="openNewPersonelModal()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-purple-600/10 transition-all cursor-pointer">
+                        + Yeni Personel / İK Tanımla
+                    </button>
+                </div>
+
+                <!-- SEKMELER -->
+                <div class="flex items-center gap-2 border-t border-slate-100 pt-4">
+                    <button id="hr-tab-personels-btn" onclick="switchHrTab('personels')" class="bg-[#0b1329] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer">Personel Listesi</button>
+                    <button id="hr-tab-past-btn" onclick="switchHrTab('past')" class="bg-transparent text-slate-600 hover:text-slate-800 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer">Şirket İzin Arşivi</button>
+                </div>
+            </div>
+
+            <!-- ALT SEKME 1: PERSONEL LİSTESİ -->
+            <div id="hr-view-personels" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden space-y-4">
+                <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h3 class="font-bold text-slate-800 text-sm">Şirket Çalışanları Listesi</h3>
+
+                    <div class="flex items-center gap-3">
+                        <select id="hr-role-filter" onchange="filterHrPersonelTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-purple-500 cursor-pointer">
+                            <option value="ALL">Tüm Roller</option>
+                            <option value="0">Sadece Personeller</option>
+                            <option value="2">Sadece İnsan Kaynakları</option>
+                        </select>
+                        <input type="text" id="hr-personel-search" oninput="filterHrPersonelTable()" placeholder="İsim veya e-posta ara..." class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/70 text-slate-600 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
+                                <th class="px-6 py-3">Ad Soyad</th>
+                                <th class="px-6 py-3">Rol</th>
+                                <th class="px-6 py-3">E-posta</th>
+                                <th class="px-6 py-3">Kalan Yıllık İzin</th>
+                                <th class="px-6 py-3 text-right">İşe Başlama Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hr-personels-tbody" class="divide-y divide-slate-100 text-slate-600"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ALT SEKME 2: ŞİRKET İZİN ARŞİVİ -->
+            <div id="hr-view-past" class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-sm">Şirket Genel İzin Geçmişi Arşivi</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/70 text-slate-600 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
+                                <th class="px-6 py-3">Personel</th>
+                                <th class="px-6 py-3">İzin Türü</th>
+                                <th class="px-6 py-3">Tarih Aralığı</th>
+                                <th class="px-6 py-3">Süre</th>
+                                <th class="px-6 py-3">Açıklama</th>
+                                <th class="px-6 py-3 text-right">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hr-past-leaves-tbody" class="divide-y divide-slate-100 text-slate-600"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL 1: YENİ İZİN TALEBİ OLUŞTURMA (PERSONEL SAYFASI İLE BİREBİR AYNI) -->
+    <!-- ========================================================================= -->
+    <div id="leave-request-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 sm:p-8 space-y-5 border border-slate-100 relative">
+
+            <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-[#0b1329]">Yeni İzin Talebi</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Formu doldurarak onaya gönderebilirsiniz</p>
+                </div>
+                <button onclick="closeLeaveRequestModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl cursor-pointer p-1">&times;</button>
+            </div>
+
+            <!-- PANELDEN ARKAYA DÜŞMEYEN İÇ UYARI KUTUSU -->
+            <div id="modal-alert-box" class="hidden p-3.5 rounded-xl text-xs font-semibold border transition-all"></div>
+
+            <form onsubmit="handleLeaveSubmit(event)" class="space-y-5">
+
+                <!-- İZİN KATEGORİSİ -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">İzin Kategorisi</label>
+                    <div class="relative">
+                        <select id="req-category" class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-500 cursor-pointer appearance-none">
+                            <option value="1">Yıllık İzin</option>
+                            <option value="3">Mazeret İzni</option>
+                            <option value="5">Ücretsiz İzin</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İZİN SÜRESİ (3 BUTONLU TASARIM) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">İzin Süresi</label>
+                    <div class="grid grid-cols-3 gap-2.5">
+                        <button type="button" id="btn-sure-0" onclick="selectSureTipi(0)" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-sky-500 bg-sky-50/30 text-sky-600 font-bold text-xs transition-all cursor-pointer gap-1.5 shadow-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 0-2 2v12a2 2 0 002 2z" /></svg>
+                            <span>Tam Gün</span>
+                        </button>
+                        <button type="button" id="btn-sure-1" onclick="selectSureTipi(1)" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-600 font-semibold text-xs transition-all cursor-pointer gap-1.5 hover:border-slate-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            <span>Yarım Gün</span>
+                        </button>
+                        <button type="button" id="btn-sure-3" onclick="selectSureTipi(3)" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-600 font-semibold text-xs transition-all cursor-pointer gap-1.5 hover:border-slate-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Kısa Süreli</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="req-sure-tipi" value="0">
+                </div>
+
+                <!-- TARİH SEÇİMLERİ -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Başlangıç Tarihi</label>
+                        <input type="date" id="req-start-date" required onchange="handleStartDateChange()" class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-3.5 py-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-sky-500 cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bitiş Tarihi</label>
+                        <input type="date" id="req-end-date" required class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-3.5 py-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-sky-500 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- AÇIKLAMA -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Açıklama / Gerekçe</label>
+                    <textarea id="req-description" rows="3" required placeholder="Lütfen izin gerekçesini detaylıca yazınız..." class="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3.5 text-xs text-slate-700 focus:outline-none focus:border-sky-500 placeholder-slate-400"></textarea>
+                </div>
+
+                <!-- BUTONLAR -->
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="button" onclick="closeLeaveRequestModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 rounded-xl text-xs transition-all cursor-pointer">İptal Et</button>
+                    <button type="submit" id="req-submit-btn" class="flex-1 bg-[#1e3a8a] hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl text-xs shadow-md shadow-blue-900/10 transition-all cursor-pointer">Onaya Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL 2: YENİ PERSONEL / İK TANIMLAMA (ŞİRKET YÖNETİMİ İÇİN) -->
+    <!-- ========================================================================= -->
+    <div id="new-personel-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-5 border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-800">Şirkete Yeni Çalışan Kaydet</h3>
+                <button onclick="closeNewPersonelModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl cursor-pointer">&times;</button>
+            </div>
+            <form onsubmit="handleNewPersonelSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Kullanıcı Rolü</label>
+                    <select id="p-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 cursor-pointer">
+                        <option value="0">Personel (Standart Çalışan)</option>
+                        <option value="2">İnsan Kaynakları (İK Yetkilisi)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Ad Soyad</label>
+                    <input type="text" id="p-name" required placeholder="Ahmet Yılmaz" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">E-posta Adresi</label>
+                    <input type="email" id="p-email" required placeholder="ahmet@company.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Giriş Şifresi</label>
+                    <input type="password" id="p-password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">İşe Başlama Tarihi</label>
+                    <input type="date" id="p-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-purple-500 cursor-pointer">
+                </div>
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeNewPersonelModal()" class="px-4 py-2.5 bg-slate-100 text-slate-600 font-semibold text-xs rounded-xl cursor-pointer">İptal</button>
+                    <button type="submit" id="p-save-btn" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl cursor-pointer shadow-md shadow-purple-600/10">Çalışanı Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT MANTIĞI VE ENTEGRASYON -->
+    <script>
+        let currentUser = null;
+        let userId = 0;
+        let managerId = 0;
+        let globalPersonelsList = [];
+        let myExistingLeavesList = []; // Çakışan izin kontrolü için hafızada tutulan geçmiş izinler
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const sessionData = localStorage.getItem("user_data");
+            if (!sessionData) { window.location.href = "index.html"; return; }
+
+            currentUser = JSON.parse(sessionData);
+            const role = currentUser.role || currentUser.Role;
+
+            // Güvenlik Kontrolü: Rol "2" (İK) değilse yetkisiz erişimi engelle
+            if (role !== "2") {
+                window.location.href = role === "1" ? "admin.html" : "personel.html";
+                return;
+            }
+
+            userId = currentUser.UserID || currentUser.id || currentUser.ID || 0;
+            managerId = currentUser.ManagerID || currentUser.managerID || currentUser.managerId || userId;
+
+            document.getElementById("hr-user-name").innerText = currentUser.name || currentUser.Name || "İK Yetkilisi";
+            document.getElementById("hr-user-email").innerText = currentUser.email || currentUser.Email || "";
+            document.getElementById("welcome-name").innerText = currentUser.name || currentUser.Name || "İK Yetkilisi";
+
+            loadPersonalData();
+            loadCompanyData();
+        });
+
+        // MOD DEĞİŞTİRME MANTIĞI
+        function openMode(mode) {
+            document.getElementById("selection-screen").classList.add("hidden");
+            document.getElementById("switch-mode-btn").classList.remove("hidden");
+
+            if (mode === 'personal') {
+                document.getElementById("personal-mode-section").classList.remove("hidden");
+                document.getElementById("company-mode-section").classList.add("hidden");
+            } else if (mode === 'company') {
+                document.getElementById("company-mode-section").classList.remove("hidden");
+                document.getElementById("personal-mode-section").classList.add("hidden");
+            }
+        }
+
+        function showSelectionScreen() {
+            document.getElementById("selection-screen").classList.remove("hidden");
+            document.getElementById("personal-mode-section").classList.add("hidden");
+            document.getElementById("company-mode-section").classList.add("hidden");
+            document.getElementById("switch-mode-btn").classList.add("hidden");
+        }
+
+        // BİREYSEL İZİN VERİLERİNİ YÜKLE
+        async function loadPersonalData() {
+            document.getElementById("my-yillik-quota").innerText = `${currentUser.kalanIzin || currentUser.KalanYillikIzin || 0} Gün`;
+            document.getElementById("my-mazeret-quota").innerText = `${currentUser.mazeretKota || currentUser.MazeretIzinKotasi || 5} Gün`;
+            document.getElementById("my-ucretsiz-quota").innerText = `${currentUser.ucretsizKota || currentUser.UcretsizIzinKotasi || 15} Gün`;
+
+            try {
+                const res = await fetch(`/api/auth/get-personel-leaves/${userId}`);
+                if (res.ok) {
+                    const leaves = await res.json();
+                    myExistingLeavesList = leaves || []; // Çakışan izin tespiti için sakla
+                    renderMyLeavesTable(leaves);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderMyLeavesTable(leaves) {
+            const tbody = document.getElementById("my-leaves-tbody");
+            const noMsg = document.getElementById("no-my-leaves-msg");
+            tbody.innerHTML = "";
+
+            if (!leaves || leaves.length === 0) {
+                noMsg.classList.remove("hidden");
+                return;
+            }
+            noMsg.classList.add("hidden");
+
+            leaves.forEach(l => {
+                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : "Yıllık İzin";
+                let statusBadge = l.durum === 2
+                    ? `<span class="px-2 py-0.5 font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">Onaylandı</span>`
+                    : l.durum === 3
+                        ? `<span class="px-2 py-0.5 font-bold text-[10px] bg-rose-50 text-rose-700 border border-rose-200 rounded-full">Reddedildi</span>`
+                        : l.durum === 4
+                            ? `<span class="px-2 py-0.5 font-bold text-[10px] bg-amber-50 text-amber-700 border border-amber-200 rounded-full">İptal Edildi</span>`
+                            : `<span class="px-2 py-0.5 font-bold text-[10px] bg-sky-50 text-sky-700 border border-sky-200 rounded-full">Beklemede</span>`;
+
+                let cancelBtn = "";
+                if (l.durum === 1) {
+                    cancelBtn = `<button onclick="cancelMyLeave(${l.id})" class="text-xs text-rose-600 hover:underline font-semibold cursor-pointer">İptal Et</button>`;
+                }
+
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition-all";
+                tr.innerHTML = `
+                        <td class="px-6 py-3 font-semibold text-slate-800">${katText}</td>
+                        <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                        <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
+                        <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                        <td class="px-6 py-3">${statusBadge}</td>
+                        <td class="px-6 py-3 text-right">${cancelBtn}</td>
+                    `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function cancelMyLeave(leaveId) {
+            if (!confirm("Bu izin talebinizi iptal etmek istediğinize emin misiniz?")) return;
+            try {
+                const res = await fetch(`/api/auth/cancel-leave/${leaveId}`, { method: 'POST' });
+                if (res.ok) {
+                    showNotification("İzin talebi başarıyla iptal edildi.", true);
+                    loadPersonalData();
+                } else {
+                    const txt = await res.text();
+                    showNotification("Hata: " + txt);
+                }
+            } catch (e) { showNotification("Sunucu hatası."); }
+        }
+
+        // İZİN SÜRESİ BUTON SEÇİM MANTIĞI
+        function selectSureTipi(val) {
+            document.getElementById("req-sure-tipi").value = val;
+            const btn0 = document.getElementById("btn-sure-0");
+            const btn1 = document.getElementById("btn-sure-1");
+            const btn3 = document.getElementById("btn-sure-3");
+
+            // Sıfırla
+            [btn0, btn1, btn3].forEach(b => {
+                b.className = "flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-600 font-semibold text-xs transition-all cursor-pointer gap-1.5 hover:border-slate-300";
+            });
+
+            // Seçileni Aktif Yap
+            const activeBtn = val === 0 ? btn0 : val === 1 ? btn1 : btn3;
+            activeBtn.className = "flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-sky-500 bg-sky-50/30 text-sky-600 font-bold text-xs transition-all cursor-pointer gap-1.5 shadow-xs";
+
+            handleSureTipiChange();
+        }
+
+        function handleSureTipiChange() {
+            const sureTipi = document.getElementById("req-sure-tipi").value;
+            const endDateInput = document.getElementById("req-end-date");
+            const startDateInput = document.getElementById("req-start-date");
+
+            if (sureTipi !== "0") {
+                if (startDateInput.value) {
+                    endDateInput.value = startDateInput.value;
+                }
+                endDateInput.readOnly = true;
+                endDateInput.classList.add("bg-slate-100", "cursor-not-allowed");
+            } else {
+                endDateInput.readOnly = false;
+                endDateInput.classList.remove("bg-slate-100", "cursor-not-allowed");
+            }
+        }
+
+        function handleStartDateChange() {
+            const sureTipi = document.getElementById("req-sure-tipi").value;
+            const startDate = document.getElementById("req-start-date").value;
+            const endDateInput = document.getElementById("req-end-date");
+
+            if (sureTipi !== "0" && startDate) {
+                endDateInput.value = startDate;
+            } else if (!endDateInput.value && startDate) {
+                endDateInput.value = startDate;
+            }
+        }
+
+        // MODAL İÇİ UYARI GÖSTERME (ARKAYA DÜŞMEZ)
+        function showModalAlert(msg, isSuccess = false) {
+            const box = document.getElementById("modal-alert-box");
+            box.innerText = msg;
+            box.className = `p-3.5 rounded-xl text-xs font-semibold border transition-all ${isSuccess ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`;
+            box.classList.remove("hidden");
+        }
+
+        function hideModalAlert() {
+            document.getElementById("modal-alert-box").classList.add("hidden");
+        }
+
+        // İZİN TALEBİ GÖNDERME (ÇAKIŞAN İZİN KONTROLÜ VE İÇ UYARI İLE)
+        async function handleLeaveSubmit(e) {
+            e.preventDefault();
+            hideModalAlert();
+
+            const btn = document.getElementById("req-submit-btn");
+            btn.disabled = true;
+
+            const category = parseInt(document.getElementById("req-category").value);
+            const sureTipi = parseInt(document.getElementById("req-sure-tipi").value);
+            const startDate = document.getElementById("req-start-date").value;
+            let endDate = document.getElementById("req-end-date").value;
+            const description = document.getElementById("req-description").value.trim();
+
+            if (sureTipi !== 0) {
+                endDate = startDate;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                showModalAlert("Bitiş tarihi, başlangıç tarihinden önce olamaz!");
+                btn.disabled = false;
+                return;
+            }
+
+            // Gelişmiş Çakışan İzin Kontrolü (Onaylanan [2] veya Bekleyen [1] İzinler)
+            const hasOverlap = myExistingLeavesList.some(l => {
+                if (l.durum === 3 || l.durum === 4) return false;
+
+                const exStart = new Date(l.baslangic);
+                const exEnd = new Date(l.bitis);
+                const reqStart = new Date(startDate);
+                const reqEnd = new Date(endDate);
+
+                return (reqStart <= exEnd && reqEnd >= exStart);
+            });
+
+            if (hasOverlap) {
+                showModalAlert("Seçtiğiniz tarihlerde zaten aktif veya onay bekleyen başka bir izin talebiniz bulunuyor!");
+                btn.disabled = false;
+                return;
+            }
+
+            const payload = {
+                KullaniciId: userId,
+                Kategori: category,
+                SureTipi: sureTipi,
+                BaslangicTarihi: startDate,
+                BitisTarihi: endDate,
+                Aciklama: description
+            };
+
+            try {
+                const res = await fetch('/api/auth/request-leave', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    showNotification("İzin talebiniz başarıyla iletildi. Onay bekliyor.", true);
+                    closeLeaveRequestModal();
+                    loadPersonalData();
+                } else {
+                    const txt = await res.text();
+                    showModalAlert("Talep başarısız: " + txt);
+                }
+            } catch (err) {
+                showModalAlert("Bağlantı hatası oluştu.");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // ŞİRKET VERİLERİNİ YÜKLE (ÇALIŞANLAR & GEÇMİŞ İZİNLER)
+        async function loadCompanyData() {
+            try {
+                const res = await fetch(`/api/auth/get-personels/${managerId}`);
+                if (res.ok) {
+                    globalPersonelsList = await res.json();
+                    filterHrPersonelTable();
+                }
+            } catch (e) { console.error(e); }
+
+            try {
+                const pastRes = await fetch(`/api/auth/get-past-leaves/${managerId}`);
+                if (pastRes.ok) {
+                    const pastLeaves = await pastRes.json();
+                    renderHrPastLeavesTable(pastLeaves);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function filterHrPersonelTable() {
+            const search = document.getElementById("hr-personel-search").value.trim().toLowerCase('tr');
+            const selectedRole = document.getElementById("hr-role-filter").value;
+
+            const filtered = globalPersonelsList.filter(p => {
+                const nameMatch = (p.ad || "").toLowerCase('tr').includes(search) || (p.eposta || "").toLowerCase('tr').includes(search);
+                const pRole = p.rolId || (p.rol === "İnsan Kaynakları" ? "2" : "0");
+                const roleMatch = (selectedRole === "ALL") || (pRole === selectedRole);
+                return nameMatch && roleMatch;
+            });
+
+            renderHrPersonelsTable(filtered);
+        }
+
+        function renderHrPersonelsTable(list) {
+            const tbody = document.getElementById("hr-personels-tbody");
+            tbody.innerHTML = "";
+
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Çalışan bulunamadı.</td></tr>`;
+                return;
+            }
+
+            list.forEach(p => {
+                const isIK = (p.rolId === "2" || p.rol === "İnsan Kaynakları");
+                const badge = isIK
+                    ? `<span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-purple-50 text-purple-700 border border-purple-200">İnsan Kaynakları</span>`
+                    : `<span class="px-2.5 py-0.5 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">Personel</span>`;
+
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition-all";
+                tr.innerHTML = `
+                        <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
+                        <td class="px-6 py-3">${badge}</td>
+                        <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
+                        <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün</td>
+                        <td class="px-6 py-3 text-right font-mono text-slate-500">${p.iseBaslamaTarihi || '-'}</td>
+                    `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderHrPastLeavesTable(list) {
+            const tbody = document.getElementById("hr-past-leaves-tbody");
+            tbody.innerHTML = "";
+
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Geçmiş izin kaydı yok.</td></tr>`;
+                return;
+            }
+
+            list.forEach(l => {
+                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : "Yıllık İzin";
+                let statusBadge = l.durum === 2
+                    ? `<span class="px-2.5 py-0.5 font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">Onaylandı</span>`
+                    : `<span class="px-2.5 py-0.5 font-bold text-[10px] bg-rose-50 text-rose-700 border border-rose-200 rounded-full">Reddedildi</span>`;
+
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition-all";
+                tr.innerHTML = `
+                        <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
+                        <td class="px-6 py-3 text-slate-500">${katText}</td>
+                        <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                        <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
+                        <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                        <td class="px-6 py-3 text-right">${statusBadge}</td>
+                    `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // YENİ PERSONEL/İK KAYDETME
+        async function handleNewPersonelSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById("p-save-btn");
+            btn.disabled = true; btn.innerText = "Kaydediliyor...";
+
+            const payload = {
+                AdminName: document.getElementById("p-name").value.trim(),
+                Email: document.getElementById("p-email").value.trim(),
+                Password: document.getElementById("p-password").value,
+                IseBaslamaTarihi: document.getElementById("p-date").value,
+                Role: document.getElementById("p-role").value,
+                ManagerID: managerId
+            };
+
+            try {
+                const res = await fetch('/api/auth/register-personel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    showNotification("Yeni çalışan başarıyla kaydedildi!", true);
+                    closeNewPersonelModal();
+                    loadCompanyData();
+                } else {
+                    const txt = await res.text();
+                    showNotification("Kayıt hatası: " + txt);
+                }
+            } catch (err) { showNotification("Bağlantı hatası."); }
+            finally { btn.disabled = false; btn.innerText = "Çalışanı Kaydet"; }
+        }
+
+        function switchHrTab(tab) {
+            const pSec = document.getElementById("hr-view-personels");
+            const pastSec = document.getElementById("hr-view-past");
+            const pBtn = document.getElementById("hr-tab-personels-btn");
+            const pastBtn = document.getElementById("hr-tab-past-btn");
+
+            if (tab === 'personels') {
+                pSec.classList.remove("hidden"); pastSec.classList.add("hidden");
+                pBtn.className = "bg-[#0b1329] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer";
+                pastBtn.className = "bg-transparent text-slate-600 hover:text-slate-800 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer";
+            } else {
+                pastSec.classList.remove("hidden"); pSec.classList.add("hidden");
+                pastBtn.className = "bg-[#0b1329] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer";
+                pBtn.className = "bg-transparent text-slate-600 hover:text-slate-800 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer";
+            }
+        }
+
+        // MODAL YÖNETİMLERİ
+        function openLeaveRequestModal() {
+            hideModalAlert();
+            document.getElementById("req-start-date").value = "";
+            document.getElementById("req-end-date").value = "";
+            document.getElementById("req-description").value = "";
+            selectSureTipi(0); // Tam Gün varsayılan
+            document.getElementById("leave-request-modal").classList.remove("hidden");
+        }
+
+        function closeLeaveRequestModal() {
+            hideModalAlert();
+            document.getElementById("leave-request-modal").classList.add("hidden");
+        }
+
+        function openNewPersonelModal() { document.getElementById("new-personel-modal").classList.remove("hidden"); }
+        function closeNewPersonelModal() { document.getElementById("new-personel-modal").classList.add("hidden"); }
+
+        function showNotification(msg, isSuccess = false) {
+            const box = document.getElementById("alert-box");
+            box.innerText = msg;
+            box.className = `mb-6 p-4 rounded-xl text-sm font-medium ${isSuccess ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`;
+            box.classList.remove("hidden");
+            setTimeout(() => box.classList.add("hidden"), 4000);
+        }
+
+        function handleLogout() { localStorage.clear(); window.location.href = "index.html"; }
+    </script>
+</body>
+</html>

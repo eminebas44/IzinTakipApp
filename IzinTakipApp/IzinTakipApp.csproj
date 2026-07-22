@@ -250,6 +250,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="ik.html" />
     <Content Include="index.html" />
     <Content Include="personel.html" />
     <Content Include="Scripts\bootstrap.bundle.js" />

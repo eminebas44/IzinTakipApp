@@ -45,7 +45,14 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var personeller = db.Users.Where(u => u.Role == "0" && u.ManagerID == adminId).ToList();
+                    // İstek atan kullanıcı İK ise, bağlı olduğu Yönetici (Admin) ID'sini tespit ediyoruz
+                    var reqUser = db.Users.FirstOrDefault(u => u.ID == adminId);
+                    int targetManagerId = (reqUser != null && reqUser.Role == "2" && reqUser.ManagerID.HasValue)
+                                          ? reqUser.ManagerID.Value
+                                          : adminId;
+
+                    // Personel ("0") ve İnsan Kaynakları ("2") rollerindeki tüm çalışanları çekiyoruz
+                    var personeller = db.Users.Where(u => (u.Role == "0" || u.Role == "2") && u.ManagerID == targetManagerId).ToList();
                     var liste = new List<object>();
 
                     foreach (var p in personeller)
@@ -60,11 +67,14 @@ namespace IzinTakip.API.Controllers
                             toplamHakEdilen += kidem >= 5 ? 20 : kidem >= 1 ? 14 : 5;
                         }
 
+                        string rolAdi = p.Role == "2" ? "İnsan Kaynakları" : "Personel";
+
                         liste.Add(new
                         {
                             id = p.ID,
                             ad = p.Name,
-                            rol = "Personel",
+                            rol = rolAdi,
+                            rolId = p.Role,
                             eposta = p.Email,
                             kalanIzin = p.KalanYillikIzin,
                             toplamHakEdilen = toplamHakEdilen,
@@ -91,11 +101,16 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
+                    var reqUser = db.Users.FirstOrDefault(u => u.ID == adminId);
+                    int targetManagerId = (reqUser != null && reqUser.Role == "2" && reqUser.ManagerID.HasValue)
+                                          ? reqUser.ManagerID.Value
+                                          : adminId;
+
                     var tumTalepler = db.IzinTalepleri.Where(t => t.Durum == IzinDurumu.Beklemede).ToList();
                     var tumKullanicilar = db.Users.ToList();
 
                     var benimPersonelIdleri = tumKullanicilar
-                                                   .Where(u => u.ManagerID == adminId && u.Role == "0")
+                                                   .Where(u => u.ManagerID == targetManagerId && (u.Role == "0" || u.Role == "2"))
                                                    .Select(u => u.ID)
                                                    .ToList();
 
@@ -142,11 +157,16 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
+                    var reqUser = db.Users.FirstOrDefault(u => u.ID == adminId);
+                    int targetManagerId = (reqUser != null && reqUser.Role == "2" && reqUser.ManagerID.HasValue)
+                                          ? reqUser.ManagerID.Value
+                                          : adminId;
+
                     var tumTalepler = db.IzinTalepleri.Where(t => t.Durum != IzinDurumu.Beklemede).ToList();
                     var tumKullanicilar = db.Users.ToList();
 
                     var benimPersonelIdleri = tumKullanicilar
-                                                   .Where(u => u.ManagerID == adminId && u.Role == "0")
+                                                   .Where(u => u.ManagerID == targetManagerId && (u.Role == "0" || u.Role == "2"))
                                                    .Select(u => u.ID)
                                                    .ToList();
 
@@ -281,12 +301,14 @@ namespace IzinTakip.API.Controllers
 
                     var adminUser = db.Users.FirstOrDefault(u => u.ID == dto.ManagerID);
 
+                    string atanacakRol = string.IsNullOrEmpty(dto.Role) ? "0" : dto.Role;
+
                     Kullanici yeniPersonel = new Kullanici
                     {
                         Name = dto.AdminName,
                         Email = dto.Email,
                         PasswordHash = Crypto.HashPassword(dto.Password),
-                        Role = "0",
+                        Role = atanacakRol,
                         IseGirisTarihi = iseGiris,
                         KalanYillikIzin = tanimlananIzinGunu,
                         MazeretIzinKotasi = adminUser != null ? adminUser.MazeretIzinKotasi : 5,
@@ -297,7 +319,7 @@ namespace IzinTakip.API.Controllers
                     db.Users.Add(yeniPersonel);
                     db.SaveChanges();
 
-                    Logger.Info($"Şirkete yeni personel tanımlandı. Adı: {dto.AdminName}, E-posta: {dto.Email}, Yönetici ID: {dto.ManagerID}");
+                    Logger.Info($"Şirkete yeni çalışan tanımlandı. Adı: {dto.AdminName}, E-posta: {dto.Email}, Rol: {atanacakRol}, Yönetici ID: {dto.ManagerID}");
                     return Ok("Personel başarıyla tanımlandı.");
                 }
             }
@@ -323,6 +345,11 @@ namespace IzinTakip.API.Controllers
 
                     personel.Name = dto.AdminName;
                     personel.Email = dto.Email;
+
+                    if (!string.IsNullOrEmpty(dto.Role))
+                    {
+                        personel.Role = dto.Role;
+                    }
 
                     if (dto.IseBaslamaTarihi.HasValue)
                     {
@@ -364,7 +391,7 @@ namespace IzinTakip.API.Controllers
                     adminUser.MaxIzinliKota = dto.MaxIzinliKota;
                     adminUser.SirketPolitikasi = dto.SirketPolitikasi ?? string.Empty;
 
-                    var bagliPersoneller = db.Users.Where(u => u.ManagerID == dto.AdminId && u.Role == "0").ToList();
+                    var bagliPersoneller = db.Users.Where(u => u.ManagerID == dto.AdminId && (u.Role == "0" || u.Role == "2")).ToList();
                     foreach (var personel in bagliPersoneller)
                     {
                         personel.MazeretIzinKotasi = dto.MazeretKota;
@@ -391,7 +418,12 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    var adminUser = db.Users.FirstOrDefault(u => u.ID == managerId);
+                    var reqUser = db.Users.FirstOrDefault(u => u.ID == managerId);
+                    int targetManagerId = (reqUser != null && reqUser.Role == "2" && reqUser.ManagerID.HasValue)
+                                          ? reqUser.ManagerID.Value
+                                          : managerId;
+
+                    var adminUser = db.Users.FirstOrDefault(u => u.ID == targetManagerId);
                     if (adminUser == null)
                     {
                         return Ok(new { sirketPolitikasi = string.Empty });
@@ -699,8 +731,10 @@ namespace IzinTakip.API.Controllers
                     int maxIzinliKota = kullanici.MaxIzinliKota;
                     DateTime? iseGirisTarihi = kullanici.IseGirisTarihi;
                     bool isFirstLogin = kullanici.IsFirstLogin;
+                    int? managerID = kullanici.ManagerID;
 
-                    Logger.Info($"Kullanıcı başarıyla sisteme giriş yaptı. Adı: {userName}, Rol: {(userRole == "1" ? "Yönetici" : "Personel")}");
+                    string rolMetni = userRole == "1" ? "Yönetici" : userRole == "2" ? "İnsan Kaynakları" : "Personel";
+                    Logger.Info($"Kullanıcı başarıyla sisteme giriş yaptı. Adı: {userName}, Rol: {rolMetni}");
 
                     return Ok(new
                     {
@@ -715,7 +749,8 @@ namespace IzinTakip.API.Controllers
                         ucretsizKota = ucretsizKota,
                         maxIzinliKota = maxIzinliKota,
                         iseGirisTarihi = iseGirisTarihi,
-                        isFirstLogin = isFirstLogin
+                        isFirstLogin = isFirstLogin,
+                        ManagerID = managerID
                     });
                 }
             }
@@ -923,7 +958,6 @@ namespace IzinTakip.API.Controllers
 
                 var logList = new List<object>();
 
-                // FileShare.ReadWrite kullanarak kilitli dosyayı metin satırları halinde oku
                 using (var stream = new FileStream(targetFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (var reader = new StreamReader(stream, Encoding.UTF8))
                 {
@@ -932,7 +966,6 @@ namespace IzinTakip.API.Controllers
                     {
                         if (string.IsNullOrWhiteSpace(line)) continue;
 
-                        // <logTime="..." level="..." message="..." exception="..." /> biçimini ayıran Regex
                         var matchTime = Regex.Match(line, @"logTime=""([^""]+)""");
                         var matchLevel = Regex.Match(line, @"level=""([^""]+)""");
                         var matchMessage = Regex.Match(line, @"message=""([^""]+)""");
@@ -956,7 +989,6 @@ namespace IzinTakip.API.Controllers
                     }
                 }
 
-                // En güncel loglar en üstte olsun
                 logList.Reverse();
                 return Ok(logList);
             }

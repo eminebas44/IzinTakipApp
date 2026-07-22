@@ -7,6 +7,11 @@ namespace IzinTakipApp.Models
     [Table("Users")]
     public class Kullanici
     {
+        // ROL SABİTLERİ (İş mantığında ve kontrollerde kullanmak için)
+        public const string RolePersonel = "0";
+        public const string RoleAdmin = "1";
+        public const string RoleIK = "2";
+
         [Key]
         public int ID { get; set; }
 
@@ -22,6 +27,12 @@ namespace IzinTakipApp.Models
         [StringLength(255)]
         public string PasswordHash { get; set; }
 
+        /// <summary>
+        /// Kullanıcı Rolü:
+        /// "0" = Personel
+        /// "1" = Şirket Yöneticisi (Admin)
+        /// "2" = İnsan Kaynakları (HR)
+        /// </summary>
         [Required]
         [StringLength(50)]
         public string Role { get; set; }
@@ -34,10 +45,10 @@ namespace IzinTakipApp.Models
 
         public double UcretsizIzinKotasi { get; set; }
 
-        // YENİ EKLENEN ALAN: Aynı gün izinli olabilecek maksimum personel kotası
+        // Aynı gün izinli olabilecek maksimum personel kotası
         public int MaxIzinliKota { get; set; } = 3;
 
-        // YENİ EKLENEN ALAN: Şirket İzin Politikası & Duyurular Metni
+        // Şirket İzin Politikası & Duyurular Metni
         public string SirketPolitikasi { get; set; } = string.Empty;
 
         public bool IsFirstLogin { get; set; } = true;

@@ -98,6 +98,7 @@
 
     </div>
 
+    <!-- ŞİFRE YENİLEME MODALI -->
     <div id="forgot-modal" class="hidden fixed inset-0 bg-[#0b1329]/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 border border-slate-100 space-y-6 relative">
             <button onclick="closeForgotModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-semibold text-lg cursor-pointer">&times;</button>
@@ -111,6 +112,7 @@
                 <span id="forgot-alert-message"></span>
             </div>
 
+            <!-- ADIM 1: E-POSTA GİRİŞİ -->
             <div id="forgot-step-1" class="space-y-4">
                 <div class="space-y-2">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">E-Posta Adresiniz</label>
@@ -124,19 +126,32 @@
                 </button>
             </div>
 
+            <!-- ADIM 2: DOĞRULAMA KODU VE DÜZENLENEN TEMİZ SAYAÇ ALANI -->
             <div id="forgot-step-2" class="space-y-4 hidden">
                 <div class="space-y-2">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">E-Posta Doğrulama Kodu</label>
                     <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                         <input type="text" id="forgot-code" placeholder="123456" maxlength="6" class="w-full bg-transparent border-none outline-none text-slate-700 text-sm focus:ring-0 font-bold tracking-widest text-center">
                     </div>
                 </div>
+
                 <button type="button" onclick="verifyCode()" id="forgot-btn-verify" class="w-full bg-[#1e3a8a] hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition-all text-sm uppercase tracking-wide cursor-pointer">
                     Kodu Doğrula
                 </button>
+
+                <!-- ŞIK VE TEMİZ KOD TEKRAR İSTEME / SAYAÇ YAZISI -->
+                <div class="text-center pt-1">
+                    <span id="timer-status" class="text-xs font-medium text-slate-400">
+                        Kalan Süre: <strong id="timer-text" class="text-slate-700 font-bold">01:00</strong>
+                    </span>
+                    <button type="button" id="forgot-btn-resend" onclick="sendVerificationCode()" class="hidden text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline transition-all cursor-pointer">
+                        Süre Doldu - Yeni Kod Al
+                    </button>
+                </div>
             </div>
 
+            <!-- ADIM 3: YENİ ŞİFRE -->
             <div id="forgot-step-3" class="space-y-4 hidden">
                 <div class="space-y-2">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Yeni Şifre</label>
@@ -160,21 +175,24 @@
     </div>
 
     <script>
-        
-        /* OTO-YÖNLENDİRME METODU: Tarayıcı açıldığında localStorage içinde kayıtlı aktif oturum verisi (user_data) varsa rolüne göre (1: Admin, 0: Personel) sayfayı otomatik fırlatır. */
-        
+        let timerInterval = null;
+        let timeLeft = 60; // Test İçin 60 Saniye (1 Dakika)
+
+        /* OTO-YÖNLENDİRME METODU (İK İÇİN ROLE "2" DESTEĞİ EKLENDİ) */
         document.addEventListener("DOMContentLoaded", () => {
             const sessionData = localStorage.getItem("user_data");
             if (sessionData) {
                 const data = JSON.parse(sessionData);
-                if (data.role === "1") {
+                const role = data.role || data.Role;
+                if (role === "1") {
                     window.location.href = "admin.html";
+                } else if (role === "2") {
+                    window.location.href = "ik.html";
                 } else {
                     window.location.href = "personel.html";
                 }
             }
-        }); 
-        
+        });
 
         function toggleForm(showRegister) {
             const loginForm = document.getElementById("login-form");
@@ -215,6 +233,7 @@
             document.getElementById("forgot-modal").classList.remove("hidden");
             showForgotStep(1);
             hideForgotAlert();
+            stopTimer();
             document.getElementById("forgot-email").value = "";
             document.getElementById("forgot-code").value = "";
             document.getElementById("forgot-new-password").value = "";
@@ -223,6 +242,7 @@
 
         function closeForgotModal() {
             document.getElementById("forgot-modal").classList.add("hidden");
+            stopTimer();
         }
 
         function showForgotStep(stepNum) {
@@ -248,12 +268,56 @@
             document.getElementById("forgot-alert-box").classList.add("hidden");
         }
 
+        /* 60 SANİYELİK DÜZENLENMİŞ SAYAÇ MANTIĞI */
+        function startTimer() {
+            stopTimer();
+            timeLeft = 60; // 60 Saniye
+            const timerStatus = document.getElementById("timer-status");
+            const timerText = document.getElementById("timer-text");
+            const resendBtn = document.getElementById("forgot-btn-resend");
+            const verifyBtn = document.getElementById("forgot-btn-verify");
+            const codeInput = document.getElementById("forgot-code");
+
+            timerStatus.classList.remove("hidden");
+            resendBtn.classList.add("hidden");
+            verifyBtn.disabled = false;
+            codeInput.disabled = false;
+
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+
+                const formattedMin = String(minutes).padStart(2, '0');
+                const formattedSec = String(seconds).padStart(2, '0');
+
+                timerText.innerText = `${formattedMin}:${formattedSec}`;
+
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    timerStatus.classList.add("hidden");
+                    resendBtn.classList.remove("hidden");
+                    verifyBtn.disabled = true;
+                    codeInput.disabled = true;
+                    showForgotAlert("Doğrulama kodunun süresi doldu! Lütfen yeni kod alın.");
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
         async function sendVerificationCode() {
             hideForgotAlert();
             const email = document.getElementById("forgot-email").value.trim();
             if (!email) { showForgotAlert("Lütfen e-posta adresinizi girin."); return; }
 
             const btn = document.getElementById("forgot-btn-send");
+
             btn.disabled = true; btn.innerText = "Kod Gönderiliyor...";
 
             try {
@@ -265,7 +329,11 @@
 
                 if (response.ok) {
                     showForgotAlert("Doğrulama kodu e-postanıza gönderildi!", true);
-                    setTimeout(() => { hideForgotAlert(); showForgotStep(2); }, 1500);
+                    setTimeout(() => {
+                        hideForgotAlert();
+                        showForgotStep(2);
+                        startTimer(); // Sayacı Başlat
+                    }, 1000);
                 } else {
                     const errorText = await response.text();
                     showForgotAlert(errorText || "E-posta gönderilemedi.");
@@ -294,11 +362,11 @@
                 });
 
                 if (response.ok) {
+                    stopTimer(); // Doğrulama başarılı olunca sayacı durdur
                     showForgotAlert("Kod doğrulandı! Yeni şifrenizi belirleyin.", true);
                     setTimeout(() => { hideForgotAlert(); showForgotStep(3); }, 1500);
                 } else {
-                    const errorText = await response.text();
-                    showForgotAlert(errorText || "Geçersiz veya süresi dolmuş kod.");
+                    showForgotAlert("Doğrulama kodu hatalı veya kullanım süresi dolmuş. Lütfen kodu kontrol edin ya da yeni bir kod talep edin.");
                 }
             } catch (error) {
                 showForgotAlert("Bağlantı hatası.");
@@ -344,6 +412,7 @@
             }
         }
 
+        /* GİRİŞ İŞLEMİ (ROLE === "2" İÇİN IK.HTML YÖNLENDİRMESİ EKLENDİ) */
         async function handleLogin(event) {
             event.preventDefault();
             hideAlert();
@@ -370,9 +439,13 @@
 
                     localStorage.setItem("user_data", JSON.stringify(data));
 
+                    const role = data.role || data.Role;
+
                     setTimeout(() => {
-                        if (data.role === "1") {
+                        if (role === "1") {
                             window.location.href = "admin.html";
+                        } else if (role === "2") {
+                            window.location.href = "ik.html";
                         } else {
                             window.location.href = "personel.html";
                         }

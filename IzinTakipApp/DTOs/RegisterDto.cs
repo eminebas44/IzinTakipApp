@@ -4,17 +4,32 @@ namespace IzinTakip.API.Models.DTOs
 {
     public class RegisterDto
     {
-        // YENİ EKLENEN ALAN: Güncelleme işlemlerinde personelin benzersiz kimliğini taşır
+        // Güncelleme işlemlerinde personelin benzersiz kimliğini taşır
         public int? id { get; set; }
-        //yeni eklendi!!  ->ayni gun icinde max kac personelin izinli olacagi ile ilgili
+
+        // Aynı gün içinde max kaç personelin izinli olacağı bilgisi
         public int? MaxIzinliKota { get; set; }
+
         public string CompanyName { get; set; }
+
         public string AdminName { get; set; }
+
         public string Email { get; set; }
+
         public string Password { get; set; }
+
         public string TelefonNo { get; set; }
-        public string Role { get; set; }
+
+        /// <summary>
+        /// Kullanıcı Rolü:
+        /// "0" = Personel
+        /// "1" = Admin / Yönetici
+        /// "2" = İnsan Kaynakları (İK)
+        /// </summary>
+        public string Role { get; set; } = "0";
+
         public DateTime? IseBaslamaTarihi { get; set; }
+
         public int? ManagerID { get; set; }
     }
 }
