@@ -561,3 +561,20 @@ The statement has been terminated.
 <logTime="2026-07-23 14:57:22.7900" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
 <logTime="2026-07-23 14:58:55.2160" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
 <logTime="2026-07-23 14:59:26.1243" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-23 15:13:48.6957" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-23 15:13:57.9758" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 15:14:20.4176" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: deneme38, Rol: Personel" exception="" />
+<logTime="2026-07-23 15:14:51.3507" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yöneticiye yeni izin talep maili başarıyla gönderildi. Yönetici: emine@ebyazilim.com, Personel: deneme38" exception="" />
+<logTime="2026-07-23 15:14:51.3507" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni izin talebi oluşturuldu. Personel ID: 2043, Tür: 7, Gün: 1" exception="" />
+<logTime="2026-07-23 15:14:55.3017" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 15:15:27.0253" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 15:15:46.0998" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ozlem sen, Rol: Personel" exception="" />
+<logTime="2026-07-23 15:16:46.3006" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yöneticiye yeni izin talep maili başarıyla gönderildi. Yönetici: emine@ebyazilim.com, Personel: ozlem sen" exception="" />
+<logTime="2026-07-23 15:16:46.3006" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni izin talebi oluşturuldu. Personel ID: 2030, Tür: 7, Gün: 1" exception="" />
+<logTime="2026-07-23 15:16:51.2401" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Personel 5 dakikalık geri alma süresi içinde iznini bozdu. Talep ID: 1094, Personel ID: 2030" exception="" />
+<logTime="2026-07-23 15:17:10.7799" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ayse celik, Rol: Personel" exception="" />
+<logTime="2026-07-23 15:17:25.7977" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-23 15:21:47.1099" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ayse celik, Rol: Personel" exception="" />
+<logTime="2026-07-23 15:22:29.9658" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-23 15:24:12.4484" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ayse celik, Rol: Personel" exception="" />
+<logTime="2026-07-23 15:24:32.3584" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
