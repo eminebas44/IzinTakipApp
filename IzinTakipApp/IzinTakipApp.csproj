@@ -223,6 +223,10 @@
     <Compile Include="Migrations\202607210744531_AddSirketPolitikasi.designer.cs">
       <DependentUpon>202607210744531_AddSirketPolitikasi.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202607230813177_AddSirketAdiToKullanici.cs" />
+    <Compile Include="Migrations\202607230813177_AddSirketAdiToKullanici.designer.cs">
+      <DependentUpon>202607230813177_AddSirketAdiToKullanici.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\IzinTalebi.cs" />
     <Compile Include="Models\Kullanici.cs" />
@@ -346,6 +350,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202607210744531_AddSirketPolitikasi.resx">
       <DependentUpon>202607210744531_AddSirketPolitikasi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202607230813177_AddSirketAdiToKullanici.resx">
+      <DependentUpon>202607230813177_AddSirketAdiToKullanici.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

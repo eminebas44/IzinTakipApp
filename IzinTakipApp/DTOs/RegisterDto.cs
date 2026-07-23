@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace IzinTakip.API.Models.DTOs
 {
@@ -10,7 +11,16 @@ namespace IzinTakip.API.Models.DTOs
         // Aynı gün içinde max kaç personelin izinli olacağı bilgisi
         public int? MaxIzinliKota { get; set; }
 
+        [JsonProperty("CompanyName")]
         public string CompanyName { get; set; }
+
+        // Frontend hem sirketAdi hem companyName yollasa da eşleşmesi için alternatif mülk
+        [JsonProperty("SirketAdi")]
+        public string SirketAdi
+        {
+            get => CompanyName;
+            set => CompanyName = value;
+        }
 
         public string AdminName { get; set; }
 

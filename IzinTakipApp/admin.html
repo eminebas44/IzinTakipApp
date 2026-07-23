@@ -254,11 +254,12 @@
                 <h2 class="font-bold text-white text-lg tracking-tight sidebar-text">İzinPort</h2>
             </div>
 
-            <!-- AKTİF YÖNETİCİ BİLGİSİ -->
+            <!-- AKTİF YÖNETİCİ BİLGİSİ (ŞİRKET ADI EKLENDİ) -->
             <div class="bg-slate-800/30 p-4 rounded-xl border border-slate-800/50 sidebar-text">
                 <p class="text-xs text-slate-400 font-medium">Aktif Yönetici</p>
                 <h4 class="font-bold text-sm text-slate-200 mt-0.5" id="admin-name">Yükleniyor...</h4>
-                <span class="inline-block text-[10px] font-bold bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded mt-1.5 uppercase tracking-wider">Şirket Yöneticisi</span>
+                <p class="text-xs font-semibold text-sky-400 mt-0.5" id="admin-company">Şirket Yükleniyor...</p>
+                <span class="inline-block text-[10px] font-bold bg-sky-500/10 text-sky-300 px-2 py-0.5 rounded mt-2 uppercase tracking-wider">Şirket Yöneticisi</span>
             </div>
 
             <!-- ŞİRKET İZİN POLİTİKASI & LOG KAYITLARI BUTONLARI -->
@@ -596,7 +597,7 @@
         </div>
     </div>
 
-    <!-- DİNAMİK VE MODERN İŞLEM ONAY MODALİ (HEM BİREYSEL HEM TOPLU İÇİN) -->
+    <!-- DİNAMİK VE MODERN İŞLEM ONAY MODALİ -->
     <div id="action-confirm-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-slate-100 text-center space-y-4">
             <div id="action-modal-icon-box" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto shadow-inner">
@@ -668,12 +669,10 @@
 
             <!-- Gelişmiş Çoklu Filtreleme Barı -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2.5 bg-slate-50/80 p-3 rounded-xl border border-slate-100 shrink-0">
-                <!-- Arama Metni -->
                 <div class="md:col-span-1">
                     <input type="text" id="log-search-input" oninput="filterLogs()" placeholder="Açıklama / Kişi ara..." class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium w-full focus:outline-none focus:border-sky-500 shadow-sm">
                 </div>
 
-                <!-- İşlem Kategorisi -->
                 <div>
                     <select id="log-category-filter" onchange="filterLogs()" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 w-full cursor-pointer focus:outline-none focus:border-sky-500 shadow-sm">
                         <option value="ALL">Tüm İşlem Tipleri</option>
@@ -684,7 +683,6 @@
                     </select>
                 </div>
 
-                <!-- Log Seviyesi -->
                 <div>
                     <select id="log-level-filter" onchange="filterLogs()" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 w-full cursor-pointer focus:outline-none focus:border-sky-500 shadow-sm">
                         <option value="ALL">Tüm Seviyeler</option>
@@ -694,12 +692,10 @@
                     </select>
                 </div>
 
-                <!-- Başlangıç Tarihi -->
                 <div>
                     <input type="date" id="log-date-start" onchange="filterLogs()" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-medium text-slate-700 w-full focus:outline-none focus:border-sky-500 shadow-sm cursor-pointer" title="Başlangıç Tarihi">
                 </div>
 
-                <!-- Bitiş Tarihi ve Temizle -->
                 <div class="flex items-center gap-1.5">
                     <input type="date" id="log-date-end" onchange="filterLogs()" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-medium text-slate-700 w-full focus:outline-none focus:border-sky-500 shadow-sm cursor-pointer" title="Bitiş Tarihi">
                     <button onclick="resetLogFilters()" title="Filtreleri Temizle" class="bg-slate-200 hover:bg-slate-300 text-slate-700 p-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0">
@@ -718,9 +714,7 @@
                             <th class="px-4 py-3">Açıklama / Mesaj Detayı</th>
                         </tr>
                     </thead>
-                    <tbody id="logs-table-body" class="divide-y divide-slate-100 text-slate-600 font-mono">
-                        <!-- JS ile yüklenecek -->
-                    </tbody>
+                    <tbody id="logs-table-body" class="divide-y divide-slate-100 text-slate-600 font-mono"></tbody>
                 </table>
                 <div id="no-logs-msg" class="hidden p-12 text-center text-slate-400 font-sans space-y-1">
                     <p class="text-sm font-semibold text-slate-500">Kayıtlı log verisi bulunamadı.</p>
@@ -736,7 +730,7 @@
         </div>
     </div>
 
-    <!-- PERSONEL TANIMLAMA MODAL (ROL SEÇİMİ EKLENDİ) -->
+    <!-- PERSONEL TANIMLAMA MODAL -->
     <div id="personel-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 md:p-8 space-y-5 border border-slate-100">
             <div class="flex items-center justify-between">
@@ -746,7 +740,6 @@
             <form onsubmit="handlePersonelSubmit(event)" class="space-y-4">
                 <input type="hidden" id="p-id-hidden" value="">
 
-                <!-- KULLANICI ROLÜ SEÇİMİ (YENİ EKLENDİ) -->
                 <div id="p-role-block">
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Kullanıcı Rolü</label>
                     <select id="p-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 cursor-pointer font-medium text-slate-700">
@@ -827,7 +820,11 @@
 
             adminLogID = currentUser.UserID || currentUser.id || currentUser.ID || currentUser.Id || 0;
 
+            // YÖNETİCİ VE ŞİRKET ADI YAZDIRMA
             document.getElementById("admin-name").innerText = currentUser.name || currentUser.Name || "Yönetici";
+
+            const companyName = currentUser.sirketAdi || currentUser.SirketAdi || currentUser.companyName || currentUser.CompanyName || "Kurumsal Şirket";
+            document.getElementById("admin-company").innerText = companyName;
 
             document.getElementById("quota-mazeret-input").value = currentUser.mazeretKota || currentUser.MazeretKota || 5;
             document.getElementById("quota-ucretsiz-input").value = currentUser.ucretsizKota || currentUser.UcretsizKota || 15;
@@ -963,13 +960,13 @@
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                                    <td class="px-4 py-3 whitespace-nowrap text-slate-500 text-[11px] font-semibold">${displayDate}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap"><span class="px-2 py-0.5 text-[10px] font-bold rounded border ${badgeClass}">${log.level}</span></td>
-                                    <td class="px-4 py-3 text-slate-700 break-all text-[11px] leading-relaxed">
-                                        ${log.message}
-                                        ${log.exception ? `<div class="bg-red-50/80 border border-red-100 p-2 rounded-lg text-red-600 text-[10px] mt-1.5 font-mono overflow-x-auto max-h-24 leading-snug">${log.exception}</div>` : ''}
-                                    </td>
-                                `;
+                        <td class="px-4 py-3 whitespace-nowrap text-slate-500 text-[11px] font-semibold">${displayDate}</td>
+                        <td class="px-4 py-3 whitespace-nowrap"><span class="px-2 py-0.5 text-[10px] font-bold rounded border ${badgeClass}">${log.level}</span></td>
+                        <td class="px-4 py-3 text-slate-700 break-all text-[11px] leading-relaxed">
+                            ${log.message}
+                            ${log.exception ? `<div class="bg-red-50/80 border border-red-100 p-2 rounded-lg text-red-600 text-[10px] mt-1.5 font-mono overflow-x-auto max-h-24 leading-snug">${log.exception}</div>` : ''}
+                        </td>
+                    `;
                 tbody.appendChild(tr);
             });
         }
@@ -1111,11 +1108,11 @@
                 }
             } else {
                 box.innerHTML = `
-                                    <div class="text-center py-8 px-4 space-y-2">
-                                        <p class="text-xs font-bold text-red-500">Yüklenen rapor görseli veya dosyası bulunamadı.</p>
-                                        <p class="text-[11px] text-slate-400">Rapor verisi veritabanında veya tarayıcı önbelleğinde bulunamadı.</p>
-                                    </div>
-                                `;
+                        <div class="text-center py-8 px-4 space-y-2">
+                            <p class="text-xs font-bold text-red-500">Yüklenen rapor görseli veya dosyası bulunamadı.</p>
+                            <p class="text-[11px] text-slate-400">Rapor verisi veritabanında veya tarayıcı önbelleğinde bulunamadı.</p>
+                        </div>
+                    `;
             }
             modal.classList.remove("hidden");
         }
@@ -1197,10 +1194,10 @@
 
                     return {
                         html: `
-                                    <div class="leave-pill ${catClass}" title="${name}">
-                                        <span class="truncate font-semibold">${name}</span>
-                                    </div>
-                                `
+                                <div class="leave-pill ${catClass}" title="${name}">
+                                    <span class="truncate font-semibold">${name}</span>
+                                </div>
+                            `
                     };
                 },
                 dateClick: function (info) {
@@ -1248,20 +1245,20 @@
                 const bitisTarihi = formatDateTrReadable(p.realEnd);
 
                 top3Container.innerHTML += `
-                            <div class="bg-slate-50 border border-slate-100 p-3.5 rounded-xl flex items-center justify-between shadow-xs hover:bg-slate-100 transition-all">
-                                <div class="space-y-1">
-                                    <h4 class="font-bold text-xs text-slate-800">${p.personelName || p.title}</h4>
-                                    <p class="text-[10px] font-semibold text-sky-600">${p.categoryName}</p>
-                                    <p class="text-[10px] font-medium text-slate-500 flex items-center gap-1.5 pt-0.5">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 0-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>${baslangicTarihi} - ${bitisTarihi}</span>
-                                    </p>
-                                </div>
-                                <span class="text-[10px] font-bold bg-slate-200/80 text-slate-700 px-2.5 py-1 rounded-lg self-start shrink-0">${p.duration} Gün</span>
+                        <div class="bg-slate-50 border border-slate-100 p-3.5 rounded-xl flex items-center justify-between shadow-xs hover:bg-slate-100 transition-all">
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-xs text-slate-800">${p.personelName || p.title}</h4>
+                                <p class="text-[10px] font-semibold text-sky-600">${p.categoryName}</p>
+                                <p class="text-[10px] font-medium text-slate-500 flex items-center gap-1.5 pt-0.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 002-2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>${baslangicTarihi} - ${bitisTarihi}</span>
+                                </p>
                             </div>
-                        `;
+                            <span class="text-[10px] font-bold bg-slate-200/80 text-slate-700 px-2.5 py-1 rounded-lg self-start shrink-0">${p.duration} Gün</span>
+                        </div>
+                    `;
             });
         }
 
@@ -1372,7 +1369,6 @@
             } catch (error) { console.error(error); }
         }
 
-        // PERSONEL TABLOSUNU RENDER ETME (İK ROZETİ EKLENDİ)
         function renderPersonelsTable(list) {
             const tbody = document.getElementById("personels-table");
             tbody.innerHTML = "";
@@ -1394,27 +1390,25 @@
 
                 const toplamMetin = p.toplamHakEdilen ? ` <span class="text-xs font-medium text-slate-400">(Toplam: ${p.toplamHakEdilen} Gün)</span>` : '';
 
-                // Rol metni ve şık rozet tasarımı
                 const isIK = (p.rolId === "2" || p.rol === "İnsan Kaynakları");
                 const rolBadge = isIK
                     ? `<span class="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-purple-50 text-purple-700 border border-purple-200">İnsan Kaynakları</span>`
                     : `<span class="inline-block px-2.5 py-0.5 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">Personel</span>`;
 
                 tr.innerHTML = `
-                                <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
-                                <td class="px-6 py-3">${rolBadge}</td>
-                                <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
-                                <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün${toplamMetin}</td>
-                                <td class="px-6 py-3 text-right space-x-1.5 whitespace-nowrap">
-                                    <button onclick="openDetailModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Detay</button>
-                                    <button onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')}, '${formattedDate}')" class="bg-sky-50 hover:bg-sky-100 text-sky-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Düzenle</button>
-                                </td>
-                            `;
+                        <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
+                        <td class="px-6 py-3">${rolBadge}</td>
+                        <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
+                        <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün${toplamMetin}</td>
+                        <td class="px-6 py-3 text-right space-x-1.5 whitespace-nowrap">
+                            <button onclick="openDetailModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Detay</button>
+                            <button onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')}, '${formattedDate}')" class="bg-sky-50 hover:bg-sky-100 text-sky-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Düzenle</button>
+                        </td>
+                    `;
                 tbody.appendChild(tr);
             });
         }
 
-        // FİLTRELEME METODU (İSİM ARAMASI + ROL FİLTRESİ UYUMLU)
         function filterPersonelsTable() {
             const searchKeyword = (document.getElementById("personel-search-input")?.value || "").trim().toLowerCase('tr');
             const selectedRole = document.getElementById("personel-role-filter")?.value || "ALL";
@@ -1441,7 +1435,6 @@
             document.getElementById("p-email").value = personelObj.eposta;
             document.getElementById("p-date").value = dateString;
 
-            // Düzenleme sırasında rol de güncellenebilir
             document.getElementById("p-role").value = personelObj.rolId || (personelObj.rol === "İnsan Kaynakları" ? "2" : "0");
 
             document.getElementById("p-password-block").classList.add("hidden");
@@ -1518,13 +1511,12 @@
             document.getElementById("p-email").value = "";
             document.getElementById("p-date").value = "";
             document.getElementById("p-password").value = "";
-            document.getElementById("p-role").value = "0"; // Varsayılan personel
+            document.getElementById("p-role").value = "0";
             document.getElementById("p-password-block").classList.remove("hidden");
             document.getElementById("p-password").required = true;
             document.getElementById("personel-modal").classList.remove("hidden");
         }
 
-        // ONAY BEKLEYENLER TALEPLERİNİ GETİRME
         async function getPendingLeaves() {
             try {
                 const response = await fetch(`/api/auth/get-pending-leaves/${adminLogID}`);
@@ -1549,7 +1541,6 @@
             } catch (error) { console.error(error); badge.classList.add("hidden"); }
         }
 
-        // ONAY BEKLEYEN TALEPLERİ RENDER ETME
         function renderPendingLeavesTable(list) {
             const msgBox = document.getElementById("no-leaves-message");
             const tbody = document.getElementById("pending-leaves-table");
@@ -1582,27 +1573,26 @@
                 const rowBg = index % 2 === 0 ? "bg-white" : "bg-slate-100";
                 tr.className = `${rowBg} hover:bg-slate-200/60 transition-all`;
                 tr.innerHTML = `
-                                <td class="pl-6 py-3 w-10">
-                                    <input type="checkbox" value="${t.id}" onchange="updateBulkActionBar()" class="pending-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 cursor-pointer">
-                                </td>
-                                <td class="px-4 py-3 font-semibold text-slate-800">${t.ad}</td>
-                                <td class="px-6 py-3 text-xs font-medium text-slate-400">${katMetni}</td>
-                                <td class="px-6 py-3 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
-                                <td class="px-6 py-3 font-bold text-slate-700">${t.gun} Gün</td>
-                                <td class="px-6 py-3 text-slate-500 text-xs max-w-[150px] truncate" title="${t.aciklama || ''}">${t.aciklama || '-'}</td>
-                                <td class="px-6 py-3 text-right whitespace-nowrap">
-                                    <div id="action-buttons-${t.id}" class="inline-flex items-center gap-1.5">
-                                        ${raporBtn}
-                                        <button onclick="showApproveOptions(${t.id})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin onay seçeneklerini göster">Onayla</button>
-                                        <button onclick="openActionConfirmModal(false, false, false, ${t.id})" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin talebini reddet">Reddet</button>
-                                    </div>
-                                </td>
-                            `;
+                        <td class="pl-6 py-3 w-10">
+                            <input type="checkbox" value="${t.id}" onchange="updateBulkActionBar()" class="pending-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 cursor-pointer">
+                        </td>
+                        <td class="px-4 py-3 font-semibold text-slate-800">${t.ad}</td>
+                        <td class="px-6 py-3 text-xs font-medium text-slate-400">${katMetni}</td>
+                        <td class="px-6 py-3 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
+                        <td class="px-6 py-3 font-bold text-slate-700">${t.gun} Gün</td>
+                        <td class="px-6 py-3 text-slate-500 text-xs max-w-[150px] truncate" title="${t.aciklama || ''}">${t.aciklama || '-'}</td>
+                        <td class="px-6 py-3 text-right whitespace-nowrap">
+                            <div id="action-buttons-${t.id}" class="inline-flex items-center gap-1.5">
+                                ${raporBtn}
+                                <button onclick="showApproveOptions(${t.id})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin onay seçeneklerini göster">Onayla</button>
+                                <button onclick="openActionConfirmModal(false, false, false, ${t.id})" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin talebini reddet">Reddet</button>
+                            </div>
+                        </td>
+                    `;
                 tbody.appendChild(tr);
             });
         }
 
-        // ONAY BEKLEYEN TALEPLER FİLTRELEME METODU
         function filterPendingLeavesTable() {
             const searchKeyword = (document.getElementById("pending-search-input")?.value || "").trim().toLowerCase('tr');
             const selectedType = document.getElementById("pending-filter-type")?.value || "ALL";
@@ -1773,17 +1763,16 @@
             }
         }
 
-        // BİREYSEL ONAY SEÇENEKLERİ
         function showApproveOptions(talepId) {
             const container = document.getElementById(`action-buttons-${talepId}`);
             if (!container) return;
 
             container.innerHTML = `
-                            <span class="text-xs text-slate-500 font-medium mr-1">Kotaya:</span>
-                            <button onclick="openActionConfirmModal(true, true, false, ${talepId})" class="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin süresi personelin yıllık/mazeret izin kotasından düşülerek onaylanır.">İzne Yansıt</button>
-                            <button onclick="openActionConfirmModal(true, false, false, ${talepId})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="Personelin izin kotasından düşülmeden (özel/harici izin olarak) onaylanır.">Yansıtma</button>
-                            <button onclick="getPendingLeaves()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-2 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İşlemi İptal Et">✕</button>
-                        `;
+                    <span class="text-xs text-slate-500 font-medium mr-1">Kotaya:</span>
+                    <button onclick="openActionConfirmModal(true, true, false, ${talepId})" class="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin süresi personelin yıllık/mazeret izin kotasından düşülerek onaylanır.">İzne Yansıt</button>
+                    <button onclick="openActionConfirmModal(true, false, false, ${talepId})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="Personelin izin kotasından düşülmeden (özel/harici izin olarak) onaylanır.">Yansıtma</button>
+                    <button onclick="getPendingLeaves()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-2 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İşlemi İptal Et">✕</button>
+                `;
         }
 
         async function getPastLeavesList() {
@@ -1802,7 +1791,6 @@
             } catch (error) { console.error(error); }
         }
 
-        // GEÇMİŞ İZİNLER TABLO RENDER METODU
         function renderPastLeavesTable(list) {
             const msgBox = document.getElementById("no-past-leaves-message");
             const tbody = document.getElementById("past-leaves-table");
@@ -1827,13 +1815,13 @@
                 const rowBg = index % 2 === 0 ? "bg-white" : "bg-slate-100";
                 tr.className = `${rowBg} hover:bg-slate-200/60 transition-all`;
                 tr.innerHTML = `
-                                <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
-                                <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
-                                <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
-                                <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
-                                <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
-                                <td class="px-6 py-2.5 text-right"><span class="inline-block px-2.5 py-0.5 text-[11px] font-bold rounded-full border ${durumClass}">${durumText}</span></td>
-                            `;
+                        <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
+                        <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
+                        <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
+                        <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
+                        <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
+                        <td class="px-6 py-2.5 text-right"><span class="inline-block px-2.5 py-0.5 text-[11px] font-bold rounded-full border ${durumClass}">${durumText}</span></td>
+                    `;
                 tbody.appendChild(tr);
             });
         }
@@ -1906,13 +1894,13 @@
                 const rowBg = index % 2 === 0 ? "bg-white" : "bg-slate-100";
                 tr.className = `${rowBg} hover:bg-slate-200/60 transition-all`;
                 tr.innerHTML = `
-                                <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
-                                <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
-                                <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
-                                <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
-                                <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
-                                <td class="px-6 py-2.5 text-right"><span class="inline-block px-3 py-0.5 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100">İzin Talebinden Vazgeçildi</span></td>
-                            `;
+                        <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
+                        <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
+                        <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
+                        <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
+                        <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
+                        <td class="px-6 py-2.5 text-right"><span class="inline-block px-3 py-0.5 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100">İzin Talebinden Vazgeçildi</span></td>
+                    `;
                 cancelledTbody.appendChild(tr);
             });
         }

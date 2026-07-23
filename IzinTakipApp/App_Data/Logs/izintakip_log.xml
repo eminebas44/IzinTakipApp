@@ -417,3 +417,116 @@
 <logTime="2026-07-22 14:42:43.5597" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
 <logTime="2026-07-22 15:38:29.7922" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
 <logTime="2026-07-22 15:38:46.3977" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-22 17:36:39.6067" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-22 17:38:55.6561" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: deneme, E-posta: denem@gmail.com, Rol: 0, Yönetici ID: 1008" exception="" />
+<logTime="2026-07-22 17:39:08.8672" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: Şifre uyuşmadı. Hesap E-posta: deneme@gmail.com" exception="" />
+<logTime="2026-07-22 17:39:10.4729" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: Şifre uyuşmadı. Hesap E-posta: deneme@gmail.com" exception="" />
+<logTime="2026-07-22 17:39:14.8793" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: Şifre uyuşmadı. Hesap E-posta: deneme@gmail.com" exception="" />
+<logTime="2026-07-22 17:40:40.4744" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-22 17:41:02.4523" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: deneme, Rol: Personel" exception="" />
+<logTime="2026-07-22 17:41:22.7445" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: deneme, Rol: Personel" exception="" />
+<logTime="2026-07-22 17:41:31.5640" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-22 17:41:45.4177" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Personel kartı bilgileri güncellendi. Personel ID: 2042, Yeni Adı: deneme" exception="" />
+<logTime="2026-07-22 17:41:55.6450" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: Şifre uyuşmadı. Hesap E-posta: deneme@gmail.com" exception="" />
+<logTime="2026-07-22 17:42:01.8201" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: Şifre uyuşmadı. Hesap E-posta: deneme@gmail.com" exception="" />
+<logTime="2026-07-22 17:42:06.9023" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: E-posta bulunamadı. Girilen E-posta: denem@gmail.com" exception="" />
+<logTime="2026-07-22 17:42:14.3498" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-22 17:42:36.3082" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: Şifre uyuşmadı. Hesap E-posta: deneme@gmail.com" exception="" />
+<logTime="2026-07-22 17:42:42.5575" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-22 17:43:28.6566" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: deneme38, E-posta: deneme38@gmail.com, Rol: 0, Yönetici ID: 1008" exception="" />
+<logTime="2026-07-22 17:43:55.0951" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: deneme38, Rol: Personel" exception="" />
+<logTime="2026-07-22 17:44:17.2535" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-22 17:44:48.5181" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: meral bas, E-posta: meral@gmail.com, Rol: 2, Yönetici ID: 1008" exception="" />
+<logTime="2026-07-22 17:45:02.6803" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: meral bas, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-22 17:45:29.6491" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-22 17:52:02.6734" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-22 17:52:18.4880" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: meral bas, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-23 10:58:46.7635" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni şirket yöneticisi kaydı başarılı. E-posta: samet@syyazilim.com, Adı: samet yildirim" exception="" />
+<logTime="2026-07-23 10:59:01.3727" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: samet yildirim, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:04:35.1876" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni şirket yöneticisi kaydı başarılı. E-posta: mert@mmyyazilim.com, Adı: mert yalinkilic" exception="" />
+<logTime="2026-07-23 11:04:46.1499" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: mert yalinkilic, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:09:24.6934" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni şirket yöneticisi kaydı başarılı. E-posta: emin@saheseryazilim.com, Adı: emin talas" exception="" />
+<logTime="2026-07-23 11:09:41.2549" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emin talas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:23:16.6765" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni şirket yöneticisi kaydı başarılı. E-posta: cagatay@ctyazilim.com, Adı: cagatay turker, Şirket: ct yazilim" exception="" />
+<logTime="2026-07-23 11:23:24.9989" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: cagatay turker, Rol: Yönetici, Şirket: ct yazilim" exception="" />
+<logTime="2026-07-23 11:23:40.1094" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: cagatay turker, Rol: Yönetici, Şirket: ct yazilim" exception="" />
+<logTime="2026-07-23 11:23:56.4652" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici, Şirket: " exception="" />
+<logTime="2026-07-23 11:24:44.9000" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici, Şirket: " exception="" />
+<logTime="2026-07-23 11:27:00.7440" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:27:09.7738" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:30:41.7722" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:30:57.9045" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: cagatay turker, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:31:39.8481" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni şirket yöneticisi kaydı başarılı. E-posta: emir@dumanyazilim.com, Adı: emir duman" exception="" />
+<logTime="2026-07-23 11:31:47.1857" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emir duman, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:32:46.7566" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:32:59.7462" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: cagatay turker, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:33:24.0151" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emin talas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:34:11.5888" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni şirket yöneticisi kaydı başarılı. E-posta: ahmet@aygunyazilim.com, Adı: ahmet aygun" exception="" />
+<logTime="2026-07-23 11:34:18.4132" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ahmet aygun, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:38:27.6602" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ayse celik, Rol: Personel" exception="" />
+<logTime="2026-07-23 11:38:40.5263" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: cagatay turker, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:40:01.1577" level="ERROR" logger="IzinTakip.API.Controllers.AuthController" message="Personel tanımlama servisinde hata meydana geldi. Eklenmeye çalışılan: kenan@gmail.com" exception="System.Data.Entity.Infrastructure.DbUpdateException: An error occurred while updating the entries. See the inner exception for details. ---> System.Data.Entity.Core.UpdateException: An error occurred while updating the entries. See the inner exception for details. ---> System.Data.SqlClient.SqlException: The conversion of a datetime2 data type to a datetime data type resulted in an out-of-range value.
+The statement has been terminated.
+   konum: System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   konum: System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   konum: System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   konum: System.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   konum: System.Data.SqlClient.SqlDataReader.get_MetaData()
+   konum: System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   konum: System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   konum: System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   konum: System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   konum: System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior, String method)
+   konum: System.Data.Entity.Infrastructure.Interception.InternalDispatcher`1.Dispatch[TTarget,TInterceptionContext,TResult](TTarget target, Func`3 operation, TInterceptionContext interceptionContext, Action`3 executing, Action`3 executed)
+   konum: System.Data.Entity.Infrastructure.Interception.DbCommandDispatcher.Reader(DbCommand command, DbCommandInterceptionContext interceptionContext)
+   konum: System.Data.Entity.Core.Mapping.Update.Internal.DynamicUpdateCommand.Execute(Dictionary`2 identifierValues, List`1 generatedValues)
+   konum: System.Data.Entity.Core.Mapping.Update.Internal.UpdateTranslator.Update()
+   --- İç özel durum yığını izlemesinin sonu ---
+   konum: System.Data.Entity.Core.Mapping.Update.Internal.UpdateTranslator.Update()
+   konum: System.Data.Entity.Core.Objects.ObjectContext.ExecuteInTransaction[T](Func`1 func, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction, Boolean releaseConnectionOnSuccess)
+   konum: System.Data.Entity.Core.Objects.ObjectContext.SaveChangesToStore(SaveOptions options, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction)
+   konum: System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   konum: System.Data.Entity.Core.Objects.ObjectContext.SaveChangesInternal(SaveOptions options, Boolean executeInExistingTransaction)
+   konum: System.Data.Entity.Internal.InternalContext.SaveChanges()
+   --- İç özel durum yığını izlemesinin sonu ---
+   konum: System.Data.Entity.Internal.InternalContext.SaveChanges()
+   konum: IzinTakip.API.Controllers.AuthController.RegisterPersonel(RegisterDto dto) C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\Controllers\AuthController.cs içinde: satır 332    konum: System.Data.Entity.Internal.InternalContext.SaveChanges()
+   konum: IzinTakip.API.Controllers.AuthController.RegisterPersonel(RegisterDto dto) C:\Users\emine\source\repos\IzinTakipApp\IzinTakipApp\Controllers\AuthController.cs içinde: satır 332" />
+<logTime="2026-07-23 11:40:33.5264" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:40:51.9237" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: ertryui, E-posta: dgfhjk@gfghl, Rol: 0, Yönetici ID: 1008" exception="" />
+<logTime="2026-07-23 11:41:12.1962" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: cagatay turker, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:43:48.5017" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: tytuyiui, E-posta: ytyuu@uyiuoi, Rol: 0, Yönetici ID: 2048" exception="" />
+<logTime="2026-07-23 11:44:38.0284" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: kenan ince, E-posta: kenan@gmail.com, Rol: 0, Yönetici ID: 2048" exception="" />
+<logTime="2026-07-23 11:44:52.8344" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: kenan ince, Rol: Personel" exception="" />
+<logTime="2026-07-23 11:45:30.0027" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:50:49.9054" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: cagatay turker, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 11:51:34.5887" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: fatih can, E-posta: fatih@gmail.com, Rol: 2, Yönetici ID: 2048" exception="" />
+<logTime="2026-07-23 11:51:51.0515" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: fatih can, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-23 11:53:35.2110" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şifre sıfırlama doğrulama kodu başarıyla mail olarak gönderildi. Alıcı: eminebas3818@gmail.com" exception="" />
+<logTime="2026-07-23 12:01:09.8564" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şifre sıfırlama doğrulama kodu başarıyla mail olarak gönderildi. Alıcı: eminebas3818@gmail.com" exception="" />
+<logTime="2026-07-23 12:02:33.1210" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şifre sıfırlama doğrulama kodu başarıyla mail olarak gönderildi. Alıcı: eminebas3818@gmail.com" exception="" />
+<logTime="2026-07-23 12:03:53.5211" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 12:05:36.7181" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ezgi gul, Rol: Personel" exception="" />
+<logTime="2026-07-23 12:06:05.9520" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ezgi gul, Rol: Personel" exception="" />
+<logTime="2026-07-23 12:06:44.0183" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni izin talebi oluşturuldu. Personel ID: 2038, Tür: YillikIzin, Gün: 5" exception="" />
+<logTime="2026-07-23 12:06:49.0769" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 12:11:50.4407" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="İzin durum maili başarıyla gönderildi. Alıcı: ezgibas3846@gmail.com, Durum: ONAYLANDI" exception="" />
+<logTime="2026-07-23 12:11:50.4881" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yönetici izin talebini sonuçlandırdı. Talep ID: 1088, Karar: Onaylandı, İzne Yansıtıldı Mı: True, Personel: ezgi gul" exception="" />
+<logTime="2026-07-23 12:12:58.2105" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Personel" exception="" />
+<logTime="2026-07-23 12:13:26.3552" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni izin talebi oluşturuldu. Personel ID: 1025, Tür: YillikIzin, Gün: 2" exception="" />
+<logTime="2026-07-23 12:13:37.6951" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: mehmet omac, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 12:13:49.6413" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="İzin durum maili başarıyla gönderildi. Alıcı: eminebas3818@gmail.com, Durum: ONAYLANDI" exception="" />
+<logTime="2026-07-23 12:13:49.6413" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yönetici izin talebini sonuçlandırdı. Talep ID: 1089, Karar: Onaylandı, İzne Yansıtıldı Mı: True, Personel: emine bas" exception="" />
+<logTime="2026-07-23 12:14:23.8827" level="WARN" logger="IzinTakip.API.Controllers.AuthController" message="Hatalı giriş denemesi: Şifre uyuşmadı. Hesap E-posta: eminebas3818@gmail.com" exception="" />
+<logTime="2026-07-23 12:14:27.9159" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Personel" exception="" />
+<logTime="2026-07-23 12:15:10.5795" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni izin talebi oluşturuldu. Personel ID: 1025, Tür: MazeretIzni, Gün: 1" exception="" />
+<logTime="2026-07-23 12:15:23.5149" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: mehmet omac, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 12:15:32.6253" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="İzin durum maili başarıyla gönderildi. Alıcı: eminebas3818@gmail.com, Durum: REDDEDİLDİ" exception="" />
+<logTime="2026-07-23 12:15:32.6253" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yönetici izin talebini sonuçlandırdı. Talep ID: 1090, Karar: Reddedildi, İzne Yansıtıldı Mı: False, Personel: emine bas" exception="" />
+<logTime="2026-07-23 12:18:36.9537" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni şirket yöneticisi kaydı başarılı. E-posta: talp3361@gmail.com, Adı: muhammed alp" exception="" />
+<logTime="2026-07-23 12:18:43.6985" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: muhammed alp, Rol: Yönetici" exception="" />
+<logTime="2026-07-23 12:19:12.8333" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: meryem gul, E-posta: meryem@gmail.com, Rol: 0, Yönetici ID: 2056" exception="" />
+<logTime="2026-07-23 12:19:25.7850" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: meryem gul, Rol: Personel" exception="" />
+<logTime="2026-07-23 12:20:13.2337" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yöneticiye yeni izin talep maili başarıyla gönderildi. Yönetici: talp3361@gmail.com, Personel: meryem gul" exception="" />
+<logTime="2026-07-23 12:20:13.2337" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Yeni izin talebi oluşturuldu. Personel ID: 2057, Tür: MazeretIzni, Gün: 1" exception="" />
+<logTime="2026-07-23 12:21:56.3319" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />

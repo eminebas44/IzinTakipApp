@@ -45,13 +45,11 @@ namespace IzinTakip.API.Controllers
             {
                 using (AppDbContext db = new AppDbContext())
                 {
-                    // İstek atan kullanıcı İK ise, bağlı olduğu Yönetici (Admin) ID'sini tespit ediyoruz
                     var reqUser = db.Users.FirstOrDefault(u => u.ID == adminId);
                     int targetManagerId = (reqUser != null && reqUser.Role == "2" && reqUser.ManagerID.HasValue)
                                           ? reqUser.ManagerID.Value
                                           : adminId;
 
-                    // Personel ("0") ve İnsan Kaynakları ("2") rollerindeki tüm çalışanları çekiyoruz
                     var personeller = db.Users.Where(u => (u.Role == "0" || u.Role == "2") && u.ManagerID == targetManagerId).ToList();
                     var liste = new List<object>();
 
@@ -255,6 +253,8 @@ namespace IzinTakip.API.Controllers
                     var varOlan = db.Users.FirstOrDefault(u => u.Email == dto.Email);
                     if (varOlan != null) return BadRequest("Bu e-posta adresi zaten kayıtlı.");
 
+                    string sirket = !string.IsNullOrEmpty(dto.CompanyName) ? dto.CompanyName : dto.SirketAdi;
+
                     Kullanici yeniKullanici = new Kullanici
                     {
                         Name = dto.AdminName ?? "Yeni Yönetici",
@@ -267,6 +267,8 @@ namespace IzinTakip.API.Controllers
                         UcretsizIzinKotasi = 15,
                         MaxIzinliKota = 3
                     };
+
+                    try { yeniKullanici.SirketAdi = sirket; } catch { }
 
                     db.Users.Add(yeniKullanici);
                     db.SaveChanges();
@@ -313,8 +315,18 @@ namespace IzinTakip.API.Controllers
                         KalanYillikIzin = tanimlananIzinGunu,
                         MazeretIzinKotasi = adminUser != null ? adminUser.MazeretIzinKotasi : 5,
                         UcretsizIzinKotasi = adminUser != null ? adminUser.UcretsizIzinKotasi : 15,
+                        MaxIzinliKota = adminUser != null ? adminUser.MaxIzinliKota : 3,
                         ManagerID = dto.ManagerID
                     };
+
+                    try
+                    {
+                        if (adminUser != null)
+                        {
+                            yeniPersonel.SirketAdi = adminUser.SirketAdi;
+                        }
+                    }
+                    catch { }
 
                     db.Users.Add(yeniPersonel);
                     db.SaveChanges();
@@ -502,6 +514,13 @@ namespace IzinTakip.API.Controllers
 
                     db.IzinTalepleri.Add(yeniTalep);
                     db.SaveChanges();
+
+                    // YÖNETİCİYE BİLDİRİM E-POSTASI GÖNDERİMİ
+                    if (adminUser != null && !string.IsNullOrEmpty(adminUser.Email))
+                    {
+                        string tarihAraligi = $"{dto.BaslangicTarihi:dd.MM.yyyy} - {dto.BitisTarihi:dd.MM.yyyy}";
+                        SendNewLeaveRequestEmail(adminUser.Email, adminUser.Name, personel.Name, tarihAraligi, dto.Kategori.ToString(), hesaplananGun, dto.Aciklama);
+                    }
 
                     Logger.Info($"Yeni izin talebi oluşturuldu. Personel ID: {dto.KullaniciId}, Tür: {dto.Kategori}, Gün: {hesaplananGun}");
                     return Ok("İzin talebi başarıyla iletildi.");
@@ -733,6 +752,24 @@ namespace IzinTakip.API.Controllers
                     bool isFirstLogin = kullanici.IsFirstLogin;
                     int? managerID = kullanici.ManagerID;
 
+                    string sirketAdi = "";
+                    try
+                    {
+                        sirketAdi = kullanici.SirketAdi;
+                        if (string.IsNullOrEmpty(sirketAdi) && managerID.HasValue)
+                        {
+                            var manager = db.Users.FirstOrDefault(m => m.ID == managerID.Value);
+                            if (manager != null)
+                            {
+                                sirketAdi = manager.SirketAdi;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        sirketAdi = "";
+                    }
+
                     string rolMetni = userRole == "1" ? "Yönetici" : userRole == "2" ? "İnsan Kaynakları" : "Personel";
                     Logger.Info($"Kullanıcı başarıyla sisteme giriş yaptı. Adı: {userName}, Rol: {rolMetni}");
 
@@ -744,6 +781,7 @@ namespace IzinTakip.API.Controllers
                         name = userName,
                         email = userEmail,
                         role = userRole,
+                        sirketAdi = sirketAdi ?? "",
                         kalanIzin = kalanIzin,
                         mazeretKota = mazeretKota,
                         ucretsizKota = ucretsizKota,
@@ -816,8 +854,69 @@ namespace IzinTakip.API.Controllers
                         using (var mailMessage = new MailMessage())
                         {
                             mailMessage.From = new MailAddress(senderEmail, "İzinPort Sistem");
-                            mailMessage.Subject = "İzinPort - Şifre Sıfırlama Kodu";
-                            mailMessage.Body = $"<h3>Şifre Yenileme Talebi</h3><p>İzinPort sistemine kayıtlı e-posta hesabınız için oluşturulan 6 haneli doğrulama kodunuz: <b>{code}</b></p>";
+                            mailMessage.Subject = "🔐 İzinPort - Şifre Sıfırlama Kodu";
+                            mailMessage.Body = $@"
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <meta charset='utf-8'>
+                            </head>
+                            <body style='margin: 0; padding: 0; background-color: #f4f6f9; font-family: -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, Helvetica, Arial, sans-serif;'>
+                                <table border='0' cellpadding='0' cellspacing='0' width='100%' style='padding: 40px 10px;'>
+                                    <tr>
+                                        <td align='center'>
+                                            <table border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;'>
+                                                <tr>
+                                                    <td style='background-color: #0b1329; padding: 28px; text-align: center;'>
+                                                        <h1 style='color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;'>İzinPort</h1>
+                                                        <p style='color: #38bdf8; margin: 4px 0 0 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;'>Kurumsal İzin Yönetimi</p>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style='padding: 36px 32px;'>
+                                                        <h2 style='color: #1e293b; margin: 0 0 12px 0; font-size: 18px; font-weight: 700;'>Şifre Yenileme Talebi</h2>
+                                                        <p style='color: #64748b; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;'>
+                                                            Merhaba,<br>
+                                                            İzinPort hesabınız için bir şifre sıfırlama talebinde bulundunuz. İşleminize devam etmek için aşağıdaki 6 haneli doğrulama kodunu kullanabilirsiniz:
+                                                        </p>
+                                                        <table border='0' cellpadding='0' cellspacing='0' width='100%' style='margin-bottom: 24px;'>
+                                                            <tr>
+                                                                <td align='center' style='background-color: #f0f9ff; border: 2px dashed #0091ff; border-radius: 12px; padding: 18px;'>
+                                                                    <span style='font-family: ""Courier New"", Courier, monospace; font-size: 32px; font-weight: 800; color: #0091ff; letter-spacing: 8px;'>{code}</span>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        <p style='color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 16px 0;'>
+                                                            Bu kod <b>15 dakika</b> boyunca geçerlidir.
+                                                        </p>
+                                                        <table border='0' cellpadding='0' cellspacing='0' width='100%'>
+                                                            <tr>
+                                                                <td style='background-color: #f8fafc; border-left: 4px solid #f59e0b; border-radius: 4px; padding: 12px 16px;'>
+                                                                    <p style='color: #78350f; font-size: 12px; margin: 0; line-height: 1.4;'>
+                                                                        <b>Güvenlik Uyarısı:</b> Bu talebi siz yapmadıysanız bu e-postayı güvenle göz ardı edebilirsiniz. Şifreniz değişmeyecektir.
+                                                                    </p>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style='background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f1f5f9;'>
+                                                        <p style='color: #94a3b8; font-size: 11px; margin: 0; font-weight: 500;'>
+                                                            © {DateTime.Now.Year} İzinPort. Tüm hakları saklıdır.
+                                                        </p>
+                                                        <p style='color: #cbd5e1; font-size: 10px; margin: 4px 0 0 0;'>
+                                                            Bu e-posta otomatik olarak oluşturulmuştur, lütfen yanıtlamayınız.
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </body>
+                            </html>";
+
                             mailMessage.IsBodyHtml = true;
                             mailMessage.To.Add(email);
 
@@ -901,6 +1000,19 @@ namespace IzinTakip.API.Controllers
                 string senderEmail = ConfigurationManager.AppSettings["SenderEmail"];
                 string senderPassword = ConfigurationManager.AppSettings["SenderPassword"];
 
+                bool isOnay = statusText.ToUpper().Contains("ONAY");
+
+                string statusTitle = isOnay ? "İzin Talebiniz Onaylandı! 🎉" : "İzin Talebiniz Hakkında Güncelleme";
+                string headerBg = isOnay ? "#059669" : "#dc2626";
+                string badgeBg = isOnay ? "#ecfdf5" : "#fef2f2";
+                string badgeColor = isOnay ? "#047857" : "#b91c1c";
+                string badgeBorder = isOnay ? "#a7f3d0" : "#fecaca";
+                string iconEmoji = isOnay ? "✅" : "❌";
+
+                string messageDetail = isOnay
+                    ? $"Harika haber! <b>{dateRange}</b> tarihleri arasındaki <b>{categoryText}</b> talebiniz yöneticiniz tarafından onaylanmıştır. Şimdiden dinlendirici ve keyifli bir tatil dileriz!"
+                    : $"<b>{dateRange}</b> tarihleri arasındaki <b>{categoryText}</b> talebiniz şirket iş planlaması ve operasyonel yoğunluk nedeniyle şu an için uygun görülmemiştir. Detaylar için yöneticinizle iletişime geçebilirsiniz.";
+
                 using (var smtpClient = new SmtpClient(smtpServer, smtpPort))
                 {
                     smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
@@ -909,15 +1021,76 @@ namespace IzinTakip.API.Controllers
                     using (var mailMessage = new MailMessage())
                     {
                         mailMessage.From = new MailAddress(senderEmail, "İzinPort Sistem");
-                        mailMessage.Subject = $"İzinPort - İzin Talebiniz {statusText}";
+                        mailMessage.Subject = $"{iconEmoji} İzinPort - {statusTitle}";
                         mailMessage.Body = $@"
-                            <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
-                                <h3 style='color: #0b1329;'>Merhaba {personelName},</h3>
-                                <p><b>{dateRange}</b> tarihleri arasındaki <b>{categoryText}</b> talebiniz yönetici tarafından <b>{statusText}</b>.</p>
-                                <p>Detayları görüntülemek için sisteme giriş yapabilirsiniz.</p>
-                                <br/>
-                                <p style='font-size: 12px; color: #777;'>Bu e-posta otomatik olarak gönderilmiştir, lütfen yanıtlamayınız.</p>
-                            </div>";
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset='utf-8'>
+                        </head>
+                        <body style='margin: 0; padding: 0; background-color: #f4f6f9; font-family: -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, Helvetica, Arial, sans-serif;'>
+                            <table border='0' cellpadding='0' cellspacing='0' width='100%' style='padding: 40px 10px;'>
+                                <tr>
+                                    <td align='center'>
+                                        <table border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;'>
+                                            <tr>
+                                                <td style='background-color: {headerBg}; padding: 28px; text-align: center;'>
+                                                    <h1 style='color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;'>{statusTitle}</h1>
+                                                    <p style='color: rgba(255, 255, 255, 0.85); margin: 4px 0 0 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;'>İzinPort Bildirim Servisi</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style='padding: 36px 32px;'>
+                                                    <h2 style='color: #1e293b; margin: 0 0 12px 0; font-size: 18px; font-weight: 700;'>Merhaba {personelName},</h2>
+                                                    <p style='color: #475569; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;'>
+                                                        {messageDetail}
+                                                    </p>
+                                                    <table border='0' cellpadding='0' cellspacing='0' width='100%' style='margin-bottom: 24px; background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px;'>
+                                                        <tr>
+                                                            <td>
+                                                                <table border='0' cellpadding='0' cellspacing='0' width='100%'>
+                                                                    <tr>
+                                                                        <td style='padding-bottom: 8px; font-size: 12px; color: #64748b; font-weight: 600;'>İzin Türü:</td>
+                                                                        <td style='padding-bottom: 8px; font-size: 13px; color: #0f172a; font-weight: 700; text-align: right;'>{categoryText}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style='padding-bottom: 8px; font-size: 12px; color: #64748b; font-weight: 600;'>Tarih Aralığı:</td>
+                                                                        <td style='padding-bottom: 8px; font-size: 13px; color: #0f172a; font-weight: 700; text-align: right;'>{dateRange}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style='font-size: 12px; color: #64748b; font-weight: 600;'>Karar Durumu:</td>
+                                                                        <td style='text-align: right;'>
+                                                                            <span style='background-color: {badgeBg}; color: {badgeColor}; border: 1px solid {badgeBorder}; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-block;'>
+                                                                                {statusText.ToUpper()}
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <p style='color: #94a3b8; font-size: 12px; line-height: 1.5; margin: 0;'>
+                                                        Gerekli durumlarda izin bakiyelerinizi ve geçmişinizi görüntülemek için sisteme giriş yapabilirsiniz.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style='background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f1f5f9;'>
+                                                    <p style='color: #94a3b8; font-size: 11px; margin: 0; font-weight: 500;'>
+                                                        © {DateTime.Now.Year} İzinPort. Tüm hakları saklıdır.
+                                                    </p>
+                                                    <p style='color: #cbd5e1; font-size: 10px; margin: 4px 0 0 0;'>
+                                                        Bu e-posta otomatik olarak oluşturulmuştur, lütfen yanıtlamayınız.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                        </html>";
+
                         mailMessage.IsBodyHtml = true;
                         mailMessage.To.Add(personelEmail);
 
@@ -932,7 +1105,111 @@ namespace IzinTakip.API.Controllers
             }
         }
 
-        // ------------------ DİREKT METİN AYRIŞTIRICI (REGEX) İLE KESİN LOG OKUMA ------------------
+        private static void SendNewLeaveRequestEmail(string managerEmail, string managerName, string personelName, string dateRange, string categoryText, double totalDays, string description)
+        {
+            try
+            {
+                string smtpServer = ConfigurationManager.AppSettings["SmtpServer"];
+                int smtpPort = int.Parse(ConfigurationManager.AppSettings["SmtpPort"]);
+                string senderEmail = ConfigurationManager.AppSettings["SenderEmail"];
+                string senderPassword = ConfigurationManager.AppSettings["SenderPassword"];
+
+                using (var smtpClient = new SmtpClient(smtpServer, smtpPort))
+                {
+                    smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
+                    smtpClient.EnableSsl = true;
+
+                    using (var mailMessage = new MailMessage())
+                    {
+                        mailMessage.From = new MailAddress(senderEmail, "İzinPort Sistem");
+                        mailMessage.Subject = $"📋 İzinPort - Yeni İzin Talebi: {personelName}";
+                        mailMessage.Body = $@"
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset='utf-8'>
+                        </head>
+                        <body style='margin: 0; padding: 0; background-color: #f4f6f9; font-family: -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, Helvetica, Arial, sans-serif;'>
+                            <table border='0' cellpadding='0' cellspacing='0' width='100%' style='padding: 40px 10px;'>
+                                <tr>
+                                    <td align='center'>
+                                        <table border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;'>
+                                            <tr>
+                                                <td style='background-color: #0b1329; padding: 28px; text-align: center;'>
+                                                    <h1 style='color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;'>Yeni İzin Talebi 📋</h1>
+                                                    <p style='color: #38bdf8; margin: 4px 0 0 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;'>İzinPort Onay Yönetimi</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style='padding: 36px 32px;'>
+                                                    <h2 style='color: #1e293b; margin: 0 0 12px 0; font-size: 18px; font-weight: 700;'>Sayın {managerName},</h2>
+                                                    <p style='color: #475569; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;'>
+                                                        Ekibinizde yer alan <b>{personelName}</b> yeni bir izin talebinde bulunmuştur. Detaylar aşağıda yer almaktadır:
+                                                    </p>
+                                                    <table border='0' cellpadding='0' cellspacing='0' width='100%' style='margin-bottom: 24px; background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px;'>
+                                                        <tr>
+                                                            <td>
+                                                                <table border='0' cellpadding='0' cellspacing='0' width='100%'>
+                                                                    <tr>
+                                                                        <td style='padding-bottom: 8px; font-size: 12px; color: #64748b; font-weight: 600;'>Talep Eden:</td>
+                                                                        <td style='padding-bottom: 8px; font-size: 13px; color: #0f172a; font-weight: 700; text-align: right;'>{personelName}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style='padding-bottom: 8px; font-size: 12px; color: #64748b; font-weight: 600;'>İzin Türü:</td>
+                                                                        <td style='padding-bottom: 8px; font-size: 13px; color: #0f172a; font-weight: 700; text-align: right;'>{categoryText}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style='padding-bottom: 8px; font-size: 12px; color: #64748b; font-weight: 600;'>Tarih Aralığı:</td>
+                                                                        <td style='padding-bottom: 8px; font-size: 13px; color: #0f172a; font-weight: 700; text-align: right;'>{dateRange}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style='padding-bottom: 8px; font-size: 12px; color: #64748b; font-weight: 600;'>Toplam Süre:</td>
+                                                                        <td style='padding-bottom: 8px; font-size: 13px; color: #0f172a; font-weight: 700; text-align: right;'>{totalDays} Gün</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style='font-size: 12px; color: #64748b; font-weight: 600;'>Açıklama:</td>
+                                                                        <td style='font-size: 13px; color: #334155; font-style: italic; text-align: right;'>{(string.IsNullOrEmpty(description) ? "-" : description)}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <p style='color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;'>
+                                                        Talebi incelemek, onaylamak veya reddetmek için yönetim panelinize giriş yapabilirsiniz.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style='background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f1f5f9;'>
+                                                    <p style='color: #94a3b8; font-size: 11px; margin: 0; font-weight: 500;'>
+                                                        © {DateTime.Now.Year} İzinPort. Tüm hakları saklıdır.
+                                                    </p>
+                                                    <p style='color: #cbd5e1; font-size: 10px; margin: 4px 0 0 0;'>
+                                                        Bu e-posta otomatik olarak oluşturulmuştur, lütfen yanıtlamayınız.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                        </html>";
+
+                        mailMessage.IsBodyHtml = true;
+                        mailMessage.To.Add(managerEmail);
+
+                        smtpClient.Send(mailMessage);
+                    }
+                }
+                Logger.Info($"Yöneticiye yeni izin talep maili başarıyla gönderildi. Yönetici: {managerEmail}, Personel: {personelName}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Yöneticiye yeni izin talep maili gönderilirken hata oluştu. Hedef: {managerEmail}");
+            }
+        }
+
         [HttpGet]
         [Route("get-logs")]
         public IHttpActionResult GetLogs()

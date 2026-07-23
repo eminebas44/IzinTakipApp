@@ -37,6 +37,12 @@ namespace IzinTakipApp.Models
         [StringLength(50)]
         public string Role { get; set; }
 
+        /// <summary>
+        /// Şirket / Kurum Adı
+        /// </summary>
+        [StringLength(150)]
+        public string SirketAdi { get; set; }
+
         public DateTime IseGirisTarihi { get; set; }
 
         public double KalanYillikIzin { get; set; }
