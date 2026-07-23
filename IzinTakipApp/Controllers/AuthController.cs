@@ -132,7 +132,8 @@ namespace IzinTakip.API.Controllers
                                 gun = talep.ToplamGun,
                                 aciklama = talep.Aciklama,
                                 raporUrl = talep.RaporUrl,
-                                raporDosyasi = talep.RaporUrl
+                                raporDosyasi = talep.RaporUrl,
+                                olusturulmaTarihi = talep.OlusturulmaTarihi.ToString("yyyy-MM-ddTHH:mm:ss")
                             });
                         }
                     }
@@ -189,7 +190,8 @@ namespace IzinTakip.API.Controllers
                                 durum = (int)talep.Durum,
                                 aciklama = talep.Aciklama,
                                 raporUrl = talep.RaporUrl,
-                                raporDosyasi = talep.RaporUrl
+                                raporDosyasi = talep.RaporUrl,
+                                olusturulmaTarihi = talep.OlusturulmaTarihi.ToString("yyyy-MM-ddTHH:mm:ss")
                             });
                         }
                     }
@@ -515,7 +517,6 @@ namespace IzinTakip.API.Controllers
                     db.IzinTalepleri.Add(yeniTalep);
                     db.SaveChanges();
 
-                    // YÖNETİCİYE BİLDİRİM E-POSTASI GÖNDERİMİ
                     if (adminUser != null && !string.IsNullOrEmpty(adminUser.Email))
                     {
                         string tarihAraligi = $"{dto.BaslangicTarihi:dd.MM.yyyy} - {dto.BitisTarihi:dd.MM.yyyy}";

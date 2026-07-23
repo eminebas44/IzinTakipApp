@@ -237,6 +237,7 @@
                         <tbody id="hr-personels-tbody" class="divide-y divide-slate-100 text-slate-600"></tbody>
                     </table>
                 </div>
+                <div id="hr-personel-pagination" class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500"></div>
             </div>
 
             <!-- ALT SEKME 2: ONAY BEKLEYEN TALEPLER (SALT OKUNUR - İZLEME MODU) -->
@@ -258,6 +259,7 @@
                             <tr class="bg-slate-100/70 text-slate-600 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
                                 <th class="px-6 py-3">Personel</th>
                                 <th class="px-6 py-3">İzin Türü</th>
+                                <th class="px-6 py-3">Talep Zamanı</th>
                                 <th class="px-6 py-3">Tarih Aralığı</th>
                                 <th class="px-6 py-3">Süre</th>
                                 <th class="px-6 py-3">Açıklama / Mazeret</th>
@@ -267,19 +269,31 @@
                         <tbody id="hr-pending-leaves-tbody" class="divide-y divide-slate-100 text-slate-600"></tbody>
                     </table>
                 </div>
+                <div id="hr-pending-pagination" class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500"></div>
             </div>
 
             <!-- ALT SEKME 3: ŞİRKET İZİN ARŞİVİ -->
             <div id="hr-view-past" class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden space-y-4">
                 <div class="p-5 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <h3 class="font-bold text-slate-800 text-sm whitespace-nowrap">Şirket Genel İzin Geçmişi Arşivi</h3>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm whitespace-nowrap">Şirket Genel İzin Geçmişi Arşivi</h3>
+                        <p class="text-xs text-amber-600 font-medium mt-0.5">⚠️ Sadece son 1 aydaki onaylanan/reddedilen izin talepleri görüntülenir.</p>
+                    </div>
 
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto justify-start lg:justify-end">
+                        <select id="archive-timeframe-filter" onchange="filterHrPastLeavesTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-purple-500 cursor-pointer">
+                            <option value="1M" selected>Son 1 Ay (Maksimum)</option>
+                            <option value="2W">Son 2 Hafta</option>
+                            <option value="1W">Son 1 Hafta</option>
+                            <option value="1D">Son 1 Gün</option>
+                        </select>
+
                         <select id="archive-type-filter" onchange="filterHrPastLeavesTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-purple-500 cursor-pointer">
                             <option value="ALL">Tüm İzin Türleri</option>
                             <option value="1">Yıllık İzin</option>
                             <option value="3">Mazeret İzni</option>
                             <option value="5">Ücretsiz İzin</option>
+                            <option value="7">Hastalık / Rapor İzni</option>
                         </select>
 
                         <select id="archive-status-filter" onchange="filterHrPastLeavesTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-purple-500 cursor-pointer">
@@ -303,6 +317,7 @@
                             <tr class="bg-slate-100/70 text-slate-600 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
                                 <th class="px-6 py-3">Personel</th>
                                 <th class="px-6 py-3">İzin Türü</th>
+                                <th class="px-6 py-3">Talep Zamanı</th>
                                 <th class="px-6 py-3">Tarih Aralığı</th>
                                 <th class="px-6 py-3">Süre</th>
                                 <th class="px-6 py-3">Açıklama</th>
@@ -312,6 +327,7 @@
                         <tbody id="hr-past-leaves-tbody" class="divide-y divide-slate-100 text-slate-600"></tbody>
                     </table>
                 </div>
+                <div id="hr-past-pagination" class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500"></div>
             </div>
         </section>
     </main>
@@ -351,7 +367,7 @@
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">İzin Süresi</label>
                     <div class="grid grid-cols-3 gap-2.5">
                         <button type="button" id="btn-sure-0" onclick="selectSureTipi(0)" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-sky-500 bg-sky-50/30 text-sky-600 font-bold text-xs transition-all cursor-pointer gap-1.5 shadow-xs">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 0-2 2v12a2 2 0 002 2z" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                             <span>Tam Gün</span>
                         </button>
                         <button type="button" id="btn-sure-1" onclick="selectSureTipi(1)" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-600 font-semibold text-xs transition-all cursor-pointer gap-1.5 hover:border-slate-300">
@@ -359,7 +375,7 @@
                             <span>Yarım Gün</span>
                         </button>
                         <button type="button" id="btn-sure-3" onclick="selectSureTipi(3)" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-600 font-semibold text-xs transition-all cursor-pointer gap-1.5 hover:border-slate-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             <span>Kısa Süreli</span>
                         </button>
                     </div>
@@ -441,6 +457,11 @@
         let globalPastLeavesList = [];    // Geçmiş izinler ana listesi
         let myExistingLeavesList = [];
 
+        const PAGE_SIZE = 20;
+        let pageHrPersonel = 1;
+        let pageHrPending = 1;
+        let pageHrPast = 1;
+
         document.addEventListener("DOMContentLoaded", () => {
             const sessionData = localStorage.getItem("user_data");
             if (!sessionData) { window.location.href = "index.html"; return; }
@@ -468,6 +489,55 @@
             loadPersonalData();
             loadCompanyData();
         });
+
+        function formatDateTimeTrReadable(dateTimeStr) {
+            if (!dateTimeStr) return '-';
+            try {
+                const dateObj = new Date(dateTimeStr);
+                if (isNaN(dateObj.getTime())) return dateTimeStr;
+                return dateObj.toLocaleString('tr-TR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return dateTimeStr;
+            }
+        }
+
+        function renderPaginationControls(containerId, currentPage, totalItems, onPageChange) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+            if (totalItems <= PAGE_SIZE) {
+                container.innerHTML = `<span class="text-slate-400">Toplam ${totalItems} kayıt gösteriliyor</span>`;
+                return;
+            }
+
+            const startIdx = (currentPage - 1) * PAGE_SIZE + 1;
+            const endIdx = Math.min(currentPage * PAGE_SIZE, totalItems);
+
+            let buttonsHtml = '';
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    buttonsHtml += `<button class="w-7 h-7 rounded-lg bg-[#0b1329] text-white font-bold text-xs">${i}</button>`;
+                } else {
+                    buttonsHtml += `<button onclick="${onPageChange}(${i})" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all">${i}</button>`;
+                }
+            }
+
+            container.innerHTML = `
+                    <span>Gösterilen: <b>${startIdx}-${endIdx}</b> / Toplam: <b>${totalItems}</b></span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="${onPageChange}(${Math.max(1, currentPage - 1)})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&lt;</button>
+                        ${buttonsHtml}
+                        <button onclick="${onPageChange}(${Math.min(totalPages, currentPage + 1)})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&gt;</button>
+                    </div>
+                `;
+        }
 
         // MOD DEĞİŞTİRME MANTIĞI
         function openMode(mode) {
@@ -518,7 +588,7 @@
             noMsg.classList.add("hidden");
 
             leaves.forEach(l => {
-                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : "Yıllık İzin";
+                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : l.kategori === 7 ? "Hastalık / Rapor İzni" : "Yıllık İzin";
                 let statusBadge = l.durum === 2
                     ? `<span class="px-2 py-0.5 font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">Onaylandı</span>`
                     : l.durum === 3
@@ -535,13 +605,13 @@
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                            <td class="px-6 py-3 font-semibold text-slate-800">${katText}</td>
-                            <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
-                            <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
-                            <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
-                            <td class="px-6 py-3">${statusBadge}</td>
-                            <td class="px-6 py-3 text-right">${cancelBtn}</td>
-                        `;
+                                <td class="px-6 py-3 font-semibold text-slate-800">${katText}</td>
+                                <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                                <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
+                                <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                                <td class="px-6 py-3">${statusBadge}</td>
+                                <td class="px-6 py-3 text-right">${cancelBtn}</td>
+                            `;
                 tbody.appendChild(tr);
             });
         }
@@ -716,14 +786,20 @@
                 }
             } catch (e) { console.error(e); }
 
-            // 3. Geçmiş Arşiv
+            // 3. Geçmiş Arşiv (Sadece Onaylı '2' ve Reddedilen '3' veriler filtrelenir)
             try {
                 const pastRes = await fetch(`/api/auth/get-past-leaves/${managerId}`);
                 if (pastRes.ok) {
-                    globalPastLeavesList = await pastRes.json();
+                    const allPast = await pastRes.json();
+                    globalPastLeavesList = allPast.filter(l => l.durum === 2 || l.durum === 3);
                     filterHrPastLeavesTable();
                 }
             } catch (e) { console.error(e); }
+        }
+
+        function changeHrPersonelPage(newPage) {
+            pageHrPersonel = newPage;
+            filterHrPersonelTable();
         }
 
         // PERSONEL LİSTESİ FİLTRELEME
@@ -775,7 +851,13 @@
             document.getElementById("hr-role-filter").value = "ALL";
             document.getElementById("hr-leave-quota-filter").value = "ALL";
             document.getElementById("hr-tenure-filter").value = "ALL";
+            pageHrPersonel = 1;
             filterHrPersonelTable();
+        }
+
+        function changeHrPendingPage(newPage) {
+            pageHrPending = newPage;
+            filterHrPendingLeavesTable();
         }
 
         // ONAY BEKLEYEN TALEPLERİ FİLTRELEME
@@ -794,30 +876,43 @@
             tbody.innerHTML = "";
 
             if (!list || list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Şu anda onay bekleyen herhangi bir izin talebi bulunmuyor.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Şu anda onay bekleyen herhangi bir izin talebi bulunmuyor.</td></tr>`;
+                renderPaginationControls("hr-pending-pagination", 1, 0, "changeHrPendingPage");
                 return;
             }
 
-            list.forEach(l => {
-                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : "Yıllık İzin";
+            const start = (pageHrPending - 1) * PAGE_SIZE;
+            const paginatedList = list.slice(start, start + PAGE_SIZE);
+
+            paginatedList.forEach(l => {
+                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : l.kategori === 7 ? "Hastalık / Rapor İzni" : "Yıllık İzin";
+                const createdTimeStr = formatDateTimeTrReadable(l.olusturulmaTarihi || l.OlusturulmaTarihi);
 
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                            <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
-                            <td class="px-6 py-3 text-slate-600">${katText}</td>
-                            <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
-                            <td class="px-6 py-3 font-bold text-sky-600">${l.gun} Gün</td>
-                            <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
-                            <td class="px-6 py-3 text-right">
-                                <span class="px-2.5 py-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 rounded-full inline-flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
-                                    Yönetici Onayı Bekliyor
-                                </span>
-                            </td>
-                        `;
+                                <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
+                                <td class="px-6 py-3 text-slate-600">${katText}</td>
+                                <td class="px-6 py-3 font-mono text-slate-500 font-medium">${createdTimeStr}</td>
+                                <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                                <td class="px-6 py-3 font-bold text-sky-600">${l.gun} Gün</td>
+                                <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                                <td class="px-6 py-3 text-right">
+                                    <span class="px-2.5 py-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 rounded-full inline-flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+                                        Yönetici Onayı Bekliyor
+                                    </span>
+                                </td>
+                            `;
                 tbody.appendChild(tr);
             });
+
+            renderPaginationControls("hr-pending-pagination", pageHrPending, list.length, "changeHrPendingPage");
+        }
+
+        function changeHrPastPage(newPage) {
+            pageHrPast = newPage;
+            filterHrPastLeavesTable();
         }
 
         // ARŞİV FİLTRELEME MANTIĞI
@@ -825,13 +920,34 @@
             const search = document.getElementById("archive-search").value.trim().toLowerCase('tr');
             const selectedType = document.getElementById("archive-type-filter").value;
             const selectedStatus = document.getElementById("archive-status-filter").value;
+            const timeframe = document.getElementById("archive-timeframe-filter")?.value || "1M";
+
+            const now = new Date();
+            let daysLimit = 30;
+            if (timeframe === "2W") daysLimit = 14;
+            else if (timeframe === "1W") daysLimit = 7;
+            else if (timeframe === "1D") daysLimit = 1;
+
+            const cutoffDate = new Date();
+            cutoffDate.setDate(now.getDate() - daysLimit);
 
             let filtered = globalPastLeavesList.filter(l => {
                 const searchMatch = (l.ad || "").toLowerCase('tr').includes(search) || (l.aciklama || "").toLowerCase('tr').includes(search);
                 const typeMatch = (selectedType === "ALL") || (l.kategori.toString() === selectedType);
                 const statusMatch = (selectedStatus === "ALL") || (l.durum.toString() === selectedStatus);
 
-                return searchMatch && typeMatch && statusMatch;
+                let matchesTimeframe = true;
+                const itemDateStr = l.olusturulmaTarihi || l.OlusturulmaTarihi || l.baslangic;
+                if (itemDateStr) {
+                    const itemDate = new Date(itemDateStr);
+                    if (!isNaN(itemDate.getTime())) {
+                        if (itemDate < cutoffDate) {
+                            matchesTimeframe = false;
+                        }
+                    }
+                }
+
+                return searchMatch && typeMatch && statusMatch && matchesTimeframe;
             });
 
             renderHrPastLeavesTable(filtered);
@@ -841,6 +957,8 @@
             document.getElementById("archive-search").value = "";
             document.getElementById("archive-type-filter").value = "ALL";
             document.getElementById("archive-status-filter").value = "ALL";
+            if (document.getElementById("archive-timeframe-filter")) document.getElementById("archive-timeframe-filter").value = "1M";
+            pageHrPast = 1;
             filterHrPastLeavesTable();
         }
 
@@ -850,10 +968,14 @@
 
             if (!list || list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Aranan kriterlere uygun çalışan bulunamadı.</td></tr>`;
+                renderPaginationControls("hr-personel-pagination", 1, 0, "changeHrPersonelPage");
                 return;
             }
 
-            list.forEach(p => {
+            const start = (pageHrPersonel - 1) * PAGE_SIZE;
+            const paginatedList = list.slice(start, start + PAGE_SIZE);
+
+            paginatedList.forEach(p => {
                 const isIK = (p.rolId === "2" || p.rol === "İnsan Kaynakları");
                 const badge = isIK
                     ? `<span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-purple-50 text-purple-700 border border-purple-200">İnsan Kaynakları</span>`
@@ -862,14 +984,16 @@
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                            <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
-                            <td class="px-6 py-3">${badge}</td>
-                            <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
-                            <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün</td>
-                            <td class="px-6 py-3 text-right font-mono text-slate-500">${p.iseBaslamaTarihi || '-'}</td>
-                        `;
+                                <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
+                                <td class="px-6 py-3">${badge}</td>
+                                <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
+                                <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün</td>
+                                <td class="px-6 py-3 text-right font-mono text-slate-500">${p.iseBaslamaTarihi || '-'}</td>
+                            `;
                 tbody.appendChild(tr);
             });
+
+            renderPaginationControls("hr-personel-pagination", pageHrPersonel, list.length, "changeHrPersonelPage");
         }
 
         function renderHrPastLeavesTable(list) {
@@ -877,28 +1001,37 @@
             tbody.innerHTML = "";
 
             if (!list || list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Aranan kriterlere uygun geçmiş izin kaydı bulunamadı.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Aranan kriterlere uygun geçmiş izin kaydı bulunamadı.</td></tr>`;
+                renderPaginationControls("hr-past-pagination", 1, 0, "changeHrPastPage");
                 return;
             }
 
-            list.forEach(l => {
-                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : "Yıllık İzin";
+            const start = (pageHrPast - 1) * PAGE_SIZE;
+            const paginatedList = list.slice(start, start + PAGE_SIZE);
+
+            paginatedList.forEach(l => {
+                let katText = l.kategori === 3 ? "Mazeret İzni" : l.kategori === 5 ? "Ücretsiz İzin" : l.kategori === 7 ? "Hastalık / Rapor İzni" : "Yıllık İzin";
                 let statusBadge = l.durum === 2
                     ? `<span class="px-2.5 py-0.5 font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">Onaylandı</span>`
                     : `<span class="px-2.5 py-0.5 font-bold text-[10px] bg-rose-50 text-rose-700 border border-rose-200 rounded-full">Reddedildi</span>`;
 
+                const createdTimeStr = formatDateTimeTrReadable(l.olusturulmaTarihi || l.OlusturulmaTarihi);
+
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                            <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
-                            <td class="px-6 py-3 text-slate-500">${katText}</td>
-                            <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
-                            <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
-                            <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
-                            <td class="px-6 py-3 text-right">${statusBadge}</td>
-                        `;
+                                <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
+                                <td class="px-6 py-3 text-slate-500">${katText}</td>
+                                <td class="px-6 py-3 font-mono text-slate-500 font-medium">${createdTimeStr}</td>
+                                <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                                <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
+                                <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                                <td class="px-6 py-3 text-right">${statusBadge}</td>
+                            `;
                 tbody.appendChild(tr);
             });
+
+            renderPaginationControls("hr-past-pagination", pageHrPast, list.length, "changeHrPastPage");
         }
 
         // YENİ PERSONEL/İK KAYDETME
