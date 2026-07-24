@@ -24,7 +24,8 @@
     <header class="bg-[#0b1329] text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="logo.png" alt="İzinPort Logo" class="h-9 w-auto object-contain">
+                <!-- BÜYÜTÜLMÜŞ DERECE YUVARLAK LOGO (h-12 w-12) -->
+                <img src="logo.png" alt="İzinPort Logo" class="h-12 w-12 rounded-full object-cover shadow-md">
                 <div>
                     <h1 class="font-bold text-base tracking-tight text-white">İzinPort</h1>
                     <span class="text-[10px] font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded uppercase tracking-wider">İnsan Kaynakları Paneli</span>
@@ -339,7 +340,7 @@
     </main>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 1: YENİ İZİN TALEBİ OLUŞTURMA (RAPOR YÜKLEMELİ + SCROLL DÜZELTMELİ) -->
+    <!-- MODAL 1: YENİ İZİN TALEBİ OLUŞTURMA -->
     <!-- ========================================================================= -->
     <div id="leave-request-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl p-6 sm:p-8 space-y-5 border border-slate-100 relative my-auto">
@@ -469,6 +470,27 @@
         </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- MODAL 3: ÖZELLEŞTİRİLMİŞ İZİN BOZMA ONAY PENCERESİ -->
+    <!-- ========================================================================= -->
+    <div id="cancel-confirm-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4 border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-800">İzin Talebini Boz</h3>
+                <p class="text-xs text-slate-500 mt-1">Bu izin talebini henüz 5 dakikalık süreniz dolmadan geri çekip bozmak istediğinize emin misiniz?</p>
+            </div>
+            <div class="flex items-center gap-2 pt-2">
+                <button onclick="closeCancelConfirmModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition-all cursor-pointer">Vazgeç</button>
+                <button id="confirm-cancel-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-red-600/10 transition-all cursor-pointer">Evet, Boz</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT MANTIĞI VE ENTEGRASYON -->
     <script>
         let currentUser = null;
@@ -483,6 +505,9 @@
         let pageHrPersonel = 1;
         let pageHrPending = 1;
         let pageHrPast = 1;
+
+        let activeIntervalsGlobal = {};
+        let targetCancelLeaveId = null;
 
         document.addEventListener("DOMContentLoaded", () => {
             const sessionData = localStorage.getItem("user_data");
@@ -552,13 +577,13 @@
             }
 
             container.innerHTML = `
-                    <span>Gösterilen: <b>${startIdx}-${endIdx}</b> / Toplam: <b>${totalItems}</b></span>
-                    <div class="flex items-center gap-1">
-                        <button onclick="${onPageChange}(${Math.max(1, currentPage - 1)})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&lt;</button>
-                        ${buttonsHtml}
-                        <button onclick="${onPageChange}(${Math.min(totalPages, currentPage + 1)})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&gt;</button>
-                    </div>
-                `;
+                            <span>Gösterilen: <b>${startIdx}-${endIdx}</b> / Toplam: <b>${totalItems}</b></span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="${onPageChange}(${Math.max(1, currentPage - 1)})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&lt;</button>
+                                ${buttonsHtml}
+                                <button onclick="${onPageChange}(${Math.min(totalPages, currentPage + 1)})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&gt;</button>
+                            </div>
+                        `;
         }
 
         // MOD DEĞİŞTİRME MANTIĞI
@@ -598,10 +623,45 @@
             } catch (e) { console.error(e); }
         }
 
+        // 5 DAKİKALIK GERİ SAYAÇ
+        function BerkleyCountdownTimer(leaveId, createdDateStr) {
+            if (activeIntervalsGlobal[leaveId]) clearInterval(activeIntervalsGlobal[leaveId]);
+
+            const createdTime = new Date(createdDateStr).getTime();
+            const timerSpan = document.getElementById(`timer-${leaveId}`);
+
+            function updateClock() {
+                const now = new Date().getTime();
+                const elapsed = now - createdTime;
+                const limitMs = 5 * 60 * 1000;
+                const remaining = limitMs - elapsed;
+
+                if (remaining <= 0) {
+                    clearInterval(activeIntervalsGlobal[leaveId]);
+                    const container = document.getElementById(`action-container-${leaveId}`);
+                    if (container) container.innerHTML = `<span class="text-[11px] text-slate-400 font-medium">Bozma Süresi Doldu</span>`;
+                } else {
+                    const totalSecs = Math.floor(remaining / 1000);
+                    const mins = Math.floor(totalSecs / 60);
+                    const secs = totalSecs % 60;
+                    if (timerSpan) {
+                        timerSpan.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    }
+                }
+            }
+
+            updateClock();
+            activeIntervalsGlobal[leaveId] = setInterval(updateClock, 1000);
+        }
+
+        // KENDİ İZİN TALEPLERİM TABLOSU (PERSONEL İLE TAM BİREBİR AYNISI)
         function renderMyLeavesTable(leaves) {
             const tbody = document.getElementById("my-leaves-tbody");
             const noMsg = document.getElementById("no-my-leaves-msg");
             tbody.innerHTML = "";
+
+            Object.keys(activeIntervalsGlobal).forEach(k => clearInterval(activeIntervalsGlobal[k]));
+            activeIntervalsGlobal = {};
 
             if (!leaves || leaves.length === 0) {
                 noMsg.classList.remove("hidden");
@@ -616,40 +676,69 @@
                     : l.durum === 3
                         ? `<span class="px-2 py-0.5 font-bold text-[10px] bg-rose-50 text-rose-700 border border-rose-200 rounded-full">Reddedildi</span>`
                         : l.durum === 4
-                            ? `<span class="px-2 py-0.5 font-bold text-[10px] bg-amber-50 text-amber-700 border border-amber-200 rounded-full">İptal Edildi</span>`
+                            ? `<span class="px-2 py-0.5 font-bold text-[10px] bg-amber-50 text-amber-700 border border-amber-200 rounded-full">Talebinizden Vazgeçtiniz</span>`
                             : `<span class="px-2 py-0.5 font-bold text-[10px] bg-sky-50 text-sky-700 border border-sky-200 rounded-full">Beklemede</span>`;
 
-                let cancelBtn = "";
+                let cancelBtn = `<span class="text-xs text-slate-400 font-medium">-</span>`;
                 if (l.durum === 1) {
-                    cancelBtn = `<button onclick="cancelMyLeave(${l.id})" class="text-xs text-rose-600 hover:underline font-semibold cursor-pointer">İptal Et</button>`;
+                    cancelBtn = `
+                                <div class="flex items-center justify-end gap-2" id="action-container-${l.id}">
+                                    <span id="timer-${l.id}" class="text-xs font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg border border-red-100">05:00</span>
+                                    <button id="btn-boz-${l.id}" onclick="promptCancelMyLeave(${l.id})" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg shadow-sm shadow-red-600/10 transition-all cursor-pointer">İzin Boz</button>
+                                </div>
+                            `;
                 }
 
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                                <td class="px-6 py-3 font-semibold text-slate-800">${katText}</td>
-                                <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
-                                <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
-                                <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
-                                <td class="px-6 py-3">${statusBadge}</td>
-                                <td class="px-6 py-3 text-right">${cancelBtn}</td>
-                            `;
+                            <td class="px-6 py-3 font-semibold text-slate-800">${katText}</td>
+                            <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                            <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
+                            <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                            <td class="px-6 py-3">${statusBadge}</td>
+                            <td class="px-6 py-3 text-right">${cancelBtn}</td>
+                        `;
                 tbody.appendChild(tr);
+
+                const createdTimeStr = l.olusturulmaTarihi || l.OlusturulmaTarihi || l.createdDate;
+                if (l.durum === 1 && createdTimeStr) {
+                    BerkleyCountdownTimer(l.id, createdTimeStr);
+                }
             });
         }
 
-        async function cancelMyLeave(leaveId) {
-            if (!confirm("Bu izin talebinizi iptal etmek istediğinize emin misiniz?")) return;
+        // ÖZELLEŞTİRİLMİŞ İZİN BOZMA MODALINI AÇ
+        function promptCancelMyLeave(leaveId) {
+            targetCancelLeaveId = leaveId;
+            const modal = document.getElementById("cancel-confirm-modal");
+            const confirmBtn = document.getElementById("confirm-cancel-btn");
+
+            confirmBtn.onclick = () => {
+                closeCancelConfirmModal();
+                executeCancelMyLeave(leaveId);
+            };
+
+            modal.classList.remove("hidden");
+        }
+
+        function closeCancelConfirmModal() {
+            document.getElementById("cancel-confirm-modal").classList.add("hidden");
+            targetCancelLeaveId = null;
+        }
+
+        async function executeCancelMyLeave(leaveId) {
             try {
                 const res = await fetch(`/api/auth/cancel-leave/${leaveId}`, { method: 'POST' });
                 if (res.ok) {
-                    showNotification("İzin talebi başarıyla iptal edildi.", true);
+                    showNotification("İzin talebiniz başarıyla bozuldu ve iptal edildi.", true);
+                    if (activeIntervalsGlobal[leaveId]) clearInterval(activeIntervalsGlobal[leaveId]);
                     loadPersonalData();
                 } else {
                     const txt = await res.text();
                     showNotification("Hata: " + txt);
                 }
-            } catch (e) { showNotification("Sunucu hatası."); }
+            } catch (e) { showNotification("Sunucu hatası oluştu."); }
         }
 
         // RAPOR DOSYA SEÇİMİ VE KATEGORİ DEĞİŞİMİ MANTIĞI
@@ -680,7 +769,6 @@
                 const file = fileInput.files[0];
                 const validTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
 
-                // Sadece PDF veya Resim Kontrolü
                 if (!validTypes.includes(file.type)) {
                     showModalAlert("Lütfen sadece PDF veya Resim (PNG, JPG) formatında bir dosya seçiniz!");
                     fileInput.value = "";
@@ -689,7 +777,6 @@
                     return;
                 }
 
-                // Maksimum 5MB Boyut Kontrolü
                 if (file.size > 5 * 1024 * 1024) {
                     showModalAlert("Dosya boyutu maksimum 5 MB olabilir!");
                     fileInput.value = "";
@@ -1010,19 +1097,19 @@
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                                <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
-                                <td class="px-6 py-3 text-slate-600">${katText}</td>
-                                <td class="px-6 py-3 font-mono text-slate-500 font-medium">${createdTimeStr}</td>
-                                <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
-                                <td class="px-6 py-3 font-bold text-sky-600">${l.gun} Gün</td>
-                                <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
-                                <td class="px-6 py-3 text-right">
-                                    <span class="px-2.5 py-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 rounded-full inline-flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
-                                        Yönetici Onayı Bekliyor
-                                    </span>
-                                </td>
-                            `;
+                        <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
+                        <td class="px-6 py-3 text-slate-600">${katText}</td>
+                        <td class="px-6 py-3 font-mono text-slate-500 font-medium">${createdTimeStr}</td>
+                        <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                        <td class="px-6 py-3 font-bold text-sky-600">${l.gun} Gün</td>
+                        <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                        <td class="px-6 py-3 text-right">
+                            <span class="px-2.5 py-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 rounded-full inline-flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+                                Yönetici Onayı Bekliyor
+                            </span>
+                        </td>
+                    `;
                 tbody.appendChild(tr);
             });
 
@@ -1103,12 +1190,12 @@
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                                <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
-                                <td class="px-6 py-3">${badge}</td>
-                                <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
-                                <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün</td>
-                                <td class="px-6 py-3 text-right font-mono text-slate-500">${p.iseBaslamaTarihi || '-'}</td>
-                            `;
+                        <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
+                        <td class="px-6 py-3">${badge}</td>
+                        <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
+                        <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün</td>
+                        <td class="px-6 py-3 text-right font-mono text-slate-500">${p.iseBaslamaTarihi || '-'}</td>
+                    `;
                 tbody.appendChild(tr);
             });
 
@@ -1139,14 +1226,14 @@
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                                <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
-                                <td class="px-6 py-3 text-slate-500">${katText}</td>
-                                <td class="px-6 py-3 font-mono text-slate-500 font-medium">${createdTimeStr}</td>
-                                <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
-                                <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
-                                <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
-                                <td class="px-6 py-3 text-right">${statusBadge}</td>
-                            `;
+                        <td class="px-6 py-3 font-semibold text-slate-800">${l.ad}</td>
+                        <td class="px-6 py-3 text-slate-500">${katText}</td>
+                        <td class="px-6 py-3 font-mono text-slate-500 font-medium">${createdTimeStr}</td>
+                        <td class="px-6 py-3 font-mono">${l.baslangic} / ${l.bitis}</td>
+                        <td class="px-6 py-3 font-bold text-slate-700">${l.gun} Gün</td>
+                        <td class="px-6 py-3 text-slate-500 max-w-xs truncate">${l.aciklama || '-'}</td>
+                        <td class="px-6 py-3 text-right">${statusBadge}</td>
+                    `;
                 tbody.appendChild(tr);
             });
 

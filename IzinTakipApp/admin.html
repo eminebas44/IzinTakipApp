@@ -247,8 +247,9 @@
 
         <div id="sidebar-inner" class="p-6 flex flex-col justify-between h-full overflow-y-auto w-full space-y-8">
             <div class="space-y-8">
+                <!-- LOGO ALANI (STANDART BÜYÜKLÜK VE GÖRÜNÜM) -->
                 <div class="flex flex-col items-center text-center select-none space-y-4 pb-6 border-b border-slate-800/60">
-                    <img src="logo.png" alt="İzinPort Logo" class="h-12 w-auto object-contain mx-auto">
+                    <img src="logo.png" alt="İzinPort Logo" class="h-24 w-24 rounded-full object-cover mx-auto shadow-md">
                     <h2 class="font-bold text-white text-lg tracking-tight sidebar-text">İzinPort</h2>
                 </div>
 
@@ -874,13 +875,13 @@
             }
 
             container.innerHTML = `
-                    <span>Gösterilen: <b>${startIdx}-${endIdx}</b> / Toplam: <b>${totalItems}</b></span>
-                    <div class="flex items-center gap-1">
-                        <button onclick="${onPageChange}(${Math.max(1, currentPage - 1)})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&lt;</button>
-                        ${buttonsHtml}
-                        <button onclick="${onPageChange}(${Math.min(totalPages, currentPage + 1)})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&gt;</button>
-                    </div>
-                `;
+                        <span>Gösterilen: <b>${startIdx}-${endIdx}</b> / Toplam: <b>${totalItems}</b></span>
+                        <div class="flex items-center gap-1">
+                            <button onclick="${onPageChange}(${Math.max(1, currentPage - 1)})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&lt;</button>
+                            ${buttonsHtml}
+                            <button onclick="${onPageChange}(${Math.min(totalPages, currentPage + 1)})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2 py-1 bg-slate-100 rounded-lg text-xs"' : 'class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700"'}>&gt;</button>
+                        </div>
+                    `;
         }
 
         function formatDateTimeTrReadable(dateTimeStr) {
@@ -1007,13 +1008,13 @@
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition-all";
                 tr.innerHTML = `
-                            <td class="px-4 py-3 whitespace-nowrap text-slate-500 text-[11px] font-semibold">${displayDate}</td>
-                            <td class="px-4 py-3 whitespace-nowrap"><span class="px-2 py-0.5 text-[10px] font-bold rounded border ${badgeClass}">${log.level}</span></td>
-                            <td class="px-4 py-3 text-slate-700 break-all text-[11px] leading-relaxed">
-                                ${log.message}
-                                ${log.exception ? `<div class="bg-red-50/80 border border-red-100 p-2 rounded-lg text-red-600 text-[10px] mt-1.5 font-mono overflow-x-auto max-h-24 leading-snug">${log.exception}</div>` : ''}
-                            </td>
-                        `;
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-500 text-[11px] font-semibold">${displayDate}</td>
+                                <td class="px-4 py-3 whitespace-nowrap"><span class="px-2 py-0.5 text-[10px] font-bold rounded border ${badgeClass}">${log.level}</span></td>
+                                <td class="px-4 py-3 text-slate-700 break-all text-[11px] leading-relaxed">
+                                    ${log.message}
+                                    ${log.exception ? `<div class="bg-red-50/80 border border-red-100 p-2 rounded-lg text-red-600 text-[10px] mt-1.5 font-mono overflow-x-auto max-h-24 leading-snug">${log.exception}</div>` : ''}
+                                </td>
+                            `;
                 tbody.appendChild(tr);
             });
         }
@@ -1156,11 +1157,11 @@
                 }
             } else {
                 box.innerHTML = `
-                            <div class="text-center py-8 px-4 space-y-2">
-                                <p class="text-xs font-bold text-red-500">Yüklenen rapor görseli veya dosyası bulunamadı.</p>
-                                <p class="text-[11px] text-slate-400">Rapor verisi veritabanında veya tarayıcı önbelleğinde bulunamadı.</p>
-                            </div>
-                        `;
+                                <div class="text-center py-8 px-4 space-y-2">
+                                    <p class="text-xs font-bold text-red-500">Yüklenen rapor görseli veya dosyası bulunamadı.</p>
+                                    <p class="text-[11px] text-slate-400">Rapor verisi veritabanında veya tarayıcı önbelleğinde bulunamadı.</p>
+                                </div>
+                            `;
             }
             modal.classList.remove("hidden");
         }
@@ -1241,10 +1242,10 @@
 
                     return {
                         html: `
-                                    <div class="leave-pill ${catClass}" title="${name}">
-                                        <span class="truncate font-semibold">${name}</span>
-                                    </div>
-                                `
+                                        <div class="leave-pill ${catClass}" title="${name}">
+                                            <span class="truncate font-semibold">${name}</span>
+                                        </div>
+                                    `
                     };
                 },
                 dateClick: function (info) {
@@ -1292,20 +1293,20 @@
                 const bitisTarihi = formatDateTrReadable(p.realEnd);
 
                 top3Container.innerHTML += `
-                            <div class="bg-slate-50 border border-slate-100 p-3.5 rounded-xl flex items-center justify-between shadow-xs hover:bg-slate-100 transition-all">
-                                <div class="space-y-1">
-                                    <h4 class="font-bold text-xs text-slate-800">${p.personelName || p.title}</h4>
-                                    <p class="text-[10px] font-semibold text-sky-600">${p.categoryName}</p>
-                                    <p class="text-[10px] font-medium text-slate-500 flex items-center gap-1.5 pt-0.5">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 002-2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>${baslangicTarihi} - ${bitisTarihi}</span>
-                                    </p>
+                                <div class="bg-slate-50 border border-slate-100 p-3.5 rounded-xl flex items-center justify-between shadow-xs hover:bg-slate-100 transition-all">
+                                    <div class="space-y-1">
+                                        <h4 class="font-bold text-xs text-slate-800">${p.personelName || p.title}</h4>
+                                        <p class="text-[10px] font-semibold text-sky-600">${p.categoryName}</p>
+                                        <p class="text-[10px] font-medium text-slate-500 flex items-center gap-1.5 pt-0.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 002-2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>${baslangicTarihi} - ${bitisTarihi}</span>
+                                        </p>
+                                    </div>
+                                    <span class="text-[10px] font-bold bg-slate-200/80 text-slate-700 px-2.5 py-1 rounded-lg self-start shrink-0">${p.duration} Gün</span>
                                 </div>
-                                <span class="text-[10px] font-bold bg-slate-200/80 text-slate-700 px-2.5 py-1 rounded-lg self-start shrink-0">${p.duration} Gün</span>
-                            </div>
-                        `;
+                            `;
             });
         }
 
@@ -1452,15 +1453,15 @@
                     : `<span class="inline-block px-2.5 py-0.5 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">Personel</span>`;
 
                 tr.innerHTML = `
-                            <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
-                            <td class="px-6 py-3">${rolBadge}</td>
-                            <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
-                            <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün${toplamMetin}</td>
-                            <td class="px-6 py-3 text-right space-x-1.5 whitespace-nowrap">
-                                <button onclick="openDetailModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Detay</button>
-                                <button onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')}, '${formattedDate}')" class="bg-sky-50 hover:bg-sky-100 text-sky-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Düzenle</button>
-                            </td>
-                        `;
+                                <td class="px-6 py-3 font-semibold text-slate-800">${p.ad}</td>
+                                <td class="px-6 py-3">${rolBadge}</td>
+                                <td class="px-6 py-3 text-slate-500">${p.eposta}</td>
+                                <td class="px-6 py-3 font-bold text-sky-600">${p.kalanIzin} Gün${toplamMetin}</td>
+                                <td class="px-6 py-3 text-right space-x-1.5 whitespace-nowrap">
+                                    <button onclick="openDetailModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Detay</button>
+                                    <button onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')}, '${formattedDate}')" class="bg-sky-50 hover:bg-sky-100 text-sky-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer">Düzenle</button>
+                                </td>
+                            `;
                 tbody.appendChild(tr);
             });
 
@@ -1643,23 +1644,23 @@
                 const rowBg = index % 2 === 0 ? "bg-white" : "bg-slate-100";
                 tr.className = `${rowBg} hover:bg-slate-200/60 transition-all`;
                 tr.innerHTML = `
-                            <td class="pl-6 py-3 w-10">
-                                <input type="checkbox" value="${t.id}" onchange="updateBulkActionBar()" class="pending-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 cursor-pointer">
-                            </td>
-                            <td class="px-4 py-3 font-semibold text-slate-800">${t.ad}</td>
-                            <td class="px-6 py-3 text-xs font-medium text-slate-400">${katMetni}</td>
-                            <td class="px-6 py-3 text-slate-500 text-xs font-mono font-medium">${createdTimeStr}</td>
-                            <td class="px-6 py-3 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
-                            <td class="px-6 py-3 font-bold text-slate-700">${t.gun} Gün</td>
-                            <td class="px-6 py-3 text-slate-500 text-xs max-w-[150px] truncate" title="${t.aciklama || ''}">${t.aciklama || '-'}</td>
-                            <td class="px-6 py-3 text-right whitespace-nowrap">
-                                <div id="action-buttons-${t.id}" class="inline-flex items-center gap-1.5">
-                                    ${raporBtn}
-                                    <button onclick="showApproveOptions(${t.id})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin onay seçeneklerini göster">Onayla</button>
-                                    <button onclick="openActionConfirmModal(false, false, false, ${t.id})" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin talebini reddet">Reddet</button>
-                                </div>
-                            </td>
-                        `;
+                                <td class="pl-6 py-3 w-10">
+                                    <input type="checkbox" value="${t.id}" onchange="updateBulkActionBar()" class="pending-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 cursor-pointer">
+                                </td>
+                                <td class="px-4 py-3 font-semibold text-slate-800">${t.ad}</td>
+                                <td class="px-6 py-3 text-xs font-medium text-slate-400">${katMetni}</td>
+                                <td class="px-6 py-3 text-slate-500 text-xs font-mono font-medium">${createdTimeStr}</td>
+                                <td class="px-6 py-3 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
+                                <td class="px-6 py-3 font-bold text-slate-700">${t.gun} Gün</td>
+                                <td class="px-6 py-3 text-slate-500 text-xs max-w-[150px] truncate" title="${t.aciklama || ''}">${t.aciklama || '-'}</td>
+                                <td class="px-6 py-3 text-right whitespace-nowrap">
+                                    <div id="action-buttons-${t.id}" class="inline-flex items-center gap-1.5">
+                                        ${raporBtn}
+                                        <button onclick="showApproveOptions(${t.id})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin onay seçeneklerini göster">Onayla</button>
+                                        <button onclick="openActionConfirmModal(false, false, false, ${t.id})" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin talebini reddet">Reddet</button>
+                                    </div>
+                                </td>
+                            `;
                 tbody.appendChild(tr);
             });
 
@@ -1842,10 +1843,10 @@
             if (!container) return;
 
             container.innerHTML = `
-                        <button onclick="openActionConfirmModal(true, true, false, ${talepId})" class="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin süresi personelin yıllık/mazeret izin kotasından düşülerek onaylanır.">İzne Yansıt</button>
-                        <button onclick="openActionConfirmModal(true, false, false, ${talepId})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="Personelin izin kotasından düşülmeden (özel/harici izin olarak) onaylanır.">Yansıtma</button>
-                        <button onclick="getPendingLeaves()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-2 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İşlemi İptal Et">✕</button>
-                    `;
+                            <button onclick="openActionConfirmModal(true, true, false, ${talepId})" class="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İzin süresi personelin yıllık/mazeret izin kotasından düşülerek onaylanır.">İzne Yansıt</button>
+                            <button onclick="openActionConfirmModal(true, false, false, ${talepId})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-2.5 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="Personelin izin kotasından düşülmeden (özel/harici izin olarak) onaylanır.">Yansıtma</button>
+                            <button onclick="getPendingLeaves()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-2 py-1.5 rounded-lg text-xs cursor-pointer shadow-xs transition-all" title="İşlemi İptal Et">✕</button>
+                        `;
         }
 
         async function getPastLeavesList() {
@@ -1900,14 +1901,14 @@
                 const rowBg = index % 2 === 0 ? "bg-white" : "bg-slate-100";
                 tr.className = `${rowBg} hover:bg-slate-200/60 transition-all`;
                 tr.innerHTML = `
-                            <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
-                            <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
-                            <td class="px-6 py-2.5 text-slate-500 text-xs font-mono font-medium">${createdTimeStr}</td>
-                            <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
-                            <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
-                            <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
-                            <td class="px-6 py-2.5 text-right"><span class="inline-block px-2.5 py-0.5 text-[11px] font-bold rounded-full border ${durumClass}">${durumText}</span></td>
-                        `;
+                                <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
+                                <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
+                                <td class="px-6 py-2.5 text-slate-500 text-xs font-mono font-medium">${createdTimeStr}</td>
+                                <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
+                                <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
+                                <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
+                                <td class="px-6 py-2.5 text-right"><span class="inline-block px-2.5 py-0.5 text-[11px] font-bold rounded-full border ${durumClass}">${durumText}</span></td>
+                            `;
                 tbody.appendChild(tr);
             });
 
@@ -2015,13 +2016,13 @@
                 const rowBg = index % 2 === 0 ? "bg-white" : "bg-slate-100";
                 tr.className = `${rowBg} hover:bg-slate-200/60 transition-all`;
                 tr.innerHTML = `
-                            <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
-                            <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
-                            <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
-                            <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
-                            <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
-                            <td class="px-6 py-2.5 text-right"><span class="inline-block px-3 py-0.5 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100">İzin Talebinden Vazgeçildi</span></td>
-                        `;
+                                <td class="px-6 py-2.5 font-semibold text-slate-800">${t.ad}</td>
+                                <td class="px-6 py-2.5 text-xs font-medium text-slate-500">${katMetni}</td>
+                                <td class="px-6 py-2.5 text-slate-500 text-xs font-mono">${t.baslangic} / ${t.bitis}</td>
+                                <td class="px-6 py-2.5 font-bold text-slate-700">${t.gun} Gün</td>
+                                <td class="px-6 py-2.5 text-slate-500 text-xs max-w-[180px] truncate" title="${t.aciklama}">${t.aciklama || '-'}</td>
+                                <td class="px-6 py-2.5 text-right"><span class="inline-block px-3 py-0.5 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100">İzin Talebinden Vazgeçildi</span></td>
+                            `;
                 cancelledTbody.appendChild(tr);
             });
 
