@@ -247,9 +247,9 @@
 
         <div id="sidebar-inner" class="p-6 flex flex-col justify-between h-full overflow-y-auto w-full space-y-8">
             <div class="space-y-8">
-                <!-- LOGO ALANI (STANDART BÜYÜKLÜK VE GÖRÜNÜM) -->
+                <!-- LOGO ALANI -->
                 <div class="flex flex-col items-center text-center select-none space-y-4 pb-6 border-b border-slate-800/60">
-                    <img src="logo.png" alt="İzinPort Logo" class="h-24 w-24 rounded-full object-cover mx-auto shadow-md">
+                    <img id="main-logo" src="logo.png" alt="İzinPort Logo" class="h-24 w-24 rounded-full object-cover mx-auto shadow-md transition-all duration-300">
                     <h2 class="font-bold text-white text-lg tracking-tight sidebar-text">İzinPort</h2>
                 </div>
 
@@ -906,6 +906,7 @@
             const sidebarInner = document.getElementById("sidebar-inner");
             const toggleIcon = document.getElementById("sidebar-toggle-icon");
             const texts = document.querySelectorAll(".sidebar-text");
+            const mainLogo = document.getElementById("main-logo");
 
             isSidebarCollapsed = !isSidebarCollapsed;
 
@@ -918,6 +919,11 @@
                 }
                 toggleIcon.classList.add("rotate-180");
                 texts.forEach(el => el.classList.add("hidden"));
+
+                if (mainLogo) {
+                    mainLogo.classList.remove("h-24", "w-24");
+                    mainLogo.classList.add("h-10", "w-10");
+                }
             } else {
                 sidebar.classList.remove("md:w-16");
                 sidebar.classList.add("md:w-64");
@@ -927,6 +933,11 @@
                 }
                 toggleIcon.classList.remove("rotate-180");
                 texts.forEach(el => el.classList.remove("hidden"));
+
+                if (mainLogo) {
+                    mainLogo.classList.remove("h-10", "w-10");
+                    mainLogo.classList.add("h-24", "w-24");
+                }
             }
 
             setTimeout(() => {

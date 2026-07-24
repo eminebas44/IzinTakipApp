@@ -614,3 +614,12 @@ The statement has been terminated.
 <logTime="2026-07-24 10:11:16.2500" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ayse celik, Rol: Personel" exception="" />
 <logTime="2026-07-24 10:12:05.0515" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
 <logTime="2026-07-24 10:15:48.1670" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-24 10:22:25.3769" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-24 10:28:02.8398" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: ayse celik, Rol: Personel" exception="" />
+<logTime="2026-07-24 10:29:08.8262" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-24 10:29:55.1344" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-24 10:34:24.2609" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Şirkete yeni çalışan tanımlandı. Adı: sultan arslan, E-posta: sultan@gmail.com, Rol: 0, Yönetici ID: 1008" exception="" />
+<logTime="2026-07-24 10:34:50.4729" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />
+<logTime="2026-07-24 10:35:13.6343" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: sultan arslan, Rol: Personel" exception="" />
+<logTime="2026-07-24 10:35:50.2855" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: aynur yilmaz, Rol: İnsan Kaynakları" exception="" />
+<logTime="2026-07-24 11:38:08.3882" level="INFO" logger="IzinTakip.API.Controllers.AuthController" message="Kullanıcı başarıyla sisteme giriş yaptı. Adı: emine bas, Rol: Yönetici" exception="" />

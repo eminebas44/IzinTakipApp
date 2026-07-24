@@ -24,7 +24,6 @@
     <header class="bg-[#0b1329] text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <!-- BÜYÜTÜLMÜŞ DERECE YUVARLAK LOGO (h-12 w-12) -->
                 <img src="logo.png" alt="İzinPort Logo" class="h-12 w-12 rounded-full object-cover shadow-md">
                 <div>
                     <h1 class="font-bold text-base tracking-tight text-white">İzinPort</h1>
@@ -719,10 +718,12 @@
                 executeCancelMyLeave(leaveId);
             };
 
+            document.body.classList.add("overflow-hidden");
             modal.classList.remove("hidden");
         }
 
         function closeCancelConfirmModal() {
+            document.body.classList.remove("overflow-hidden");
             document.getElementById("cancel-confirm-modal").classList.add("hidden");
             targetCancelLeaveId = null;
         }
@@ -965,11 +966,20 @@
 
         // ŞİRKET VERİLERİNİ YÜKLE (3 FARKLI ENDPOINT)
         async function loadCompanyData() {
-            // 1. Personeller
+            // 1. Personeller (A-Z Alfabetik Sıralamalı)
             try {
                 const res = await fetch(`/api/auth/get-personels/${managerId}`);
                 if (res.ok) {
-                    globalPersonelsList = await res.json();
+                    const personeller = await res.json();
+
+                    // Türkçe Karakter Duyarlı A-Z Sıralaması
+                    personeller.sort((a, b) => {
+                        const adA = a.ad || "";
+                        const adB = b.ad || "";
+                        return adA.localeCompare(adB, 'tr', { sensitivity: 'base' });
+                    });
+
+                    globalPersonelsList = personeller;
                     filterHrPersonelTable();
                 }
             } catch (e) { console.error(e); }
@@ -1317,16 +1327,24 @@
             const fileInput = document.getElementById("req-rapor-file");
             if (fileInput) fileInput.value = "";
             selectSureTipi(0);
+            document.body.classList.add("overflow-hidden");
             document.getElementById("leave-request-modal").classList.remove("hidden");
         }
 
         function closeLeaveRequestModal() {
             hideModalAlert();
+            document.body.classList.remove("overflow-hidden");
             document.getElementById("leave-request-modal").classList.add("hidden");
         }
 
-        function openNewPersonelModal() { document.getElementById("new-personel-modal").classList.remove("hidden"); }
-        function closeNewPersonelModal() { document.getElementById("new-personel-modal").classList.add("hidden"); }
+        function openNewPersonelModal() {
+            document.body.classList.add("overflow-hidden");
+            document.getElementById("new-personel-modal").classList.remove("hidden");
+        }
+        function closeNewPersonelModal() {
+            document.body.classList.remove("overflow-hidden");
+            document.getElementById("new-personel-modal").classList.add("hidden");
+        }
 
         function showNotification(msg, isSuccess = false) {
             const box = document.getElementById("alert-box");
